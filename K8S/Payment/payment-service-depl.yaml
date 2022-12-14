@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: payment-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store_payment
+      version: v01
+  template:
+    metadata:
+      labels:
+        app: store_payment
+        version: v01
+    spec:
+      containers:
+        - name: store_payment
+          image: cembo/store_payment:latest
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: store_payment
+  ports:
+    - name: store_payment
+      protocol: TCP
+      port: 80
+      targetPort: 80

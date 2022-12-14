@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Images\bird_cage.jpg" />
+    <None Include="wwwroot\Images\bulldozer.jpg" />
+    <None Include="wwwroot\Images\car.jpg" />
+    <None Include="wwwroot\Images\eggs.jpg" />
+    <None Include="wwwroot\Images\fender_strat.jpg" />
+    <None Include="wwwroot\Images\marshall_jcm800.jpg" />
+    <None Include="wwwroot\Images\onion.jpg" />
+    <None Include="wwwroot\Images\paint.jpg" />
+    <None Include="wwwroot\Images\shoes.jpg" />
+    <None Include="wwwroot\Images\shoe_laces.jpg" />
+    <None Include="wwwroot\Images\steering_wheel.jpg" />
+    <None Include="wwwroot\Images\tomato.jpg" />
+    <None Include="wwwroot\Images\toothbrush.jpg" />
+    <None Include="wwwroot\Images\truck.jpg" />
+    <None Include="wwwroot\Images\wheel.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Business\Business.csproj" />
+  </ItemGroup>
+
+</Project>

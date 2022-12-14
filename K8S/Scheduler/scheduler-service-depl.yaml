@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: scheduler-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store_scheduler
+      version: v01
+  template:
+    metadata:
+      labels:
+        app: store_scheduler
+        version: v01
+    spec:
+      containers:
+        - name: store_scheduler
+          image: cembo/store_scheduler:latest
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: store_scheduler
+  ports:
+    - name: store_scheduler
+      protocol: TCP
+      port: 80
+      targetPort: 80

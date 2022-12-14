@@ -1,0 +1,67 @@
+----------------------- DOCKER --------------------------------
+
+// run from ROOT 'Store' folder:
+
+docker build -t cembo/store_api_gateway -f api_gateway/Dockerfile .
+docker push cembo/store_ordering
+
+docker build -t cembo/store_identity -f services/identity/Dockerfile .
+docker push cembo/store_ordering
+
+docker build -t cembo/store_inventory -f services/inventory/Dockerfile .
+docker push cembo/store_inventory
+
+docker build -t cembo/store_ordering -f services/ordering/Dockerfile .
+docker push cembo/store_ordering
+
+----------------------- DELETE --------------------------------
+
+SERVICES:
+
+kubectl delete deployment api-gateway-service-depl
+kubectl delete deployment identity-service-depl
+kubectl delete deployment ordering-service-depl
+
+kubectl delete service api-gateway-service-clusterip-srv
+kubectl delete service identity-service-clusterip-srv
+kubectl delete service ordering-service-clusterip-srv
+
+DB:
+
+kubectl delete deployment identity-mssql-depl
+kubectl delete deployment ordering-mssql-depl
+
+kubectl delete service identity-mssql-clusterip-srv
+kubectl delete service ordering-mssql-clusterip-srv
+
+kubectl delete service identity-mssql-loadbalancer 
+kubectl delete service ordering-mssql-loadbalancer 
+
+kubectl delete pvc identity-mssql-claim
+kubectl delete pvc ordering-mssql-claim
+
+kubectl delete secret identity-mssql
+kubectl delete secret ordering-mssql
+
+----------------------- CREATE --------------------------------
+
+DB:
+
+kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+
+kubectl apply -f identity-pvc.yaml
+kubectl apply -f inventory-pvc.yaml
+kubectl apply -f ordering-pvc.yaml
+
+kubectl apply -f identity-mssql-depl.yaml
+kubectl apply -f inventory-mssql-depl.yaml
+kubectl apply -f ordering-mssql-depl.yaml
+
+SERVICES:
+
+kubectl apply -f api-gateway-service-depl.yaml
+kubectl apply -f identity-service-depl.yaml
+kubectl apply -f inventory-service-depl.yaml
+kubectl apply -f ordering-service-depl.yaml

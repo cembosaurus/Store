@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: identity-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store-identity
+      version: v01
+  template:
+    metadata:
+      labels:
+        app: store-identity
+        version: v01
+    spec:
+      containers:
+        - name: store-identity
+          image: cembo/store_identity:latest
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: store-identity
+  ports:
+    - name: store-identity
+      protocol: TCP
+      port: 80
+      targetPort: 80
