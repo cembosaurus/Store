@@ -1,10 +1,7 @@
-﻿using API_Gateway.HttpServices;
-using API_Gateway.HttpServices.Interfaces;
-using API_Gateway.Services.Identity.Interfaces;
+﻿using API_Gateway.Services.Identity.Interfaces;
 using Business.Identity.DTOs;
 using Business.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Gateway.Controllers.Identity

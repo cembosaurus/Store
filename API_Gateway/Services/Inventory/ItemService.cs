@@ -18,16 +18,9 @@ namespace API_Gateway.Services.Inventory
 
 
 
-        public async Task<IServiceResult<ItemReadDTO>> AddItem(ItemCreateDTO item)
+        public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = default)
         {
-            return await _httpItemService.AddItem(item);
-        }
-
-
-
-        public async Task<IServiceResult<ItemReadDTO>> DeleteItem(int id)
-        {
-            return await _httpItemService.DeleteItem(id);
+            return await _httpItemService.GetItems(itemIds);
         }
 
 
@@ -39,9 +32,16 @@ namespace API_Gateway.Services.Inventory
 
 
 
-        public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = null)
+        public async Task<IServiceResult<ItemReadDTO>> AddItem(ItemCreateDTO item)
         {
-            return await _httpItemService.GetItems(itemIds);
+            return await _httpItemService.AddItem(item);
+        }
+
+
+
+        public async Task<IServiceResult<ItemReadDTO>> DeleteItem(int id)
+        {
+            return await _httpItemService.DeleteItem(id);
         }
 
 

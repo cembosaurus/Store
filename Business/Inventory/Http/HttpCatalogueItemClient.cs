@@ -33,7 +33,7 @@ namespace Business.Inventory.Http
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(_baseUri),
+                RequestUri = new Uri(_baseUri + $"{(itemIds != null && itemIds.Any() ? "" : "/all")}"),
                 Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), Encoding.UTF8, "application/json")
             };
 
@@ -144,13 +144,13 @@ namespace Business.Inventory.Http
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_baseUri}/{itemId}")
+                RequestUri = new Uri($"{_baseUri}/{itemId}/extras")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> GETTING Catalogue item '{itemId}' with extras ....");
+            Console.WriteLine($"---> GETTING Catalogue item with extras '{itemId}' with extras ....");
 
             return await _httpClient.SendAsync(request);
         }
@@ -219,7 +219,7 @@ namespace Business.Inventory.Http
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_baseUri}/{itemId}/remove/{amount}")
+                RequestUri = new Uri($"{_baseUri}/{itemId}/fromstock/{amount}")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -237,7 +237,7 @@ namespace Business.Inventory.Http
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_baseUri}/{itemId}/add/{amount}")
+                RequestUri = new Uri($"{_baseUri}/{itemId}/tostock/{amount}")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

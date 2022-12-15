@@ -24,13 +24,25 @@ namespace Services.Inventory.Controllers
 
 
 
+
+        [Authorize(Policy = "Everyone")]
+        [HttpGet("all")]
+        public async Task<ActionResult> GetAllItemPrices()
+        {
+            var result = await _itemPriceService.GetItemPrices();
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
         [Authorize(Policy = "Everyone")]
         [HttpGet]
-        public async Task<ActionResult> GetItemPrices(IEnumerable<int> itemIds = default)
+        public async Task<ActionResult> GetItemPrices(IEnumerable<int> itemIds)
         {
             var result = await _itemPriceService.GetItemPrices(itemIds);
 
-            return Ok(result);
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
@@ -41,20 +53,9 @@ namespace Services.Inventory.Controllers
         {
             var result = await _itemPriceService.GetItemPriceById(itemId);
 
-            return Ok(result);
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
-
-
-
-        [Authorize(Policy = "Everyone")]
-        [HttpGet("foritems")]
-        public async Task<ActionResult> GetItemPricesByIds(IEnumerable<int> itemIds)
-        {
-            var result = await _itemPriceService.GetItemPricesByIds(itemIds);
-
-            return Ok(result);
-        }
 
 
 
@@ -64,7 +65,7 @@ namespace Services.Inventory.Controllers
         {
             var result = await _itemPriceService.UpdateItemPrice(itemId, itemPriceEditDTO);
 
-            return Ok(result);
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
     }

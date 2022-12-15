@@ -1,9 +1,9 @@
 ﻿using Business.Inventory.DTOs.CatalogueItem;
 using Business.Libraries.ServiceResult.Interfaces;
 
-namespace Inventory.Services.Interfaces
+namespace API_Gateway.HttpServices.Inventory.Interfaces
 {
-    public interface ICatalogueItemService
+    public interface IHttpCatalogueItemService
     {
         Task<IServiceResult<ExtrasReadDTO>> AddExtrasToCatalogueItem(int id, ExtrasAddDTO extrasAddDTO);
         Task<IServiceResult<int>> AddAmountToStock(int itemId, int amount);

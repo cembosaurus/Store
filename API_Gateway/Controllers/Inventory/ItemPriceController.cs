@@ -1,4 +1,5 @@
-﻿using Business.Inventory.DTOs.ItemPrice;
+﻿using API_Gateway.Services.Inventory.Interfaces;
+using Business.Inventory.DTOs.ItemPrice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,20 +13,36 @@ namespace API_Gateway.Controllers.Inventory
     {
 
         private readonly string _url;
+        private readonly IItemPriceService _itemPriceService;
 
-
-        public ItemPriceController(IConfiguration conf)
+        public ItemPriceController(IConfiguration conf, IItemPriceService itemPriceService)
         {
             _url = conf.GetSection("RemoteServices:InventoryService").Value + "/api/ItemPrice";
+            _itemPriceService = itemPriceService;
+        }
+
+
+
+
+
+        [Authorize(Policy = "Everyone")]
+        [HttpGet("all")]
+        public async Task<ActionResult> GetAllItemPrices()
+        {
+            var result = await _itemPriceService.GetItemPrices();
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
         [HttpGet]
-        public async Task<ActionResult> GetAllItemPrices()
+        public async Task<ActionResult> GetItemPrices(IEnumerable<int> itemIds)
         {
-            return new RedirectResult(url: _url, permanent: true, preserveMethod: true);
+            var result = await _itemPriceService.GetItemPrices(itemIds);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
@@ -34,16 +51,20 @@ namespace API_Gateway.Controllers.Inventory
         [HttpGet("{itemId}")]
         public async Task<ActionResult> GetItemPriceById(int itemId)
         {
-            return new RedirectResult(url: _url + $"/{itemId}", permanent: true, preserveMethod: true);
+            var result = await _itemPriceService.GetItemPriceById(itemId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
         [HttpPut("{itemId}")]
-        public async Task<ActionResult> EditItemPrice(int itemId)
+        public async Task<ActionResult> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceEditDTO)
         {
-            return new RedirectResult(url: _url + $"/{itemId}", permanent: true, preserveMethod: true);
+            var result = await _itemPriceService.UpdateItemPrice(itemId, itemPriceEditDTO);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
     }

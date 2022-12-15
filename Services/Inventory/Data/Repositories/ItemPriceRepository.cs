@@ -15,7 +15,7 @@ namespace Services.Inventory.Data
 
 
 
-        public async Task<IEnumerable<ItemPrice>> GetItemPrices(IEnumerable<int> itemIds = default)
+        public async Task<IEnumerable<ItemPrice>> GetItemPrices(IEnumerable<int> itemIds)
         {
             if (itemIds != null && itemIds.Any())
                 return await _context.ItemPrices
@@ -29,13 +29,6 @@ namespace Services.Inventory.Data
         public async Task<ItemPrice> GetItemPriceById(int id)
         {
             return await _context.ItemPrices.FirstOrDefaultAsync(i => i.ItemId == id);
-        }
-
-
-
-        public async Task<IEnumerable<ItemPrice>> GetItemPricesByIds(IEnumerable<int> ids)
-        {
-            return await _context.ItemPrices.Where(ip => ids.Contains(ip.ItemId)).ToListAsync();
         }
 
 

@@ -28,12 +28,12 @@ namespace Business.Inventory.Http
 
 
 
-        public async Task<HttpResponseMessage> GetItemPrices(IEnumerable<int> itemIds = default)
+        public async Task<HttpResponseMessage> GetItemPrices(IEnumerable<int> itemIds)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(_baseUri),
+                RequestUri = new Uri(_baseUri + $"{(itemIds != null && itemIds.Any() ? "" : "/all")}"),
                 Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), Encoding.UTF8, "application/json")
             };
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -63,27 +63,7 @@ namespace Business.Inventory.Http
 
 
 
-
-        public async Task<HttpResponseMessage> GetItemPricesByIds(IEnumerable<int> itemIds)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(_baseUri + "/foritems"),
-                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), Encoding.UTF8, "application/json")
-            };
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-
-            Console.WriteLine($"---> GETTING Item prices ....");
-
-            return await _httpClient.SendAsync(request);
-        }
-
-
-
-
-        public async Task<HttpResponseMessage> EditItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO)
+        public async Task<HttpResponseMessage> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO)
         {
             var request = new HttpRequestMessage
             {

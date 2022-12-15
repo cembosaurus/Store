@@ -26,6 +26,17 @@ namespace Services.Inventory.Controllers
 
         // GET:
         [Authorize(Policy = "Everyone")]
+        [HttpGet("all")]
+        public async Task<ActionResult> GetAllCatalogueItems()
+        {
+            var result = await _catalogueItemService.GetCatalogueItems();
+
+            return Ok(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]
         [HttpGet]
         public async Task<ActionResult> GetCatalogueItems(IEnumerable<int> itemIds)
         {
@@ -145,7 +156,7 @@ namespace Services.Inventory.Controllers
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpPut("{itemId}/remove/{amount}")]
+        [HttpPut("{itemId}/fromstock/{amount}")]
         public async Task<ActionResult> RemoveFromStockAmount(int itemId, int amount)
         {
             var result = await _catalogueItemService.RemoveFromStockAmount(itemId, amount);
@@ -156,10 +167,10 @@ namespace Services.Inventory.Controllers
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpPut("{itemId}/add/{amount}")]
-        public async Task<ActionResult> AddToStockAmount(int itemId, int amount)
+        [HttpPut("{itemId}/tostock/{amount}")]
+        public async Task<ActionResult> AddAmountToStock(int itemId, int amount)
         {
-            var result = await _catalogueItemService.AddToStockAmount(itemId, amount);
+            var result = await _catalogueItemService.AddAmountToStock(itemId, amount);
 
             return Ok(result);
         }

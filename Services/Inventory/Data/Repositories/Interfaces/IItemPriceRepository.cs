@@ -6,9 +6,8 @@ namespace Services.Inventory.Data.Repositories.Interfaces
 {
     public interface IItemPriceRepository: IBaseRepository
     {
-        Task<IEnumerable<ItemPrice>> GetItemPrices(IEnumerable<int> itemIds = default);
         Task<ItemPrice> GetItemPriceById(int id);
-        Task<IEnumerable<ItemPrice>> GetItemPricesByIds(IEnumerable<int> ids);
+        Task<IEnumerable<ItemPrice>> GetItemPrices(IEnumerable<int> itemIds);
         Task<bool> ItemExistsById(int id);
     }
 }

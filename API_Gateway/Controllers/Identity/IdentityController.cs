@@ -1,8 +1,5 @@
-﻿using API_Gateway.HttpServices.Interfaces;
-using API_Gateway.Models;
-using API_Gateway.Services.Identity.Interfaces;
+﻿using API_Gateway.Services.Identity.Interfaces;
 using Business.Identity.DTOs;
-using Business.Identity.Http.Clients.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

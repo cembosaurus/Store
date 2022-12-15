@@ -1,7 +1,5 @@
 ﻿using Business.Inventory.DTOs.Item;
 using Business.Inventory.Http.Interfaces;
-using Business.Libraries.Http.Interfaces;
-using Business.Libraries.ServiceResult;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
@@ -33,7 +31,7 @@ namespace Business.Inventory.Http
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(_baseUri),
+                RequestUri = new Uri(_baseUri + $"{(itemIds != null && itemIds.Any() ? "" : "/all")}"),
                 Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), Encoding.UTF8, "application/json")
             };
 

@@ -1,4 +1,4 @@
-﻿using API_Gateway.Services.Inventory;
+﻿using API_Gateway.Services.Inventory.Interfaces;
 using Business.Inventory.DTOs.Item;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +13,9 @@ namespace API_Gateway.Controllers.Inventory
     {
 
         private readonly string _url;
-        private readonly ItemService _itemService;
+        private readonly IItemService _itemService;
 
-        public ItemController(IConfiguration conf, ItemService itemService)
+        public ItemController(IConfiguration conf, IItemService itemService)
         {
             _url = conf.GetSection("RemoteServices:InventoryService").Value + "/api/Item";
             _itemService = itemService;
@@ -25,13 +25,25 @@ namespace API_Gateway.Controllers.Inventory
 
 
 
+
         [Authorize(Policy = "Everyone")]
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<ActionResult> GetAllItems()
         {
             var result = await _itemService.GetItems();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return Ok(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]
+        [HttpGet]
+        public async Task<ActionResult> GetItems(IEnumerable<int> itemIds)
+        {
+            var result = await _itemService.GetItems(itemIds);
+
+            return Ok(result);
         }
 
 

@@ -331,7 +331,7 @@ namespace Inventory.Services
 
 
 
-        public async Task<IServiceResult<int>> AddToStockAmount(int itemId, int amount)
+        public async Task<IServiceResult<int>> AddAmountToStock(int itemId, int amount)
         {
             if (amount < 0)
                 return _resultFact.Result(0, false, "Only positive number can be added to stock amount !");

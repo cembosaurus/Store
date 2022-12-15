@@ -10,9 +10,8 @@ namespace Business.Inventory.Http.Interfaces
 {
     public interface IHttpItemPriceClient
     {
-        Task<HttpResponseMessage> EditItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO);
         Task<HttpResponseMessage> GetItemPriceById(int itemId);
-        Task<HttpResponseMessage> GetItemPrices(IEnumerable<int> itemIds = null);
-        Task<HttpResponseMessage> GetItemPricesByIds(IEnumerable<int> itemIds);
+        Task<HttpResponseMessage> GetItemPrices(IEnumerable<int> itemIds);
+        Task<HttpResponseMessage> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO);
     }
 }

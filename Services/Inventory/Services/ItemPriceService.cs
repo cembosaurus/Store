@@ -25,19 +25,18 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<IEnumerable<ItemPriceReadDTO>>> GetItemPrices(IEnumerable<int> itemIds = default)
         {
-            if(itemIds == null || !itemIds.Any())
-                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, "Items Ids were NOT provided !");
-
-
             Console.WriteLine($"--> GETTING item prices ......");
 
 
             var itemPrices = await _repo.GetItemPrices(itemIds);
 
-            if (!itemPrices.Any())
+            if (itemPrices == null || !itemPrices.Any())
                 return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, "NO item prices found !");
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices), true);
+            return _resultFact.Result(
+                _mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices), 
+                true, 
+                $"{(itemIds == null ? "" : (itemIds.Count() > itemPrices.Count() ? $"Prices for {itemIds.Count() - itemPrices.Count()} items were not found ! Reason: Items may not be registered in catalogue." : ""))}");
         }
 
 
@@ -60,25 +59,6 @@ namespace Inventory.Services
             return _resultFact.Result(_mapper.Map<ItemPriceReadDTO>(itemPrice), true);
         }
 
-
-
-
-        public async Task<IServiceResult<IEnumerable<ItemPriceReadDTO>>> GetItemPricesByIds(IEnumerable<int> itemIds)
-        {
-            if (itemIds == null || !itemIds.Any())
-                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, "Items Ids were NOT provided !");
-
-
-            Console.WriteLine($"--> GETTING item prices ......");
-
-
-            var itemPrices = await _repo.GetItemPricesByIds(itemIds);
-
-            if (!itemPrices.Any())
-                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, "NO item prices found !");
-
-            return _resultFact.Result(_mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices), true, $"{(itemIds.Count() > itemPrices.Count() ? $"Prices for {itemIds.Count() - itemPrices.Count()} items were not found ! Reason: Items may not be registered in catalogue." : "")}");
-        }
 
 
 

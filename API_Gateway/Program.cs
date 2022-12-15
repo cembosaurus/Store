@@ -1,7 +1,11 @@
 using API_Gateway.HttpServices.Identity;
 using API_Gateway.HttpServices.Identity.Interfaces;
+using API_Gateway.HttpServices.Inventory;
+using API_Gateway.HttpServices.Inventory.Interfaces;
 using API_Gateway.Services.Identity;
 using API_Gateway.Services.Identity.Interfaces;
+using API_Gateway.Services.Inventory;
+using API_Gateway.Services.Inventory.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Clients;
 using Business.Identity.Http.Clients.Interfaces;
@@ -22,17 +26,22 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddTransient<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddTransient<IIdentityService, IdentityService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAddressService, AddressService>();
+builder.Services.AddTransient<IItemService, ItemService>();
+builder.Services.AddTransient<ICatalogueItemService, CatalogueItemService>();
+builder.Services.AddTransient<IItemPriceService, ItemPriceService>();
 
 builder.Services.AddTransient<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddTransient<IHttpUserService, HttpUserService>();
 builder.Services.AddTransient<IHttpAddressService, HttpAddressService>();
+builder.Services.AddTransient<IHttpItemService, HttpItemService>();
+builder.Services.AddTransient<IHttpCatalogueItemService, HttpCatalogueItemService>();
+builder.Services.AddTransient<IHttpItemPriceService, HttpItemPriceService>();
 
 builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>(client => {
     client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService").Value);
@@ -52,6 +61,7 @@ builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>(client => 
 builder.Services.AddHttpClient<IHttpUserClient, HttpUserClient>(client => {
     client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService").Value);
 });
+
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 

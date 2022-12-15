@@ -21,6 +21,19 @@ namespace Services.Inventory.Controllers
 
 
 
+
+
+        [Authorize(Policy = "Everyone")]
+        [HttpGet("all")]
+        public async Task<ActionResult> GetAllItems()
+        {
+            var result = await _itemService.GetItems();
+
+            return Ok(result);
+        }
+
+
+
         [Authorize(Policy = "Everyone")]
         [HttpGet]
         public async Task<ActionResult> GetItems(IEnumerable<int> itemIds)
