@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Business.Ordering.Http
 {
-    public class HttpCartClient : IHttpCartClient
+    public class HttpCartItemClient : IHttpCartItemClient
     {
         private static IJWTTokenStore _jwtTokenStore;
         private readonly HttpClient _httpClient;
@@ -19,10 +19,10 @@ namespace Business.Ordering.Http
 
         private static string _token => _accessor == null ? "" :
             _accessor.HttpContext?.Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "") ??
-            (_jwtTokenStore.IsExipred ? "" : _jwtTokenStore.Token) ?? 
+            (_jwtTokenStore.IsExipred ? "" : _jwtTokenStore.Token) ??
             "";
 
-        public HttpCartClient(HttpClient httpClient, IConfiguration config, IHttpContextAccessor accessor, IJWTTokenStore jwtTokenStore)
+        public HttpCartItemClient(HttpClient httpClient, IConfiguration config, IHttpContextAccessor accessor, IJWTTokenStore jwtTokenStore)
         {
             _jwtTokenStore = jwtTokenStore;
             _httpClient = httpClient;
@@ -33,131 +33,112 @@ namespace Business.Ordering.Http
 
 
 
-
-
-        public async Task<HttpResponseMessage> CreateCart(int userId)
+        public async Task<HttpResponseMessage> AddItemsToCart(int userId, IEnumerable<CartItemUpdateDTO> items)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_baseUri}")
+                RequestUri = new Uri($"{_baseUri}/{userId}/items"),
+                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), Encoding.UTF8, "application/json")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> CREATING cart for user '{userId}' ....");
+            Console.WriteLine($"---> ADDING items to cart '{userId}' ....");
 
             return await _httpClient.SendAsync(request);
         }
 
 
 
-        public async Task<HttpResponseMessage> ExistsCartByCartId(Guid cartId)
-        {
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_baseUri}/exists"),
-                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), Encoding.UTF8, "application/json")
-            };
-
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-
-            Console.WriteLine($"---> EXISTS cart '{cartId}' ....");
-
-            return await _httpClient.SendAsync(request);
-        }
-
-
-
-        public async Task<HttpResponseMessage> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
+        public async Task<HttpResponseMessage> DeleteExpiredCartItems(IEnumerable<CartItemsLockDeleteDTO> items)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
                 RequestUri = new Uri($"{_baseUri}/items/expired"),
-                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), Encoding.UTF8, "application/json")
+                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), Encoding.UTF8, "application/json")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> REMOVING expired items from carts ....");
+            Console.WriteLine($"---> DELETING expired cart items ....");
 
             return await _httpClient.SendAsync(request);
         }
 
 
 
-        public async Task<HttpResponseMessage> DeleteCart(int id)
+        public async Task<HttpResponseMessage> DeleteCartItems(int userId, IEnumerable<int> items)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri($"{_baseUri}/{id}")
+                RequestUri = new Uri($"{_baseUri}/{userId}/items/delete"),
+                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), Encoding.UTF8, "application/json")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> DELETING cart ....");
+            Console.WriteLine($"---> DELETING items from cart '{userId}' ....");
 
             return await _httpClient.SendAsync(request);
         }
 
 
 
-        public async Task<HttpResponseMessage> GetCards()
+        public async Task<HttpResponseMessage> GetAllCardItems()
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_baseUri}/all")
+                RequestUri = new Uri($"{_baseUri}/items/all")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> GETTING carts ....");
+            Console.WriteLine($"---> GETTING all cart items ....");
 
             return await _httpClient.SendAsync(request);
         }
 
 
 
-        public async Task<HttpResponseMessage> GetCartByUserId(int userId)
+        public async Task<HttpResponseMessage> GetCartItems(int userId)
         {
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_baseUri}/{userId}")
+                RequestUri = new Uri($"{_baseUri}/{userId}/items")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> GETTING cart '{userId}' ....");
+            Console.WriteLine($"---> GETTING cart items for cart '{userId}' ....");
 
             return await _httpClient.SendAsync(request);
         }
 
 
 
-        public async Task<HttpResponseMessage> UpdateCart(int userId, CartUpdateDTO cartUpdateDTO)
+        public async Task<HttpResponseMessage> RemoveCartItems(int cartId, IEnumerable<CartItemUpdateDTO> items)
         {
             var request = new HttpRequestMessage
             {
-                Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_baseUri}/{userId}"),
-                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartUpdateDTO }), Encoding.UTF8, "application/json")
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri($"{_baseUri}/{cartId}/items"),
+                Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), Encoding.UTF8, "application/json")
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            Console.WriteLine($"---> UPDATING cart '{userId}' ....");
+            Console.WriteLine($"---> REMOVING cart items from cart '{cartId}' ....");
 
             return await _httpClient.SendAsync(request);
         }

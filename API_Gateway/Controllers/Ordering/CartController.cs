@@ -1,6 +1,11 @@
-﻿using Business.Ordering.DTOs;
+﻿using API_Gateway.Models;
+using API_Gateway.Services.Ordering.Interfaces;
+using Business.Ordering.DTOs;
+using Business.Scheduler.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace API_Gateway.Controllers.Ordering
 {
@@ -11,11 +16,15 @@ namespace API_Gateway.Controllers.Ordering
     public class CartController : ControllerBase
     {
 
-        private readonly string _url;
+        private readonly int _principalId;
+        private readonly ICartService _cartService;
+        private readonly ICartItemService _cartIItemService;
 
-        public CartController(IConfiguration conf)
+        public CartController(IHttpContextAccessor accessor, ICartService cartService, ICartItemService cartIItemService)
         {
-            _url = conf.GetSection("RemoteServices:OrderingService").Value + "/api/cart";
+            int.TryParse(accessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out _principalId);
+            _cartService = cartService;
+            _cartIItemService = cartIItemService;
         }
 
 
@@ -23,48 +32,218 @@ namespace API_Gateway.Controllers.Ordering
 
 
 
-        [Authorize(Policy = "Everyone")]
-        [HttpGet]
+        // GET:
+
+        // Cart:
+
+        [Authorize(Policy = "Everyone")]            // management
+        [HttpGet("all")]
         public async Task<IActionResult> GetCarts()
         {
-            return new RedirectResult(url: _url, permanent: true, preserveMethod: true);
+            var result = await _cartService.GetCards();
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
-        [Authorize(Policy = "Everyone")]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCartById(int id)
+        [Authorize(Policy = "Everyone")]        // customer
+        [HttpGet]
+        public async Task<IActionResult> GetCart()
         {
-            return new RedirectResult(url: _url + $"/{id}", permanent: true, preserveMethod: true);
+            var result = await _cartService.GetCartByUserId(_principalId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
-        [Authorize(Policy = "Everyone")]
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> CreateCart(int userId)
+        [Authorize(Policy = "Everyone")]        // management
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUsersCart(int userId)
         {
-            return new RedirectResult(url: _url + $"/{userId}", permanent: true, preserveMethod: true);
+            var result = await _cartService.GetCartByUserId(userId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
-        [Authorize(Policy = "Everyone")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCart(int id)
+        // Cart Items:
+
+        [Authorize(Policy = "Everyone")]       // manager
+        [HttpGet("items/all")]
+        public async Task<IActionResult> GetAllCardItems()
         {
-            return new RedirectResult(url: _url + $"/{id}", permanent: true, preserveMethod: true);
+            var result = await _cartIItemService.GetAllCardItems();
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
 
-        [Authorize(Policy = "Everyone")]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCart(int id)
+        [Authorize(Policy = "Everyone")]        // customer
+        [HttpGet("items")]
+        public async Task<IActionResult> GetCartItems()
         {
-            return new RedirectResult(url: _url + $"/{id}", permanent: true, preserveMethod: true);
+            var result = await _cartIItemService.GetCartItems(_principalId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
         }
+
+
+
+        [Authorize(Policy = "Everyone")]        // manager
+        [HttpGet("{userId}/items")]
+        public async Task<IActionResult> GetUsersCartItems(int userId)
+        {
+            var result = await _cartIItemService.GetCartItems(userId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+
+        // POST:
+
+        // Cart:
+
+
+        [Authorize(Policy = "Everyone")]            // only customer
+        [HttpPost]
+        public async Task<IActionResult> CreateCart()
+        {
+            var result = await _cartService.CreateCart(_principalId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        // Cart Items:
+
+        [Authorize(Policy = "Everyone")]            // customer
+        [HttpPost("items")]
+        public async Task<IActionResult> AddItemsToCart([FromBody]IEnumerable<CartItemUpdateDTO> items)
+        {
+            var result = await _cartIItemService.AddItemsToCart(_principalId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]            // management
+        [HttpPost("{userId}/items")]
+        public async Task<IActionResult> AddItemsToUsersCart(int userId, IEnumerable<CartItemUpdateDTO> items)
+        {
+            var result = await _cartIItemService.AddItemsToCart(userId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+
+        // PUT:
+
+        // Cart:
+
+        [Authorize(Policy = "Everyone")]        // customer
+        [HttpPut]
+        public async Task<IActionResult> UpdateCart(CartUpdateDTO cartUpdateDTO)
+        {
+            var result = await _cartService.UpdateCart(_principalId, cartUpdateDTO);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]        // management
+        [HttpPut("{UserId}")]
+        public async Task<IActionResult> UpdateUsersCart(int userid, CartUpdateDTO cartUpdateDTO)
+        {
+            var result = await _cartService.UpdateCart(userid, cartUpdateDTO);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+
+        // DELETE:
+
+        // Cart:
+
+
+        [Authorize(Policy = "Everyone")]            // customer
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCart()
+        {
+            var result = await _cartService.DeleteCart(_principalId);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]            // management
+        [HttpDelete("{UserId}")]
+        public async Task<IActionResult> DeleteUsersCart(int userid)
+        {
+            var result = await _cartService.DeleteCart(userid);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        // Cart Items:
+
+        [Authorize(Policy = "Everyone")]            // customer
+        [HttpDelete("items")]
+        public async Task<IActionResult> RemoveCartItems(IEnumerable<CartItemUpdateDTO> items)
+        {
+            var result = await _cartIItemService.RemoveCartItems(_principalId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]            // management
+        [HttpDelete("{UserId}/items")]
+        public async Task<IActionResult> RemoveUsersCartItems(int userId, IEnumerable<CartItemUpdateDTO> items)
+        {
+            var result = await _cartIItemService.RemoveCartItems(userId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]            // customer
+        [HttpDelete("items/delete")]
+        public async Task<IActionResult> DeleteCartItems(IEnumerable<int> items)
+        {
+            var result = await _cartIItemService.DeleteCartItems(_principalId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [Authorize(Policy = "Everyone")]            // management
+        [HttpDelete("{UserId}/items/delete")]
+        public async Task<IActionResult> DeleteUsersCartItems(int userId, IEnumerable<int> items)
+        {
+            var result = await _cartIItemService.DeleteCartItems(userId, items);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
 
 
     }

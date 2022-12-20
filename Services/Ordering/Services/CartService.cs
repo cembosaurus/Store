@@ -14,13 +14,13 @@ namespace Ordering.Services
     {
 
         private readonly ICartRepository _cartRepo;
-        private readonly ICartItemsService _cartItemsService;
+        private readonly ICartItemService _cartItemsService;
         private readonly IHttpInventoryService _httpInventoryService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
         private readonly ICartBusinessLogic _cartBusinessLogic;
 
-        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService, ICartItemsService cartItemsService)
+        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService, ICartItemService cartItemsService)
         {
             _cartRepo = cartRepo;
             _cartItemsService = cartItemsService;

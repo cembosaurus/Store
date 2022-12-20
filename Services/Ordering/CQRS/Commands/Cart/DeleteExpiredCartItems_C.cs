@@ -48,9 +48,9 @@ namespace Ordering.CQRS.Commands.Cart
 
         public class DeleteExpiredCartItems_H : IRequestHandler<DeleteExpiredCartItems_C, IServiceResult<IEnumerable<CartItemsLockReadDTO>>>
         {
-            private readonly ICartItemsService _cartItemsService;
+            private readonly ICartItemService _cartItemsService;
 
-            public DeleteExpiredCartItems_H(ICartItemsService cartItemsService)
+            public DeleteExpiredCartItems_H(ICartItemService cartItemsService)
             {
                 _cartItemsService = cartItemsService;
             }

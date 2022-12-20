@@ -31,9 +31,9 @@ namespace Ordering.CQRS.Queries.Cart
         public class GetCartItems_H : IRequestHandler<GetCartItems_Q, IServiceResult<IEnumerable<CartItemReadDTO>>>
         {
 
-            private readonly ICartItemsService _cartItemsService;
+            private readonly ICartItemService _cartItemsService;
 
-            public GetCartItems_H(ICartItemsService cartItemsService)
+            public GetCartItems_H(ICartItemService cartItemsService)
             {
                 _cartItemsService = cartItemsService;
             }

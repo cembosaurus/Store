@@ -37,7 +37,6 @@ namespace Services.Ordering.Controllers
 
 
 
-
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpGet]
         public async Task<IActionResult> GetOrderByUserId([FromRoute] GetOrderByUserId_Q query)
@@ -70,6 +69,17 @@ namespace Services.Ordering.Controllers
 
             return result.Status ? Ok(result) : BadRequest(result);
         }
+
+        
+        [Authorize(Policy = "Everyone")]            // Management
+        [HttpGet("ordercode")]
+        public async Task<IActionResult> GetOrderByOrderCode([FromBody] GetOrderByOrderCode_Q query)
+        {
+            var result = await _mediator.Send(query);
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
 
 
 
@@ -116,7 +126,7 @@ namespace Services.Ordering.Controllers
 
 
         [Authorize(Policy = "Everyone")]        // Management
-        [HttpPut("user/{UserId}")]
+        [HttpPut("{UserId}")]
         public async Task<IActionResult> UpdateUsersOrder([FromRoute] UpdateOrder_C user, [FromBody] UpdateOrder_C command)
         {
             command.UserId = user.UserId;
@@ -167,7 +177,7 @@ namespace Services.Ordering.Controllers
 
 
         [Authorize(Policy = "Everyone")]            // Management
-        [HttpDelete("user/{UserId}")]
+        [HttpDelete("{UserId}")]
         public async Task<IActionResult> DeleteUsersOrder([FromRoute] DeleteOrder_C command)
         {
             var result = await _mediator.Send(command);

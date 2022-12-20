@@ -33,8 +33,6 @@
     <Folder Include="Controllers\StaticContent\" />
     <Folder Include="Controllers\Scheduler\" />
     <Folder Include="Controllers\Payment\" />
-    <Folder Include="HttpServices\Ordering\Interfaces\" />
-    <Folder Include="Services\Ordering\Interfaces\" />
   </ItemGroup>
 
 </Project>

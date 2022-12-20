@@ -54,10 +54,10 @@ namespace Ordering.CQRS.Commands.Cart
         public class AddItemsToCart_H : IRequestHandler<AddItemsToCart_C, IServiceResult<IEnumerable<CartItemReadDTO>>>
         {
 
-            private readonly ICartItemsService _cartItemsService;
+            private readonly ICartItemService _cartItemsService;
 
 
-            public AddItemsToCart_H(ICartItemsService cartItemsService)
+            public AddItemsToCart_H(ICartItemService cartItemsService)
             {
                 _cartItemsService = cartItemsService;
             }

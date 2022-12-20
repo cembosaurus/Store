@@ -54,9 +54,9 @@ namespace Ordering.CQRS.Commands.Cart
 
         public class RemoveCartItems_H : IRequestHandler<RemoveCartItems_C, IServiceResult<IEnumerable<CartItemReadDTO>>>
         {
-            private readonly ICartItemsService _cartItemsService;
+            private readonly ICartItemService _cartItemsService;
 
-            public RemoveCartItems_H(ICartItemsService cartItemsService)
+            public RemoveCartItems_H(ICartItemService cartItemsService)
             {
                 _cartItemsService = cartItemsService;
             }

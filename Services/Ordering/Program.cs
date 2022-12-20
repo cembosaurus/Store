@@ -53,7 +53,7 @@ builder.Services.AddDbContext<OrderingContext>(opt => opt.UseSqlServer(builder.C
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<ICartItemsService, CartItemsService>();
+builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IArchiveService, ArchiveService>();
 builder.Services.AddScoped<IHttpInventoryService, HttpInventoryService>();
 builder.Services.AddScoped<IHttpAddressService, HttpAddressService>();

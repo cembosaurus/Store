@@ -12,9 +12,9 @@ namespace Ordering.CQRS.Queries.Cart
         public class GetAllCardItems_H : IRequestHandler<GetAllCardItems_Q, IServiceResult<IEnumerable<CartItemReadDTO>>>
         {
 
-            private readonly ICartItemsService _cartItemsService;
+            private readonly ICartItemService _cartItemsService;
 
-            public GetAllCardItems_H(ICartItemsService cartItemsService)
+            public GetAllCardItems_H(ICartItemService cartItemsService)
             {
                 _cartItemsService = cartItemsService;
             }

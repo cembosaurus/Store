@@ -11,7 +11,7 @@ using Services.Ordering.Models;
 
 namespace Ordering.Services
 {
-    public class CartItemsService : ICartItemsService
+    public class CartItemService : ICartItemService
     {
         private readonly IHttpInventoryService _httpInventoryService;
         private readonly ICartBusinessLogic _cartBusinessLogic;
@@ -20,7 +20,7 @@ namespace Ordering.Services
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
 
-        public CartItemsService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService)
+        public CartItemService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService)
         {
             _httpInventoryService = httpInventoryService;
             _cartBusinessLogic = cartBusinessLogic;

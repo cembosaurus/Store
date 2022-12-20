@@ -4,7 +4,7 @@ using Business.Scheduler.DTOs;
 
 namespace Ordering.Services.Interfaces
 {
-    public interface ICartItemsService
+    public interface ICartItemService
     {
         Task<IServiceResult<IEnumerable<CartItemReadDTO>>> AddItemsToCart(int cartId, IEnumerable<CartItemUpdateDTO> itemsToAdd);
         Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> DeleteExpiredItems(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks);
