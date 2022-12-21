@@ -31,13 +31,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING addresses ......");
 
+            var message = "";
+
 
             var addressesResult = await _addressRepo.GetAllAddresses();
 
             if (!addressesResult.Any())
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, "NO addresses found !");
+                message = "NO addresses found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addressesResult), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addressesResult), true, message);
         }
 
 
@@ -45,13 +47,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING address with address Id '{id}' ......");
 
+            var message = "";
+
 
             var address = await _addressRepo.GetAddressById(id);
 
             if (address == null)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"Address '{id}' NOT found !");
+                message = $"Address '{id}' NOT found !";
 
-            return _resultFact.Result(_mapper.Map<AddressReadDTO>(address), true);
+            return _resultFact.Result(_mapper.Map<AddressReadDTO>(address), true, message);
         }
 
 
@@ -60,13 +64,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING address by Ids ......");
 
+            var message = "";
+
 
             var addresses = await _addressRepo.GetAddressesByIds(ids);
 
             if (addresses == null || !addresses.Any())
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"Address NOT found !");
+                message = $"Address NOT found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addresses), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addresses), true, message);
         }
 
 
@@ -81,13 +87,15 @@ namespace Identity.Services
 
             Console.WriteLine($"--> GETTING addresses for user '{userId}' ......");
 
+            var message = "";
+
 
             var addresses = await _addressRepo.GetAddressesByUserId(userId);
 
             if (addresses == null || !addresses.Any())
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"Addresses for user '{userId}' NOT found !");
+                message = $"Addresses for user '{userId}' NOT found !";
 
-            return _resultFact.Result(_mapper.Map< IEnumerable<AddressReadDTO>>(addresses), true);
+            return _resultFact.Result(_mapper.Map< IEnumerable<AddressReadDTO>>(addresses), true, message);
         }
 
 
@@ -96,13 +104,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> CHECKING address with address Id '{id}' ......");
 
+            var message = "";
+
 
             var addressResult = await _addressRepo.ExistsById(id);
 
             if (!addressResult)
-                return _resultFact.Result(addressResult, false, $"Address '{id}' does NOT exist !");
+                message = $"Address '{id}' does NOT exist !";
 
-            return _resultFact.Result(addressResult, true);
+            return _resultFact.Result(addressResult, true, message);
         }
 
 
@@ -115,6 +125,8 @@ namespace Identity.Services
 
 
             Console.WriteLine($"--> ADDING address for user '{userId}'......");
+
+            var message = "";
 
 
             var address = _mapper.Map<Address>(addressDto);
@@ -134,12 +146,12 @@ namespace Identity.Services
             user.CurrentUsersAddress = _mapper.Map<CurrentUsersAddress>(new CurrentUsersAddress { UserId = user.Id, AddressId = address.AddressId });
 
             if (_addressRepo.SaveChanges() < 1)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"Address: '{user.CurrentUsersAddress.AddressId}' was NOT set as current address for user: '{user.Id}'");
+                message = $"Address: '{user.CurrentUsersAddress.AddressId}' was NOT set as current address for user: '{user.Id}'";
 
 
             address = (Address)result.Entity;
 
-            return _resultFact.Result(_mapper.Map<AddressReadDTO>(address), true);
+            return _resultFact.Result(_mapper.Map<AddressReadDTO>(address), true, message);
         }
 
 
@@ -147,14 +159,16 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> SEARCHING for addresses by parameters ......");
 
+            var message = "";
+
 
             // To Do: implement search functionality
             var addresses = await _addressRepo.SearchAddress(searchModel);
 
             if (!addresses.Any())
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, "NO addresses found !");
+                message = "NO addresses found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addresses), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<AddressReadDTO>>(addresses), true, message);
         }
 
 

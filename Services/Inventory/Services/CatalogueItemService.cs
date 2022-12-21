@@ -32,13 +32,15 @@ namespace Inventory.Services
         {
             Console.WriteLine($"--> GETTING catalogue items ......");
 
+            var message = "";
+
 
             var catalogueItems = await _catalogueItemRepo.GetCatalogueItems(itemIds);
 
             if (!catalogueItems.Any())
-                return _resultFact.Result<IEnumerable<CatalogueItemReadDTO>>(null, false, "NO catalogue items found !");
+                message = "NO catalogue items found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<CatalogueItemReadDTO>>(catalogueItems), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<CatalogueItemReadDTO>>(catalogueItems), true, message);
         }
 
 
@@ -46,20 +48,20 @@ namespace Inventory.Services
         {
             Console.WriteLine($"--> GETTING catalogue item '{id}' ......");
 
+            var message = "";
+
 
             var catalogueItem = await _catalogueItemRepo.GetCatalogueItemById(id);
 
             if (catalogueItem == null)
             {
-                var message = $"Catalogue item with id '{id}' NOT found ";
+                message = $"Catalogue Item with id '{id}' NOT found";
 
                 if (await _itemRepo.ExistsById(id))
-                    return _resultFact.Result<CatalogueItemReadDTO>(null, false, message + "but Item with this id exists !");
-
-                return _resultFact.Result<CatalogueItemReadDTO>(null, false, message + " !");
+                    message += Environment.NewLine + $", but Item with id '{id}' exists and it's not registered in catalogue !";
             }
 
-            return _resultFact.Result(_mapper.Map<CatalogueItemReadDTO>(catalogueItem), true);
+            return _resultFact.Result(_mapper.Map<CatalogueItemReadDTO>(catalogueItem), true, message);
         }
 
 
@@ -68,14 +70,15 @@ namespace Inventory.Services
         {
             Console.WriteLine($"--> EXISTS catalogue item '{id}' ......");
 
+            var message = "";
+
 
             var catalogueItem = await _catalogueItemRepo.ExistsById(id);
 
             if (!catalogueItem)
-                return _resultFact.Result(false, false, $"Catalogue item '{id}' does NOT exist !");
+                message = $"Catalogue item '{id}' does NOT exist !";
 
-
-            return _resultFact.Result(true, true);
+            return _resultFact.Result(true, true, message);
         }
 
 
@@ -90,7 +93,7 @@ namespace Inventory.Services
             var catalogueItem = await _catalogueItemRepo.GetCatalogueItemWithExtrasById(id);
 
             if(catalogueItem == null)
-                return _resultFact.Result<CatalogueItemReadDTOWithExtras>(null, false, $"Catalogue item with item id '{id}' NOT found !");
+                return _resultFact.Result<CatalogueItemReadDTOWithExtras>(null, true, $"Catalogue item with item id '{id}' NOT found !");
 
             var catalogueItemDTO = _mapper.Map<CatalogueItemReadDTOWithExtras>(catalogueItem);
 
@@ -284,20 +287,20 @@ namespace Inventory.Services
         {
             Console.WriteLine($"--> GETTING catalogue item '{id}' instock count ......");
 
+            var message = "";
+
 
             if (!await _catalogueItemRepo.ExistsById(id))
             {
-                var message = $"Catalogue item with id '{id}' NOT found ";
+                message = $"Catalogue Item with id '{id}' NOT found";
 
                 if (await _itemRepo.ExistsById(id))
-                    return _resultFact.Result(0, false, message + "but Item with this id exists !");
-
-                return _resultFact.Result(0, false, message + " !");
+                    message += $", but Item with id '{id}' exists and it's not registered in catalogue !";
             }
 
             var instock = await _catalogueItemRepo.GetInstockCount(id);
 
-            return _resultFact.Result(instock, true);
+            return _resultFact.Result(instock, true, message);
         }
 
 

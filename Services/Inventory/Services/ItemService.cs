@@ -27,35 +27,43 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = null)
         {
+            Console.WriteLine($"--> GETTING items ......");
+
+            var message = "";
+
+
             var items = await _repo.GetItems(itemIds);
 
             if (!items.Any())
-                return _resultFact.Result<IEnumerable<ItemReadDTO>>(null, false, "NO items found !");
+                message = "NO items found !";
 
-            Console.WriteLine($"--> GETTING items ......");
-
-            return _resultFact.Result(_mapper.Map<IEnumerable<ItemReadDTO>>(items), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<ItemReadDTO>>(items), true, message);
         }
 
 
 
         public async Task<IServiceResult<ItemReadDTO>> GetItemById(int id)
         {
+            Console.WriteLine($"--> GETTING item '{id}' ......");
+
+            var message = "";
+
+
             var item = await _repo.GetItemById(id);
 
             if (item == null)
-                return _resultFact.Result<ItemReadDTO>(null, false, $"Item '{id}' was NOT found !");
+                message = $"Item '{id}' was NOT found !";
 
-
-            Console.WriteLine($"--> GETTING item '{item.Id}': '{item.Name}' ......");
-
-            return _resultFact.Result(_mapper.Map<ItemReadDTO>(item), true);
+            return _resultFact.Result(_mapper.Map<ItemReadDTO>(item), true, message);
         }
 
 
 
         public async Task<IServiceResult<ItemReadDTO>> AddItem(ItemCreateDTO itemCreateDTO)
         {
+            Console.WriteLine($"--> ADDING item '{itemCreateDTO.Name}'......");
+
+
             if (await _repo.ExistsByName(itemCreateDTO.Name))
                 return _resultFact.Result<ItemReadDTO>(null, false, $"Item '{itemCreateDTO.Name}' already EXISTS !");
 
@@ -67,8 +75,6 @@ namespace Inventory.Services
 
             if (result.State != EntityState.Added || _repo.SaveChanges() < 1)
                 return _resultFact.Result<ItemReadDTO>(null, false, $"Item '{itemCreateDTO.Name}' was NOT created");
-
-            Console.WriteLine($"--> ADDING item '{item.Id}': '{item.Name}'......");
 
             return _resultFact.Result(_mapper.Map<ItemReadDTO>(item), true);
         }

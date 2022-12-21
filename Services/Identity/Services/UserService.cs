@@ -37,13 +37,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING all users ......");
 
+            var message = "";
+
 
             var users = await _repo.GetAllUsers();
 
             if (!users.Any())
-                return _resultFact.Result<IEnumerable<UserReadDTO>>(null, false, "NO users found !");
+                message = "NO users found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<UserReadDTO>>(users), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<UserReadDTO>>(users), true, message);
         }
 
 
@@ -53,13 +55,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING user '{id}' ......");
 
+            var message = "";
+
 
             var user = await _repo.GetUserById(id);
 
             if (user == null)
-                return _resultFact.Result<UserReadDTO>(null, false, $"User '{id}' was NOT found !");
+                message = $"User '{id}' was NOT found !";
 
-            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true);
+            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, message);
         }
 
 
@@ -69,13 +73,15 @@ namespace Identity.Services
         {
             Console.WriteLine($"--> GETTING user '{name}' ......");
 
+            var message = "";
+
 
             var user = await _userManager.FindByNameAsync(name);
 
             if (user == null)
-                return _resultFact.Result<UserReadDTO>(null, false, $"User '{name}' was NOT found !");
+                message = $"User '{name}' was NOT found !";
 
-            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true);
+            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, message);
         }
 
 
@@ -84,6 +90,8 @@ namespace Identity.Services
         public async Task<IServiceResult<IEnumerable<UserWithRolesReadDTO>>> GetAllUsersWithRoles()
         {
             Console.WriteLine($"--> GETTING users with roles ......");
+
+            var message = "";
 
 
             var users = await _userManager.Users
@@ -102,9 +110,9 @@ namespace Identity.Services
 
 
             if (!users.Any())
-                return _resultFact.Result<IEnumerable<UserWithRolesReadDTO>>(null, false, "NO users found !");
+                message = "NO users found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<UserWithRolesReadDTO>>(users), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<UserWithRolesReadDTO>>(users), true, message);
         }
 
 
@@ -112,6 +120,8 @@ namespace Identity.Services
         public async Task<IServiceResult<UserWithRolesReadDTO>> GetUserWithRoles(int id)
         {
             Console.WriteLine($"--> GETTING users with roles ......");
+
+            var message = "";
 
 
             var user = await _userManager.Users
@@ -130,9 +140,9 @@ namespace Identity.Services
 
 
             if (user == null)
-                return _resultFact.Result<UserWithRolesReadDTO>(null, false, "User NOT found !");
+                message = "User NOT found !";
 
-            return _resultFact.Result(_mapper.Map<UserWithRolesReadDTO>(user), true);
+            return _resultFact.Result(_mapper.Map<UserWithRolesReadDTO>(user), true, message);
         }
 
 

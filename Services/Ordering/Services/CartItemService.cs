@@ -37,13 +37,15 @@ namespace Ordering.Services
         {
             Console.WriteLine($"--> GETTING cart items ......");
 
+            var message = "";
+
 
             var cartItems = await _cartItemRepo.GetAllCardItems();
 
             if (cartItems == null || !cartItems.Any())
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, "Cart itemns NOT found !");
+                message = "Cart items NOT found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(cartItems), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(cartItems), true, message);
         }
 
 
@@ -52,6 +54,8 @@ namespace Ordering.Services
         {
             Console.WriteLine($"--> GETTING cart items for user '{userId}' ......");
 
+            var message = "";
+
 
             var cartItems = await _cartItemRepo.GetCartItemsByUserId(userId);
 
@@ -59,9 +63,9 @@ namespace Ordering.Services
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart for user '{userId}' NOT found !");
 
             if (!cartItems.Any())
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart for user '{userId}' does NOT contain any Items !");
+                message = $"Cart for user '{userId}' does NOT contain any Items !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(cartItems), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(cartItems), true, message);
         }
 
 

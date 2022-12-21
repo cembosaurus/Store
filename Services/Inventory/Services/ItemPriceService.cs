@@ -31,7 +31,7 @@ namespace Inventory.Services
             var itemPrices = await _repo.GetItemPrices(itemIds);
 
             if (itemPrices == null || !itemPrices.Any())
-                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, "NO item prices found !");
+                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, true, "NO item prices found !");
 
             return _resultFact.Result(
                 _mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices), 
@@ -45,6 +45,8 @@ namespace Inventory.Services
         {
             Console.WriteLine($"--> GETTING item price '{id}' ......");
 
+            var message = "";
+
 
             var itemPrice = await _repo.GetItemPriceById(id);
 
@@ -53,10 +55,10 @@ namespace Inventory.Services
                 if (await _repo.ItemExistsById(id))
                     return _resultFact.Result<ItemPriceReadDTO>(null, false, $"Item with Id '{id}' EXIST but was NOT labeled with price !");
 
-                return _resultFact.Result<ItemPriceReadDTO>(null, false, $"Catalogue item with Id '{id}' NOT found !");
+                message = $"Catalogue item with Id '{id}' NOT found !";
             }
 
-            return _resultFact.Result(_mapper.Map<ItemPriceReadDTO>(itemPrice), true);
+            return _resultFact.Result(_mapper.Map<ItemPriceReadDTO>(itemPrice), true, message);
         }
 
 

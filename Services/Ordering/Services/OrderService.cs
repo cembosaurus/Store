@@ -42,7 +42,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()
         {
-            var message = string.Empty;
+            var message = "";
 
             Console.WriteLine($"--> GETTING orders ......");
 
@@ -50,7 +50,7 @@ namespace Ordering.Services
             var orders = await _orderRepo.GetAllOrders();
 
             if (!orders.Any())
-                return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, false, "NO orders were found !");
+                return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, true, "NO orders were found !");
 
             var result = _mapper.Map<IEnumerable<OrderReadDTO>>(orders);
 
@@ -93,18 +93,20 @@ namespace Ordering.Services
             var cartId = await _cartRepo.GetCartIdByUserId(userId);
 
             if (cartId == Guid.Empty)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"NO Order for user '{userId}' was found !");
+                return _resultFact.Result<OrderReadDTO>(null, true, $"Cart for Order with user Id '{userId}' does NOT exist !");
 
 
             Console.WriteLine($"--> GETTING order '{userId}' ......");
+
+            var message = "";
 
 
             var orderByCartId = await _orderRepo.GetOrderByCartId(cartId);
 
             if (orderByCartId == null)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"Order '{userId}' was NOT found !");
+                message = $"Order '{userId}' was NOT found !";
 
-            return _resultFact.Result(_mapper.Map<OrderReadDTO>(orderByCartId), true);
+            return _resultFact.Result(_mapper.Map<OrderReadDTO>(orderByCartId), true, message);
         }
 
 
@@ -113,28 +115,34 @@ namespace Ordering.Services
         {
             Console.WriteLine($"--> GETTING order '{cartId}' ......");
 
+            var message = "";
+
 
             var order = await _orderRepo.GetOrderByCartId(cartId);
 
             if (order == null)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"Order '{cartId}' was NOT found !");
+                message = $"Order '{cartId}' was NOT found !";
 
-            return _resultFact.Result(_mapper.Map<OrderReadDTO>(order), true);
+            return _resultFact.Result(_mapper.Map<OrderReadDTO>(order), true, message);
         }
+
 
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string code)
         {
             Console.WriteLine($"--> GETTING order '{code}' ......");
 
+            var message = "";
+
 
             var order = await _orderRepo.GetOrderByOrderCode(code);
 
             if (order == null)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"Order '{code}' was NOT found !");
+                message = $"Order '{code}' was NOT found !";
 
-            return _resultFact.Result(_mapper.Map<OrderReadDTO>(order), true);
+            return _resultFact.Result(_mapper.Map<OrderReadDTO>(order), true, message);
         }
+
 
 
         public async Task<IServiceResult<OrderReadDTO>> CreateOrder( int userId, OrderCreateDTO orderCreateDTO)

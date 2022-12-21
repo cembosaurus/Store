@@ -75,8 +75,8 @@ namespace API_Gateway.HttpServices.Ordering
         {
             var response = await _httpOrderClient.GetAllOrders();
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
+            //if (!response.IsSuccessStatusCode)
+            //    return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
             var content = response.Content.ReadAsStringAsync().Result;
 

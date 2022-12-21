@@ -31,7 +31,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()
         {
-            var message = string.Empty;
+            var message = "";
 
             Console.WriteLine($"--> GETTING archived orders ......");
 
@@ -39,7 +39,7 @@ namespace Ordering.Services
             var orders = await _archiveRepo.GetAllOrders();
 
             if (!orders.Any())
-                return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, false, "NO archived orders were found !");
+                return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, true, "NO archived orders were found !");
 
             var result = _mapper.Map<IEnumerable<OrderReadDTO>>(orders);
 
@@ -82,7 +82,7 @@ namespace Ordering.Services
             var cartId = await _archiveRepo.GetCartIdByUserId(userId);
 
             if (cartId == null || cartId == Guid.Empty)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"CartId for User '{userId}' does NOT exist !");
+                return _resultFact.Result<OrderReadDTO>(null, true, $"Cart for Order with user Id '{userId}' does NOT exist !");
 
 
             var message = string.Empty;
@@ -120,7 +120,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByCartId(Guid cartId)
         {
-            var message = string.Empty;
+            var message = "";
 
             Console.WriteLine($"--> GETTING archived order '{cartId}' ......");
 
@@ -128,7 +128,7 @@ namespace Ordering.Services
             var order = await _archiveRepo.GetOrderByCartId(cartId);
 
             if (order == null)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"Archived order with Cart Id: '{cartId}' was NOT found !");
+                return _resultFact.Result<OrderReadDTO>(null, true, $"Archived order with Cart Id: '{cartId}' was NOT found !");
 
 
             var result = _mapper.Map<OrderReadDTO>(order);
@@ -155,7 +155,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string code)
         {
-            var message = string.Empty;
+            var message ="";
 
             Console.WriteLine($"--> GETTING archived order '{code}' ......");
 
@@ -163,7 +163,7 @@ namespace Ordering.Services
             var order = await _archiveRepo.GetOrderByOrderCode(code);
 
             if (order == null)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"Archived order '{code}' was NOT found !");
+                return _resultFact.Result<OrderReadDTO>(null, true, $"Archived Order '{code}' was NOT found !");
 
             var result = _mapper.Map<OrderReadDTO>(order);
 

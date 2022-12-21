@@ -38,11 +38,19 @@ namespace Scheduler.Services
 
         public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> GetAllLocks()
         {
+            Console.WriteLine("---> GETTING all locks ....");
+
+            var message = "";
+
+
             var locksResult = await _cartItemLockRepo.GetAllCartItemLocks();
+
+            if (locksResult == null || !locksResult.Any())
+                message = "No locks were found.";
 
             var result = _mapper.Map<IEnumerable<CartItemsLockReadDTO>>(locksResult);
 
-            return _resultFact.Result(result, true);
+            return _resultFact.Result(result, true, message);
         }
 
 

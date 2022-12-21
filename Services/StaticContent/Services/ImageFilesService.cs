@@ -24,6 +24,8 @@ namespace StaticContent.Services
         {
             var image = File.OpenRead(_imagePath + id);
 
+            image.Close();
+
             return image;
         }
 

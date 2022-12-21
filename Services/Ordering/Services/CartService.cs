@@ -37,13 +37,15 @@ namespace Ordering.Services
         {
             Console.WriteLine($"--> GETTING carts ......");
 
+            var message = "";
+
 
             var carts = await _cartRepo.GetCards();
 
             if (!carts.Any())
-                return _resultFact.Result<IEnumerable<CartReadDTO>>(null, false, "NO carts found !");
+                message = "NO carts were found !";
 
-            return _resultFact.Result(_mapper.Map<IEnumerable<CartReadDTO>>(carts), true);
+            return _resultFact.Result(_mapper.Map<IEnumerable<CartReadDTO>>(carts), true, message);
         }
 
 
@@ -58,7 +60,7 @@ namespace Ordering.Services
             var cart = await _cartRepo.GetCartByUserId(userId);
 
             if (cart == null)
-                return _resultFact.Result<CartReadDTO>(null, false, $"Cart for user '{userId}' was NOT found !");
+                return _resultFact.Result<CartReadDTO>(null, true, $"Cart for user '{userId}' was NOT found !");
 
             var result = _mapper.Map<CartReadDTO>(cart);
 
@@ -69,7 +71,7 @@ namespace Ordering.Services
 
             if (itemsResult != null || itemsResult.Status)
             {
-                //_mapper.Map(items, result.CartItems); // ........... doesn't work properly. To Do !!!!!!
+                //_mapper.Map(items, result.CartItems); // ........... doesn't work properly. Fix It !!!!!!
 
                 foreach (var ci in result.CartItems)
                 {
@@ -203,12 +205,14 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<bool>> ExistsCartByCartId(Guid cartId)
         {
+            var message = "";
+
             var cartExists = await _cartRepo.ExistsByCartId(cartId);
 
             if(!cartExists)
-                return _resultFact.Result(false, false, $"Cart '{cartId}' does NOT exist !");
+                message = $"Cart '{cartId}' does NOT exist !";
 
-            return _resultFact.Result(true, true);
+            return _resultFact.Result(true, true, message);
         }
 
 

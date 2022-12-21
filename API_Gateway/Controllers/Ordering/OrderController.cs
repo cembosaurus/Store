@@ -14,12 +14,10 @@ namespace API_Gateway.Controllers.Ordering
     {
 
         private readonly int _principalId;
-        private readonly string _url;
         private readonly IOrderService _orderService;
 
         public OrderController(IConfiguration conf, IHttpContextAccessor accessor, IOrderService orderService)
         {
-            _url = conf.GetSection("RemoteServices:OrderingService").Value + "/api/order";
             int.TryParse(accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier), out _principalId);
             _orderService = orderService;
         }
