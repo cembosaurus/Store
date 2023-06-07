@@ -51,17 +51,22 @@ namespace Business.Middlewares
 
                         break;
 
-                    default:
-                        // unhandled error:
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    //default:
+                    //    // unhandled error:
+                    //    response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                        break;
+                    //    break;
                 }
 
                 // If status code is not in defined range:
                 context.Response.StatusCode =
                     context.Response.StatusCode < 100 || context.Response.StatusCode > 599
                     ? (int)HttpStatusCode.InternalServerError
+                    : context.Response.StatusCode;
+
+                context.Response.StatusCode =
+                    context.Response.StatusCode == 400
+                    ? (int)HttpStatusCode.BadRequest
                     : context.Response.StatusCode;
 
                 result = JsonSerializer.Serialize(new { message = 

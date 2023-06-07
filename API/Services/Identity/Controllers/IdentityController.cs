@@ -34,7 +34,7 @@ namespace Services.Identity.Controllers
         {
             var result = await _identityService.Register(userToRegister);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
 
 
@@ -45,7 +45,7 @@ namespace Services.Identity.Controllers
         {
             var result = await _identityService.Login(user);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
 
 
@@ -57,7 +57,7 @@ namespace Services.Identity.Controllers
         {
             var result = await _identityService.CreateTokenForService();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
     }
 }
