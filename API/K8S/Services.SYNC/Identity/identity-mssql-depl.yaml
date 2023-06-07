@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-mssql-depl
+  labels:
+    app: identity-mssql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity-mssql
+  template:
+    metadata:
+      labels:
+        app: identity-mssql
+    spec:
+      containers:
+        - name: identity-mssql
+          image: mcr.microsoft.com/mssql/server:2017-latest
+          ports:
+            - containerPort: 1433
+          env:
+          - name: MSSQL_PID
+            value: "Express"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: identity-mssql
+                key: SA_PASSWORD
+          volumeMounts:
+          - mountPath: /var/opt/mssql/data
+            name: identity-mssqldb
+      volumes:
+      - name: identity-mssqldb
+        persistentVolumeClaim:
+          claimName: identity-mssql-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-mssql-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: identity-mssql
+  ports:
+  - name: identity-mssql
+    protocol: TCP
+    port: 1001
+    targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-mssql-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: identity-mssql
+  ports:
+  - protocol: TCP
+    port: 1001
+    targetPort: 1433

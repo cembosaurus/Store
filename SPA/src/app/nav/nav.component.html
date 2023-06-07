@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+
+  <a *ngIf="loggedIn()" class="navbar-brand" href="#">Welcome {{userDTO.Name}}</a>
+
+    <ul class="navbar-nav mr-auto">
+      <button *ngIf="loggedIn()" class="btn btn-success my-2 my-sm-0" type="submit" (click)="logOut()">Log Out</button>
+    </ul>
+
+    <form *ngIf="!loggedIn()" #loginForm="ngForm" class="form-inline my-2 my-lg-0" (ngSubmit)="login()">
+
+      <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" 
+      required [(ngModel)]="userDTO.Name" #userNameTEST="ngModel">
+
+      <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" 
+      required [(ngModel)]="userDTO.Password" #passwordTEST="ngModel">
+      
+      <button [disabled]="!loginForm.valid" class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
+
+    </form>
+
+</nav>
+

@@ -1,0 +1,82 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+  - host: store.com
+    http:
+      paths:
+      - path: /api/identity
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/user
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/item
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/catalogueitem
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/itemprice
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/cart
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/order
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      # - path: /api/identity
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: identity-service-clusterip-srv
+      #       port:
+      #         number: 80
+      # - path: /api/address
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: identity-service-clusterip-srv
+      #       port:
+      #         number: 80
+      # - path: /api/user
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: identity-service-clusterip-srv
+      #       port:
+      #         number: 80

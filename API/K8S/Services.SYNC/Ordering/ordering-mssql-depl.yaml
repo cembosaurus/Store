@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ordering-mssql-depl
+  labels:
+    app: ordering-mssql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ordering-mssql
+  template:
+    metadata:
+      labels:
+        app: ordering-mssql
+    spec:
+      containers:
+        - name: ordering-mssql
+          image: mcr.microsoft.com/mssql/server:2017-latest
+          ports:
+            - containerPort: 1433
+          env:
+          - name: MSSQL_PID
+            value: "Express"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ordering-mssql
+                key: SA_PASSWORD
+          volumeMounts:
+          - mountPath: /var/opt/mssql/data
+            name: ordering-mssqldb
+      volumes:
+      - name: ordering-mssqldb
+        persistentVolumeClaim:
+          claimName: ordering-mssql-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ordering-mssql-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: ordering-mssql
+  ports:
+  - name: ordering-mssql
+    protocol: TCP
+    port: 1003
+    targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ordering-mssql-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: ordering-mssql
+  ports:
+  - protocol: TCP
+    port: 1003
+    targetPort: 1433

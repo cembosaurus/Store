@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: inventory-amqp-consumer-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store-inventory-amqp-consumer
+      version: v01
+  template:
+    metadata:
+      labels:
+        app: store-inventory-amqp-consumer
+        version: v01
+    spec:
+      containers:
+        - name: store-inventory-amqp-consumer
+          image: cembo/store_inventory_amqp_consumer:latest
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-amqp-consumer-service-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: store-inventory-amqp-consumer
+  ports:
+    - name: store-inventory-amqp-consumer
+      protocol: TCP
+      port: 80
+      targetPort: 80

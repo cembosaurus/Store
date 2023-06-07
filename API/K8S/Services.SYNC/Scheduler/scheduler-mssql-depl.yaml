@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler-mssql-depl
+  labels:
+    app: scheduler-mssql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler-mssql
+  template:
+    metadata:
+      labels:
+        app: scheduler-mssql
+    spec:
+      containers:
+        - name: scheduler-mssql
+          image: mcr.microsoft.com/mssql/server:2017-latest
+          ports:
+            - containerPort: 1433
+          env:
+          - name: MSSQL_PID
+            value: "Express"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: scheduler-mssql
+                key: SA_PASSWORD
+          volumeMounts:
+          - mountPath: /var/opt/mssql/data
+            name: scheduler-mssqldb
+      volumes:
+      - name: scheduler-mssqldb
+        persistentVolumeClaim:
+          claimName: scheduler-mssql-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler-mssql-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: scheduler-mssql
+  ports:
+  - name: scheduler-mssql
+    protocol: TCP
+    port: 1004
+    targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler-mssql-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: scheduler-mssql
+  ports:
+  - protocol: TCP
+    port: 1004
+    targetPort: 1433

@@ -1,0 +1,313 @@
+
+
+----------------------- DOCKER --------------------------------
+
+
+// run from ROOT 'Store' folder:
+
+HTTP:
+
+docker build -t cembo/store_api_gateway -f api_gateway/Dockerfile .
+docker push cembo/store_api_gateway
+
+docker build -t cembo/store_identity -f services/identity/Dockerfile .
+docker push cembo/store_identity
+
+docker build -t cembo/store_inventory -f services/inventory/Dockerfile .
+docker push cembo/store_inventory
+
+docker build -t cembo/store_ordering -f services/ordering/Dockerfile .
+docker push cembo/store_ordering
+
+docker build -t cembo/store_payment -f services/payment/Dockerfile .
+docker push cembo/store_payment
+
+docker build -t cembo/store_scheduler -f services/scheduler/Dockerfile .
+docker push cembo/store_scheduler
+
+docker build -t cembo/store_static_content -f services/staticcontent/Dockerfile .
+docker push cembo/store_static_content
+
+AMQP:
+
+docker build -t cembo/store_inventory_amqp_publisher -f Inventory.Publisher/Dockerfile .
+docker push cembo/store_inventory_amqp_publisher
+
+docker build -t cembo/store_inventory_amqp_consumer -f Inventory.Consumer/Dockerfile .
+docker push cembo/store_inventory_amqp_consumer
+
+
+
+----------------------- KUBERNETES --------------------------------
+
+----------- DB:
+
+
+HTTP:
+
+kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+
+kubectl apply -f identity-pvc.yaml
+kubectl apply -f inventory-pvc.yaml
+kubectl apply -f ordering-pvc.yaml
+kubectl apply -f scheduler-pvc.yaml
+
+kubectl apply -f identity-mssql-depl.yaml
+kubectl apply -f inventory-mssql-depl.yaml
+kubectl apply -f ordering-mssql-depl.yaml
+kubectl apply -f scheduler-mssql-depl.yaml
+
+
+AMQP:
+
+kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+
+kubectl apply -f inventory-amqp-pvc.yaml
+
+kubectl apply -f inventory-amqp-mssql-depl.yaml
+
+
+
+DB USER:
+
+RUN: SQL script 'create-db-user.sql' for all DBs to create 'testUser':
+
+DB LogIns:
+
+HTTP:
+
+- identity-mssql-clusterip-srv, port: 1001
+- inventory-mssql-clusterip-srv, port: 1002
+- ordering-mssql-clusterip-srv, port: 1003
+- scheduler-mssql-clusterip-srv, port: 1004
+
+AMQP:
+
+- inventory-amqp-mssql-clusterip-srv, port: 1012
+
+
+
+----------- SERVICES:
+
+HTTP:
+
+kubectl apply -f api-gateway-service-depl.yaml
+kubectl apply -f identity-service-depl.yaml
+kubectl apply -f inventory-service-depl.yaml
+kubectl apply -f ordering-service-depl.yaml
+kubectl apply -f payment-service-depl.yaml
+kubectl apply -f scheduler-service-depl.yaml
+kubectl apply -f static-content-service-depl.yaml
+
+AMQP:
+kubectl apply -f inventory-amqp-publisher-service-depl.yaml
+kubectl apply -f inventory-amqp-consumer-service-depl.yaml
+
+
+
+---------------------------------------------------------------
+---------------------------------------------------------------
+
+
+
+
+
+
+----------------------- DELETE --------------------------------
+
+
+----------- SERVICES:
+
+HTTP:
+
+kubectl delete deployment api-gateway-service-depl
+kubectl delete deployment identity-service-depl
+kubectl delete deployment inventory-service-depl
+kubectl delete deployment ordering-service-depl
+kubectl delete deployment payment-service-depl
+kubectl delete deployment scheduler-service-depl
+kubectl delete deployment static-content-service-depl
+
+AMQP:
+
+kubectl delete deployment inventory-amqp-publisher-service-depl
+kubectl delete deployment inventory-amqp-consumer-service-depl
+
+
+HTTP:
+
+kubectl delete service api-gateway-service-clusterip-srv
+kubectl delete service identity-service-clusterip-srv
+kubectl delete service inventory-service-clusterip-srv
+kubectl delete service ordering-service-clusterip-srv
+kubectl delete service payment-service-clusterip-srv
+kubectl delete service scheduler-service-clusterip-srv
+kubectl delete service static-content-service-clusterip-srv
+
+AMQP:
+
+kubectl delete service inventory-amqp-publisher-service-clusterip-srv
+kubectl delete service inventory-amqp-consumer-service-clusterip-srv
+
+----------- DB:
+
+HTTP:
+
+kubectl delete deployment identity-mssql-depl
+kubectl delete deployment inventory-mssql-depl
+kubectl delete deployment ordering-mssql-depl
+kubectl delete deployment scheduler-mssql-depl
+
+kubectl delete service identity-mssql-clusterip-srv
+kubectl delete service inventory-mssql-clusterip-srv
+kubectl delete service ordering-mssql-clusterip-srv
+kubectl delete service scheduler-mssql-clusterip-srv
+
+kubectl delete service identity-mssql-loadbalancer 
+kubectl delete service inventory-mssql-loadbalancer 
+kubectl delete service ordering-mssql-loadbalancer 
+kubectl delete service scheduler-mssql-loadbalancer 
+
+kubectl delete pvc identity-mssql-claim
+kubectl delete pvc inventory-mssql-claim
+kubectl delete pvc ordering-mssql-claim
+kubectl delete pvc scheduler-mssql-claim
+
+kubectl delete secret identity-mssql
+kubectl delete secret inventory-mssql
+kubectl delete secret ordering-mssql
+kubectl delete secret scheduler-mssql
+
+AMQP:
+
+kubectl delete deployment inventory-amqp-mssql-depl
+
+kubectl delete service inventory-amqp-mssql-clusterip-srv
+
+kubectl delete service inventory-amqp-mssql-loadbalancer
+
+kubectl delete pvc inventory-amqp-mssql-claim
+
+kubectl delete secret inventory-amqp-mssql
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------- BATCH execution: ---------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+BUILD:
+
+
+docker build -t cembo/store_api_gateway -f api_gateway/Dockerfile .
+docker push cembo/store_api_gateway
+docker build -t cembo/store_identity -f services/identity/Dockerfile .
+docker push cembo/store_identity
+docker build -t cembo/store_inventory -f services/inventory/Dockerfile .
+docker push cembo/store_inventory
+docker build -t cembo/store_ordering -f services/ordering/Dockerfile .
+docker push cembo/store_ordering
+docker build -t cembo/store_payment -f services/payment/Dockerfile .
+docker push cembo/store_payment
+docker build -t cembo/store_scheduler -f services/scheduler/Dockerfile .
+docker push cembo/store_scheduler
+docker build -t cembo/store_static_content -f services/staticcontent/Dockerfile .
+docker push cembo/store_static_content
+docker build -t cembo/store_inventory_amqp_publisher -f Inventory.Publisher/Dockerfile .
+docker push cembo/store_inventory_amqp_publisher
+docker build -t cembo/store_inventory_amqp_consumer -f Inventory.Consumer/Dockerfile .
+docker push cembo/store_inventory_amqp_consumer
+cls
+
+
+
+DEPLOY:
+
+
+kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-pvc.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-pvc.yaml
+kubectl apply -f k8s/services.sync/identity/identity-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-mssql-depl.yaml
+kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-pvc.yaml
+kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-mssql-depl.yaml
+kubectl apply -f k8s/api_gateway/api-gateway-service-depl.yaml
+kubectl apply -f k8s/services.sync/identity/identity-service-depl.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-service-depl.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-service-depl.yaml
+kubectl apply -f k8s/services.sync/payment/payment-service-depl.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-service-depl.yaml
+kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.yaml
+kubectl apply -f k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
+kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
+kubectl get pods
+
+---
+
+
+DELETE:
+
+
+kubectl delete deployment api-gateway-service-depl
+kubectl delete deployment identity-service-depl
+kubectl delete deployment inventory-service-depl
+kubectl delete deployment ordering-service-depl
+kubectl delete deployment payment-service-depl
+kubectl delete deployment scheduler-service-depl
+kubectl delete deployment static-content-service-depl
+kubectl delete deployment inventory-amqp-publisher-service-depl
+kubectl delete deployment inventory-amqp-consumer-service-depl
+kubectl delete service api-gateway-service-clusterip-srv
+kubectl delete service identity-service-clusterip-srv
+kubectl delete service inventory-service-clusterip-srv
+kubectl delete service ordering-service-clusterip-srv
+kubectl delete service payment-service-clusterip-srv
+kubectl delete service scheduler-service-clusterip-srv
+kubectl delete service static-content-service-clusterip-srv
+kubectl delete service inventory-amqp-publisher-service-clusterip-srv
+kubectl delete service inventory-amqp-consumer-service-clusterip-srv
+kubectl delete deployment identity-mssql-depl
+kubectl delete deployment inventory-mssql-depl
+kubectl delete deployment ordering-mssql-depl
+kubectl delete deployment scheduler-mssql-depl
+kubectl delete service identity-mssql-clusterip-srv
+kubectl delete service inventory-mssql-clusterip-srv
+kubectl delete service ordering-mssql-clusterip-srv
+kubectl delete service scheduler-mssql-clusterip-srv
+kubectl delete service identity-mssql-loadbalancer 
+kubectl delete service inventory-mssql-loadbalancer 
+kubectl delete service ordering-mssql-loadbalancer 
+kubectl delete service scheduler-mssql-loadbalancer 
+kubectl delete pvc identity-mssql-claim
+kubectl delete pvc inventory-mssql-claim
+kubectl delete pvc ordering-mssql-claim
+kubectl delete pvc scheduler-mssql-claim
+kubectl delete secret identity-mssql
+kubectl delete secret inventory-mssql
+kubectl delete secret ordering-mssql
+kubectl delete secret scheduler-mssql
+kubectl delete deployment inventory-amqp-mssql-depl
+kubectl delete service inventory-amqp-mssql-clusterip-srv
+kubectl delete service inventory-amqp-mssql-loadbalancer
+kubectl delete pvc inventory-amqp-mssql-claim
+kubectl delete secret inventory-amqp-mssql
+kubectl get pods
+
+---
+
+
+
