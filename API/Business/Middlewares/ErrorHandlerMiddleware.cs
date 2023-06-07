@@ -51,11 +51,11 @@ namespace Business.Middlewares
 
                         break;
 
-                    //default:
-                    //    // unhandled error:
-                    //    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    default:
+                        // unhandled error:
+                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                    //    break;
+                        break;
                 }
 
                 // If status code is not in defined range:
