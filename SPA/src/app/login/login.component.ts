@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 
-@Component({
-  selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
-})
-export class NavComponent implements OnInit {
 
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
   userDTO: any = {};
+  registerMode = false;
 
   constructor(private authService: AuthService) { }
 
@@ -36,5 +37,13 @@ export class NavComponent implements OnInit {
     localStorage.removeItem('token');
     console.log('Logged OUT !');
   }
+  
 
+  registerToggle() {
+    this.registerMode = true;
+  }
+
+  cancelRegister(eventFromRegister: boolean) {
+    this.registerMode = eventFromRegister;
+  }
 }
