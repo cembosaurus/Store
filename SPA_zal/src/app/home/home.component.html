@@ -1,0 +1,17 @@
+<div class="container mt-5">
+    <div *ngIf="!registerMode" style="text-align: center">
+      <h1>Find your match </h1>
+      <p class="lead">Come on in to view your matches... All you need to do is sign up!</p>
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg mr-2" (click)="registerToggle()">Register</button>
+        <button class="btn btn-info btn-lg">Learn more</button>
+      </div>
+    </div>
+  
+</div>
+<a href="messages">Messages - test REF</a>
+<br>
+<!-- Lets you add a CSS class to an element when the link's route becomes active. 
+... I put class in styles.css -->
+<a [routerLink]="['/messages']" routerLinkActive="router-link-active">Messages - test RouterLink</a>
+<br><br>
