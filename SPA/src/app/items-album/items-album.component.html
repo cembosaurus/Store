@@ -1,34 +1,25 @@
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-</head>
 
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-
-    <div class="album py-5 bg-body-tertiary">
-        <div class="container">
-    
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            <div class="col">
-              <div class="card shadow-sm">
-                <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-                <div class="card-body">
-                  <p class="card-text">????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                    </div>
-                    <small class="text-body-secondary">??????</small>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div class="container my-5">     
+  <div class="row">
+    <div *ngFor="let catalogueItem of _catalogueItems" class="col-lg-3 col-md-6 col-sm-6 d-flex">
+      <div class="card w-100 my-2 shadow-2-strong">
+        <img src={{catalogueItem.item.photoURL}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" />
+        <div class="card-body">
+          <h4 class="card-title">{{catalogueItem.item.name}}</h4>
+          <h6 class="card-text">AU${{catalogueItem.itemPrice.rrp}}</h6>
+          <p class="card-text">{{catalogueItem.description}}</p>
+          <div class="card-footer d-flex align-items-end pb-3 px-0 pb-0 mb-auto">
+            <a href="#!" class="btn btn-primary shadow-0 me-1" (click)="addToCart(catalogueItem.itemId)">Add to cart</a>
+            <a href="#!" class="btn btn-light border px-2 pt-2 icon-hover"><i class="fas fa-heart fa-lg text-secondary px-1"></i></a>
           </div>
+          <p class="card-text">{{catalogueItem.description}}</p>
         </div>
       </div>
+    </div>
+    
+  </div>
+</div>
 
-</body>
+
+
 

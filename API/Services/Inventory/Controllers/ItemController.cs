@@ -89,10 +89,5 @@ namespace Services.Inventory.Controllers
         }
 
 
-
-        public Task<IEnumerable<string>> TestRequest()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
