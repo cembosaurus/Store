@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { Observable, map } from 'rxjs';
 import { APIServiceResult } from '../_models/APIServiceResult';
+import { AuthService } from './auth.service';
 
 
 
@@ -15,37 +16,27 @@ import { APIServiceResult } from '../_models/APIServiceResult';
 export class ItemsService {
 
   _APIServiceResult: APIServiceResult | undefined;
-  _url = environment.apiUrl + 'CatalogueItem/all/';
+  _itemsURL = environment.gatewayUrl + 'CatalogueItem/all/';
+  
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
 
 
 
   getItems(): Observable<APIServiceResult>
   {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    })
-
-    return this.http.get<APIServiceResult>(this._url, { headers: headers });
+    return this.http.get<APIServiceResult>(this._itemsURL);
   }
 
 
-  
-
-  getPhoto(photoUrl: string): Observable<any>
+  getPhoto(url: string)
   {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
-    })
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IMAGE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", url);
 
-    console.log("---> PHOTO: ", photoUrl);
-
-    return this.http.get(photoUrl, { headers: headers, responseType: 'Blob' as 'json' })
+    return this.http.get(url, {
+      responseType: 'blob'
+    });
   }
-
 
 }

@@ -30,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\StaticContent\" />
     <Folder Include="Controllers\Scheduler\" />
     <Folder Include="Controllers\Payment\" />
   </ItemGroup>

@@ -6,7 +6,7 @@ namespace Identity.Services.Interfaces
     public interface IIdentityService
     {
         Task<IServiceResult<UserAuthDTO>> Register(UserToRegisterDTO userToRegister);
-        Task<IServiceResult<UserAuthDTO>> Login(UserToLoginDTO user);
+        Task<IServiceResult<string>> Login(UserToLoginDTO user);
         Task AddDefaultUsers();
         Task AddRoles();
         Task<IServiceResult<string>> CreateTokenForService();

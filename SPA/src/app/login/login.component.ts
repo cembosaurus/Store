@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
+import { User } from '../_models/user';
 
 
 @Component({
@@ -8,34 +9,31 @@ import { AuthService } from '../_services/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  userDTO: any = {};
+  user: User = { id: 0, name: "", password: ""};
   registerMode = false;
 
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
+    this.user = this.getCurentUser();
   }
 
   login() {
-    this.authService.login(this.userDTO)
-      .subscribe(
-        next => {
-        console.log('Login was successful');
-        },
-        error => {
-          console.log(error);
-        }
-      );
+    this.authService.login(this.user)
+      .subscribe((response: any) => {
+      if(!response.status)
+      {
+        alert(" LogIn for user '" + this.user.name + "' failed !\n" + response.message);
+      }
+    });
   }
 
   loggedIn() {
-    const token = localStorage.getItem('token');
-    return !!token;
+    return this.authService.isLoggedIn();
   }
 
   logOut() {
     localStorage.removeItem('token');
-    console.log('Logged OUT !');
   }
   
 
@@ -45,5 +43,10 @@ export class LoginComponent {
 
   cancelRegister(eventFromRegister: boolean) {
     this.registerMode = eventFromRegister;
+  }
+
+  getCurentUser()
+  {
+    return this.authService.getCurentUser();
   }
 }

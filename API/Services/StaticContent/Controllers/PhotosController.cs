@@ -5,7 +5,7 @@ using StaticContent.Services.Interfaces;
 namespace StaticContent.Controllers
 {
 
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PhotosController : ControllerBase
@@ -21,16 +21,19 @@ namespace StaticContent.Controllers
 
 
 
-        //[Authorize(Policy = "Everyone")]
-        [HttpGet("{id}")]
+        [Authorize(Policy = "Everyone")]
+        [HttpGet("items/{id}")]
         public async Task<IActionResult> GetById(string id)
         {
+            var x = Request.Headers["Authorization"];
+
+
             var image = _imageFilesService.GetById(id);
 
             return File(image, "image/jpeg");
         }
 
-        
+
 
     }
 }

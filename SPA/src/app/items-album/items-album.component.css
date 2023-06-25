@@ -6,3 +6,8 @@
 .icon-hover:hover i {
   color: #3b71ca !important;
 }
+
+.card-item-description { 
+  padding: 30; 
+  margin: auto; 
+}

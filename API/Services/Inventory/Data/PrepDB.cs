@@ -35,7 +35,8 @@ namespace Services.Inventory.Data
             }
 
 
-            string Photo(string photoId) => $"{config.GetSection("RemoteServices:StaticContentService").Value}/api/photos/{photoId}";
+            //string Photo(string photoId) => $"{config.GetSection("RemoteServices:StaticContentService").Value}/api/photos/{photoId}";
+            string Photo(string photoId) => $"items/{photoId}";
 
             if (!context.CatalogueItems.Any())
             {
@@ -63,7 +64,7 @@ namespace Services.Inventory.Data
                             RRP = 125,
                             DiscountPercent = 10
                         },
-                        Description = "For families with kids trips or for transporting hookers to party",
+                        Description = "For relaxing sunday trip with family and parents in law, or for transporting hookers to party",
                         Instock = 100
                     },
                     new CatalogueItem() { 

@@ -7,17 +7,21 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ItemsAlbumComponent } from './items-album/items-album.component';
+import { HttpHeaderInterceptor } from './_interceptors/http.header.interceptor';
+import { HttpImagePipe } from './_pipes/http.image.pipe';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     RegisterComponent,
     LoginComponent,
-    ItemsAlbumComponent
+    ItemsAlbumComponent,
+    HttpImagePipe
   ],
   imports: [
     BrowserModule,
@@ -27,7 +31,8 @@ import { ItemsAlbumComponent } from './items-album/items-album.component';
   ],
   providers: [
     AuthService,
-    ErrorInterceptorProvider
+    ErrorInterceptorProvider,
+    { provide: HTTP_INTERCEPTORS, useClass: HttpHeaderInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

@@ -37,16 +37,16 @@ namespace API_Gateway.HttpServices.Identity
 
 
 
-        public async Task<IServiceResult<UserAuthDTO>> Login(UserToLoginDTO user)
+        public async Task<IServiceResult<string>> Login(UserToLoginDTO user)
         {
             var response = await _httpIdentityClient.Login(user);
 
             if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<UserAuthDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
+                return _resultFact.Result<string>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
             var content = response.Content.ReadAsStringAsync().Result;
 
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<UserAuthDTO>>(content);
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<string>>(content);
 
             return result;
         }

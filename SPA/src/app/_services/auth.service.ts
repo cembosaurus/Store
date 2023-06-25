@@ -4,6 +4,8 @@ import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { User } from '../_models/user';
 import { environment } from '../environments/environment';
+import { APIServiceResult } from '../_models/APIServiceResult';
+import { Observable } from 'rxjs';
 
 
 
@@ -12,49 +14,64 @@ import { environment } from '../environments/environment';
 })
 export class AuthService {
 
-  url = environment.apiUrl + 'identity/';
+  url = environment.gatewayUrl + 'identity/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
-  currentUser: User | undefined;
+  user: User = { id: 0, name: "", password: ""};
 
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
 
-  login(userDTO: any) {
+  getJWTToken()
+  {
+    return localStorage.getItem('token') || "";
+  }
 
-    return this.http.post(this.url + 'login', userDTO).pipe(
-      map((response: any) => {
 
-          const response_from_API = response;
+  initialize()
+  {
+    this.decodedToken = this.decodedToken = this.jwtHelper.decodeToken(localStorage.getItem('token') || "");
+    this.user.name = this.decodedToken.name;
+  }
 
-          if (response_from_API) {
 
-            console.log("---> Response from Auth API: ", response_from_API);
-            localStorage.setItem('token', response_from_API.data.token);
-            localStorage.setItem('user', JSON.stringify(response_from_API.data.Name));
-            this.decodedToken = this.jwtHelper.decodeToken(response_from_API.data.token);
-            this.currentUser = response_from_API.data.Name;
+  login(userToLogin: any): Observable<APIServiceResult> {
 
-            console.log("---> Decdoded token from Auth API: ", this.decodedToken);
+    return this.http.post<APIServiceResult>(this.url + 'login', userToLogin)
+    .pipe(
+      map((response: APIServiceResult) => {
+          if (response.status) {
 
+            localStorage.setItem('token', response.data);   
+            this.initialize();
+           
           }
+
+          return response;
         })
     );
   }
 
 
-  register(userDTO: User) {
-    return this.http.post(this.url + 'register', userDTO);
+  register(user: User): Observable<APIServiceResult>  {
+    return this.http.post(this.url + 'register', user)
+    .pipe(
+      map((response: any) => {
+          return response;
+        })
+    );
   }
 
   isLoggedIn() {
-    const jwt = localStorage.getItem('token');
-
-    console.log("---> Decoded TOKEN from Auth API: ", jwt);
-
-    return !this.jwtHelper.isTokenExpired(jwt);
+    return !this.jwtHelper.isTokenExpired(localStorage.getItem('token') || "");
   }
 
+
+  getCurentUser()
+  {
+    this.initialize();
+    return this.user;
+  }
 }

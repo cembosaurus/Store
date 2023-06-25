@@ -148,6 +148,16 @@ builder.Services.AddAuthorization(opt => {
 //        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 //    });
 //});
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.WithOrigins("https://localhost:4001", "http://localhost:4000", "http://localhost:4200")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
 
 
 

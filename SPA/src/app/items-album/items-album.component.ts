@@ -4,6 +4,9 @@ import { Item } from '../_models/item';
 import { map, take } from 'rxjs';
 import { CatalogueItem } from '../_models/catalogueItem';
 import { APIServiceResult } from '../_models/APIServiceResult';
+import { environment } from '../environments/environment';
+
+
 
 @Component({
   selector: 'app-items-album',
@@ -12,6 +15,7 @@ import { APIServiceResult } from '../_models/APIServiceResult';
 })
 export class ItemsAlbumComponent implements OnInit {
 
+  _photosURL = environment.gatewayUrl + 'photos/';
   _catalogueItems: CatalogueItem[] | undefined;
 
   constructor(private itemsService: ItemsService) { }
@@ -32,15 +36,16 @@ export class ItemsAlbumComponent implements OnInit {
   }
 
 
-  getPhoto(photoUrl: string)
-  {
-    return this.itemsService.getPhoto(photoUrl);
-  }
-
-
   addToCart(itemId: number)
   {
     console.log("----------------------> ITEM ID: ", itemId);
+  }
+
+
+
+  getPhoto(id: string)
+  {
+    this.itemsService.getPhoto(this._photosURL + id);
   }
 
 }

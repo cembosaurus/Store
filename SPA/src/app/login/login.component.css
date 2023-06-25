@@ -7,3 +7,19 @@ img {
     border: 2px solid #fff;
     display: inline;
 }
+
+.login-bar {
+    background-color: lightsteelblue;
+}
+
+.log-in-out {
+    margin-right: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.login-bar-user-name {
+
+    color: #fff;
+    font-size: large;
+}

@@ -4,7 +4,8 @@
 
 export const environment = {
     production: false,
-    apiUrl: 'http://localhost:5000/api/'
+    gatewayUrl: 'http://localhost:5000/api/',
+    staticContentUrl: 'http://localhost:4000/api/'
   };
   
   /*

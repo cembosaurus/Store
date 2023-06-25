@@ -25,7 +25,7 @@ namespace API_Gateway.Services.Identity
 
 
 
-        public async Task<IServiceResult<UserAuthDTO>> Login(UserToLoginDTO user)
+        public async Task<IServiceResult<string>> Login(UserToLoginDTO user)
         {
             return await _httpIdentityService.Login(user);
         }

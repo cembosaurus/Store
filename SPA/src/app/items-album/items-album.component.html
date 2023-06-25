@@ -1,20 +1,36 @@
 
 <div class="container my-5">     
   <div class="row">
+
     <div *ngFor="let catalogueItem of _catalogueItems" class="col-lg-3 col-md-6 col-sm-6 d-flex">
+
       <div class="card w-100 my-2 shadow-2-strong">
-        <img src={{catalogueItem.item.photoURL}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" />
+
+        <div>
+          <!-- <img src={{_photosURL}}{{catalogueItem.item.photoURL}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" /> -->
+          <img src={{getPhoto(catalogueItem.item.photoURL)}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" />
+        </div>
+
         <div class="card-body">
-          <h4 class="card-title">{{catalogueItem.item.name}}</h4>
-          <h6 class="card-text">AU${{catalogueItem.itemPrice.rrp}}</h6>
-          <p class="card-text">{{catalogueItem.description}}</p>
+          <div>
+            <h4 class="card-title">{{catalogueItem.item.name}}</h4>
+            <h6 class="card-text">AU${{catalogueItem.itemPrice.rrp}}</h6>
+            <p class="card-text">{{catalogueItem.item.description}}</p>
+          </div>
+
           <div class="card-footer d-flex align-items-end pb-3 px-0 pb-0 mb-auto">
             <a href="#!" class="btn btn-primary shadow-0 me-1" (click)="addToCart(catalogueItem.itemId)">Add to cart</a>
             <a href="#!" class="btn btn-light border px-2 pt-2 icon-hover"><i class="fas fa-heart fa-lg text-secondary px-1"></i></a>
           </div>
-          <p class="card-text">{{catalogueItem.description}}</p>
+
+          <div class="card-item-description">
+            <p class="card-text">{{catalogueItem.description}}</p>
+          </div>
+
         </div>
+
       </div>
+
     </div>
     
   </div>

@@ -75,7 +75,7 @@ namespace Identity.Services
             var tokenResult = await _tokenService.CreateTokenForUser(user);
 
             if (tokenResult == null || !tokenResult.Status)
-                return _resultFact.Result<UserAuthDTO>(null, false, $"JWT token for User '{userAuthDTO.Name}' was NOT crerated !");
+                return _resultFact.Result<UserAuthDTO>(null, false, $"JWT token for User '{userToRegister.Name}' was NOT crerated !");
 
             userAuthDTO.Token = tokenResult.Data;
 
@@ -96,12 +96,12 @@ namespace Identity.Services
 
 
 
-        public async Task<IServiceResult<UserAuthDTO>> Login(UserToLoginDTO user)
+        public async Task<IServiceResult<string>> Login(UserToLoginDTO user)
         {
             var userFromRepo = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == user.Name.ToLower());
 
             if (userFromRepo == null)
-                return _resultFact.Result<UserAuthDTO>(null, false , $"User '{user.Name}' NOT found !");
+                return _resultFact.Result<string>(null, false , $"User '{user.Name}' NOT found !");
 
 
             Console.WriteLine($"--> LOGGING IN user '{user.Name}' .....");
@@ -110,18 +110,15 @@ namespace Identity.Services
             var result = await _signInManager.CheckPasswordSignInAsync(userFromRepo, user.Password, false);                 // 'false' - not locking out user if unsuccessful log in    
 
             if (!result.Succeeded)
-                return _resultFact.Result<UserAuthDTO>(null, false, $"User '{user.Name}' is NOT authorozed !");
+                return _resultFact.Result<string>(null, false, $"User '{user.Name}' is NOT authorozed !");
 
-            var userAuthDTO = _mapper.Map<UserAuthDTO>(userFromRepo);
 
             var tokenResult = await _tokenService.CreateTokenForUser(userFromRepo);
 
             if (tokenResult == null || !tokenResult.Status || string.IsNullOrWhiteSpace(tokenResult.Data))
-                return _resultFact.Result<UserAuthDTO>(null, false, $"JWT token for User '{userAuthDTO.Name}' was NOT crerated !");
+                return _resultFact.Result<string>(null, false, $"JWT token for User '{user.Name}' was NOT crerated !");
 
-            userAuthDTO.Token = tokenResult.Data;
-
-            return _resultFact.Result(userAuthDTO, true);
+            return _resultFact.Result(tokenResult.Data, true);
         }
 
 
