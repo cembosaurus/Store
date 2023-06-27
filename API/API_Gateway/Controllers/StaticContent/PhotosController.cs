@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API_Gateway.Controllers.StaticContent
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PhotosController : ControllerBase
@@ -22,7 +22,7 @@ namespace API_Gateway.Controllers.StaticContent
         }
 
 
-        [Authorize(Policy = "Everyone")]
+        //[Authorize(Policy = "Everyone")]
         [HttpGet("items/{id}")]
         public async Task<IActionResult> GetById(string id)
         {

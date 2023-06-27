@@ -92,7 +92,7 @@ namespace Services.Inventory.Data
                             RRP = 15,
                             DiscountPercent = 10
                         },
-                        Description = "if you want to smile like human being and not like goblin use it every day",
+                        Description = "you don't want to see goblin's smile every morning in mirror",
                         Instock = 100
                     },
                     new CatalogueItem() { 
@@ -106,7 +106,7 @@ namespace Services.Inventory.Data
                             RRP = 1211,
                             DiscountPercent = 12
                         },
-                        Description = "we have lowest prices on shoes. Women are fighting over shoes in here every day like cats",
+                        Description = "we have lowest prices on shoes. The larger foot the lower price",
                         Instock = 100
                     },
                     new CatalogueItem() { 
@@ -151,7 +151,7 @@ namespace Services.Inventory.Data
                             RRP = 2100,
                             DiscountPercent = 20
                         },
-                        Description = "Round, square, triangular, any shape for any IQ",
+                        Description = "Round, square, triangular, any shape for any brain",
                         Instock = 100
                     },
                     new CatalogueItem() {

@@ -6,9 +6,10 @@
 
       <div class="card w-100 my-2 shadow-2-strong">
 
-        <div>
-          <!-- <img src={{_photosURL}}{{catalogueItem.item.photoURL}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" /> -->
-          <img src={{getPhoto(catalogueItem.item.photoURL)}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" />
+        <div class="square">
+          <img src={{_photosURL}}{{catalogueItem.item.photoURL}} />
+          <!-- <img src={{getPhoto(catalogueItem.item.photoURL)}} class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" /> -->
+          <!-- <img [src]='_photosURL + catalogueItem.item.photoURL' class="card-img-top" style="width: 100%; height: auto; margin: 0 auto;" /> -->
         </div>
 
         <div class="card-body">

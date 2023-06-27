@@ -5,6 +5,7 @@ import { map, take } from 'rxjs';
 import { CatalogueItem } from '../_models/catalogueItem';
 import { APIServiceResult } from '../_models/APIServiceResult';
 import { environment } from '../environments/environment';
+import { AuthService } from '../_services/auth.service';
 
 
 
@@ -18,11 +19,10 @@ export class ItemsAlbumComponent implements OnInit {
   _photosURL = environment.gatewayUrl + 'photos/';
   _catalogueItems: CatalogueItem[] | undefined;
 
-  constructor(private itemsService: ItemsService) { }
+  constructor(private itemsService: ItemsService, authService: AuthService) { }
 
 
   ngOnInit(): void {
-
     this.getItems();
   }
 
