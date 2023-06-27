@@ -64,7 +64,7 @@ namespace Services.Inventory.Data
                             RRP = 125,
                             DiscountPercent = 10
                         },
-                        Description = "For relaxing sunday trip with family and parents in law, or for transporting hookers to party",
+                        Description = "For relaxing sunday trip with family and parents in law, or for transporting  friends to party",
                         Instock = 100
                     },
                     new CatalogueItem() { 
