@@ -2,5 +2,6 @@
 {
     public interface ICartService
     {
+        // nothing to implement so far ...
     }
 }

@@ -12,13 +12,11 @@ namespace API_Gateway.Controllers.StaticContent
     {
         private readonly string _staticContentBaseUrl;
         private readonly string _staticContentItemsUrl;
-        private IHttpContextAccessor _accessor;
 
-        public PhotosController(IConfiguration config, IHttpContextAccessor accessor)
+        public PhotosController(IConfiguration config)
         {
             _staticContentBaseUrl = config.GetSection("RemoteServices:StaticContentService:BaseURL").Value;
             _staticContentItemsUrl = config.GetSection("RemoteServices:StaticContentService:ItemsURL").Value;
-            _accessor = accessor;
         }
 
 

@@ -135,6 +135,7 @@ var app = builder.Build();
 // Custom Exception Handler:
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
+
 //app.Use(async (context, next) => 
 //{
 //    Console.WriteLine($".... FIRST middleware BEFORE .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
@@ -170,6 +171,8 @@ app.MapControllers();
 
 // ApiKey Auth:
 app.UseMiddleware<ApiKeyAuthMiddleware>();
+
+
 
 //app.Use(async (context, next) =>
 //{

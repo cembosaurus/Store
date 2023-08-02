@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../app/_services/auth.service';
+
 
 @Component({
   selector: 'app-root',
@@ -7,4 +9,14 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'SPA';
+
+  constructor( private authService: AuthService) { }
+
+
+
+  loggedIn() {
+    return this.authService.isLoggedIn();
+  }
+
+
 }

@@ -5,6 +5,11 @@
 export const environment = {
     production: false,
     gatewayUrl: 'http://localhost:5000/api/',
+    IdentityServiceUrl: "http://localhost:6000/api/",
+    InventoryServiceUrl: "http://localhost:7000/api/",
+    OrderingServiceUrl: "http://localhost:8000/api/",
+    PaymentServiceUrl: "http://localhost:10000/api/",
+    SchedulerServiceUrl: "http://localhost:20000/api/",
     staticContentUrl: 'http://localhost:4000/api/'
   };
   

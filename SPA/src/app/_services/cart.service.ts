@@ -14,7 +14,7 @@ import { APIServiceResult } from '../_models/APIServiceResult';
 export class CartService {
 
   _APIServiceResult: APIServiceResult | undefined;
-  _url = environment.apiUrl;
+  _inventoryUrl = environment.InventoryServiceUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -28,13 +28,13 @@ export class CartService {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     })
 
-    return this.http.post<APIServiceResult>(this._url, { headers: headers });// To DO: add body //////!
+    return this.http.post<APIServiceResult>(this._inventoryUrl, { headers: headers });// To DO: add body //////!
 
 
 
 
 
+  }
 }
-
 
 // "{UserId}/items"

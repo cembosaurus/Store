@@ -1,8 +1,6 @@
-﻿using Business.Libraries.ServiceResult.Interfaces;
-using Business.Scheduler.DTOs;
+﻿using Business.Scheduler.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Scheduler.Models;
 using Scheduler.Services.Interfaces;
 
 namespace Scheduler.Controllers
@@ -13,15 +11,12 @@ namespace Scheduler.Controllers
     [ApiController]
     public class SchedulerController : ControllerBase
     {
-        private readonly IIdentityService _identityService;
         private readonly ICartItemsService _cartItemService;
-        private readonly IServiceResultFactory _resultFact;
 
-        public SchedulerController(ICartItemsService cartItemService, IServiceResultFactory resultFact, IIdentityService identityService)
+
+        public SchedulerController(ICartItemsService cartItemService)
         {
-            _identityService = identityService;
             _cartItemService = cartItemService;
-            _resultFact = resultFact;
         }
 
 

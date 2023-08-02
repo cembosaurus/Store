@@ -5,4 +5,6 @@
 </head>
 
 <app-login></app-login>
-<app-items-album></app-items-album>
+<div *ngIf="loggedIn()">
+   <app-items-album></app-items-album> 
+</div>
