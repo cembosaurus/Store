@@ -12,7 +12,7 @@ namespace Business.Identity.Http.Clients
     public class HttpAddressClient : IHttpAddressClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -26,9 +26,6 @@ namespace Business.Identity.Http.Clients
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:IdentityService").Value + "/api";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -36,8 +33,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAllAddresses()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/all");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address/all"
+            );
 
             Console.WriteLine($"---> GETTING all Addresses ....");
 
@@ -47,8 +46,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAddressByAddressId(int addressId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/{addressId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address/{addressId}"
+            );
 
             Console.WriteLine($"---> GETTING Address '{addressId}' ....");
 
@@ -59,9 +60,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAddressesByAddressIds(IEnumerable<int> addressesIds)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressesIds), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressesIds), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> GETTING addresses by Ids ....");
 
@@ -72,8 +75,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> ExistsAddressByAddressId(int addressId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/{addressId}/exists");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address/{addressId}/exists"
+            );
 
             Console.WriteLine($"---> EXISTS address '{addressId}'....");
 
@@ -84,9 +89,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> AddAddressToUser(int userId, AddressCreateDTO addressDto)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/{userId}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/address/{userId}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> ADDING address to user '{userId}'....");
 
@@ -97,8 +104,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> DeleteAddress(int id)
         {
-            _request.Method = HttpMethod.Delete;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/{id}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Delete,
+                $"/address/{id}"
+            );
 
             Console.WriteLine($"---> DELETING address '{id}'....");
 
@@ -109,8 +118,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAddressesByUserId(int userId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/user/{userId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address/user/{userId}"
+            );
 
             Console.WriteLine($"---> GETTTING address for user '{userId}'....");
 
@@ -121,9 +132,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> SearchAddress(SearchAddressModel searchModel)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(searchModel), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/address",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(searchModel), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> SEARCHING for address ....");
 
@@ -134,13 +147,29 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> UpdateAddress(int id, AddressUpdateDTO addressDto)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/address/{id}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/address/{id}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UPDATING address '{id}'....");
 
             return await _httpClient.SendAsync(_request);
+        }
+
+
+
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Business.Identity.Http.Clients
     public class HttpIdentityClient : IHttpIdentityClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -25,9 +25,6 @@ namespace Business.Identity.Http.Clients
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:IdentityService").Value + "/api";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -36,9 +33,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> Register(UserToRegisterDTO user)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/identity/register");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/identity/register",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> REGISTERING user '{user.Name}' ....");
 
@@ -49,9 +48,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> Login(UserToLoginDTO user)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/identity/login");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/identity/login",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> LOGGING IN user '{user.Name}' ....");
 
@@ -61,8 +62,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> AuthenticateService(string apiKey)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/identity/service/authenticate");
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/identity/service/authenticate"
+            );
 
             // Api Key sent in header, not in body:
             _request.Headers.Add("ApiKey", apiKey);
@@ -72,5 +75,17 @@ namespace Business.Identity.Http.Clients
             return await _httpClient.SendAsync(_request);
         }
 
+
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        }
     }
 }

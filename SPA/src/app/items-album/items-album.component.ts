@@ -32,8 +32,6 @@ export class ItemsAlbumComponent implements OnInit {
     this.itemsService.getItems()
       .subscribe((result: APIServiceResult) => {
         this._catalogueItems = result.data;
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> fetching ITEMS list:" + this._catalogueItems);
-
       });
   }
 

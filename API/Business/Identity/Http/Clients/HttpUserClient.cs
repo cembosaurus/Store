@@ -10,7 +10,7 @@ namespace Business.Identity.Http.Clients
     public class HttpUserClient : IHttpUserClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -24,9 +24,6 @@ namespace Business.Identity.Http.Clients
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:IdentityService").Value + "/api";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -34,9 +31,11 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> EditUserRoles(int id, IEnumerable<string> roles)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/{id}/changeroles");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(roles), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/user/{id}/changeroles",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(roles), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UPDATING roles for user '{id}'....");
 
@@ -46,8 +45,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAllUsers()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user"
+            );
 
             Console.WriteLine($"---> GETTING all users ....");
 
@@ -57,8 +58,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetAllUsersWithRoles()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/withroles");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/withroles"
+            );
 
             Console.WriteLine($"---> GETTING all users with roles ....");
 
@@ -68,8 +71,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetUserById(int id)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/{id}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/{id}"
+            );
 
             Console.WriteLine($"---> GETTING user '{id}'....");
 
@@ -79,8 +84,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetUserByName(string name)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/name/{name}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/name/{name}"
+            );
 
             Console.WriteLine($"---> GETTING user '{name}'....");
 
@@ -90,8 +97,10 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetUserWithRoles(int id)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/{id}/withroles");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/{id}/withroles"
+            );
 
             Console.WriteLine($"---> GETTING user '{id}' with roles ....");
 
@@ -101,12 +110,27 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> GetCurrentUser()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/current");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/current"
+            );
 
             Console.WriteLine($"---> GETTING current user ....");
 
             return await _httpClient.SendAsync(_request);
+        }
+
+
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
     }
 }

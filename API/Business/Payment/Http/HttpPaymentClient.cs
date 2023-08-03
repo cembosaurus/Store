@@ -11,7 +11,7 @@ namespace Business.Payment.Http
     public class HttpPaymentClient : IHttpPaymentClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -26,9 +26,6 @@ namespace Business.Payment.Http
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:PaymentService").Value + "/api/payment";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -37,9 +34,11 @@ namespace Business.Payment.Http
 
         public async Task<HttpResponseMessage> MakePayment(OrderPaymentCreateDTO order)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(order), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+            _request.Method = HttpMethod.Post,
+                $"",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(order), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> SENDING payment request .....");
 
@@ -47,5 +46,15 @@ namespace Business.Payment.Http
         }
 
 
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        }
     }
 }

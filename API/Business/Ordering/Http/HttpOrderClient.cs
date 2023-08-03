@@ -11,7 +11,7 @@ namespace Business.Ordering.Http.temp
     public class HttpOrderClient : IHttpOrderClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -26,9 +26,6 @@ namespace Business.Ordering.Http.temp
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:OrderingService").Value + "/api/order";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -36,8 +33,10 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> CompleteOrder(int userId)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}/complete");
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/{userId}/complete"
+            );
 
             Console.WriteLine($"---> COMPLETING order '{userId}' ....");
 
@@ -48,9 +47,11 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> CreateOrder(int userId, OrderCreateDTO orderDTO)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderDTO }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/{userId}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderDTO }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> CREATING order '{userId}' ....");
 
@@ -61,8 +62,10 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> DeleteOrder(int userId)
         {
-            _request.Method = HttpMethod.Delete;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Delete,
+                $"/{userId}"
+            );
 
             Console.WriteLine($"---> DELETING order '{userId}' ....");
 
@@ -73,8 +76,10 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> GetAllOrders()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/all");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/all"
+            );
 
             Console.WriteLine($"---> GETTING all orders ....");
 
@@ -85,9 +90,11 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> GetOrderByCartId(Guid cartId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/cart");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/cart",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> GETTING order '{cartId}' ....");
 
@@ -98,9 +105,11 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> GetOrderByOrderCode(string code)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/ordercode");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { code }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/ordercode",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { code }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> GETTING order '{code}' ....");
 
@@ -111,8 +120,10 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> GetOrderByUserId(int userId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/user/{userId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/user/{userId}"
+            );
 
             Console.WriteLine($"---> GETTING order '{userId}' ....");
 
@@ -123,13 +134,27 @@ namespace Business.Ordering.Http.temp
 
         public async Task<HttpResponseMessage> UpdateOrder(int userId, OrderUpdateDTO orderDTO)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderDTO }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/{userId}", 
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderDTO }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UPDATING order '{userId}' ....");
 
             return await _httpClient.SendAsync(_request);
+        }
+
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
     }
 }

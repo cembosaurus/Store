@@ -13,7 +13,7 @@ namespace Business.Ordering.Http
     public class HttpCartClient : IHttpCartClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -32,9 +32,6 @@ namespace Business.Ordering.Http
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:OrderingService").Value + "/api/cart";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -44,7 +41,10 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> CreateCart(int userId)
         {
-            _request.Method = HttpMethod.Post;
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $""
+            );
 
             Console.WriteLine($"---> CREATING cart for user '{userId}' ....");
 
@@ -55,9 +55,11 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> ExistsCartByCartId(Guid cartId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/exists");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/exists",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> EXISTS cart '{cartId}' ....");
 
@@ -68,9 +70,11 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
         {
-            _request.Method = HttpMethod.Delete;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/items/expired");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Delete,
+                $"/items/expired",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> REMOVING expired items from carts ....");
 
@@ -81,8 +85,10 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> DeleteCart(int id)
         {
-            _request.Method = HttpMethod.Delete;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{id}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Delete,
+                $"/{id}"
+            );
 
             Console.WriteLine($"---> DELETING cart ....");
 
@@ -93,8 +99,10 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> GetCards()
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/all");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/all"
+            );
 
             Console.WriteLine($"---> GETTING carts ....");
 
@@ -105,8 +113,10 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> GetCartByUserId(int userId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/{userId}"
+            );
 
             Console.WriteLine($"---> GETTING cart '{userId}' ....");
 
@@ -117,13 +127,27 @@ namespace Business.Ordering.Http
 
         public async Task<HttpResponseMessage> UpdateCart(int userId, CartUpdateDTO cartUpdateDTO)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/{userId}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartUpdateDTO }), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/{userId}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartUpdateDTO }), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UPDATING cart '{userId}' ....");
 
             return await _httpClient.SendAsync(_request);
+        }
+
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
     }
 }

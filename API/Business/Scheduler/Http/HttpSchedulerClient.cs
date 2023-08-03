@@ -11,7 +11,7 @@ namespace Business.Scheduler.Http
     public class HttpSchedulerClient : IHttpSchedulerClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -25,9 +25,6 @@ namespace Business.Scheduler.Http
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:SchedulerService").Value + "/api/scheduler";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -36,9 +33,11 @@ namespace Business.Scheduler.Http
 
         public async Task<HttpResponseMessage> CartItemsLock(CartItemsLockCreateDTO cartItemsToLock)
         {
-            _request.Method = HttpMethod.Post;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/cartitem/lock");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToLock), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Post,
+                $"/cartitem/lock",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToLock), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> LOCKING cart items .....");
 
@@ -49,13 +48,26 @@ namespace Business.Scheduler.Http
 
         public async Task<HttpResponseMessage> CartItemsUnLock(CartItemsLockDeleteDTO cartItemsToUnLock)
         {
-            _request.Method = HttpMethod.Delete;
-            _request.RequestUri = new Uri(_request.RequestUri + $"/cartitem/lock");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToUnLock), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Delete,
+                $"/cartitem/lock",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToUnLock), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UNLOCKING cart items .....");
 
             return await _httpClient.SendAsync(_request);
+        }
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
     }

@@ -12,7 +12,7 @@ namespace Business.Inventory.Http
     public class HttpItemPriceClient : IHttpItemPriceClient
     {
 
-        private readonly HttpRequestMessage _request;
+        private HttpRequestMessage _request;
         private readonly HttpClient _httpClient;
         private readonly string _baseUri;
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -26,9 +26,6 @@ namespace Business.Inventory.Http
             _httpClient = httpClient;
             _baseUri = config.GetSection("RemoteServices:InventoryService").Value + "/api/itemprice";
             _accessor = accessor;
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri) };
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
 
@@ -37,9 +34,11 @@ namespace Business.Inventory.Http
 
         public async Task<HttpResponseMessage> GetItemPrices(IEnumerable<int> itemIds)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_baseUri + $"{(itemIds != null && itemIds.Any() ? "" : "/all")}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"{(itemIds != null && itemIds.Any() ? "" : "/all")}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType)
+            );
 
             Console.WriteLine("---> GETTING Item prices ....");
 
@@ -50,8 +49,10 @@ namespace Business.Inventory.Http
 
         public async Task<HttpResponseMessage> GetItemPriceById(int itemId)
         {
-            _request.Method = HttpMethod.Get;
-            _request.RequestUri = new Uri(_baseUri + $"/{itemId}");
+            InitializeHttpRequestMessage(
+                HttpMethod.Get,
+                $"/{itemId}"
+            );
 
             Console.WriteLine($"---> GETTING Item price '{itemId}' ....");
 
@@ -62,9 +63,11 @@ namespace Business.Inventory.Http
 
         public async Task<HttpResponseMessage> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO)
         {
-            _request.Method = HttpMethod.Put;
-            _request.RequestUri = new Uri(_baseUri + $"/{itemId}");
-            _request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemPriceUpdateDTO), _encoding, _mediaType);
+            InitializeHttpRequestMessage(
+                HttpMethod.Put,
+                $"/{itemId}",
+                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemPriceUpdateDTO), _encoding, _mediaType)
+            );
 
             Console.WriteLine($"---> UPDATING Item price '{itemId}' ....");
 
@@ -72,6 +75,17 @@ namespace Business.Inventory.Http
         }
 
 
+
+
+
+        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        {
+            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
+            _request.Method = method;
+            _request.Content = content;
+            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        }
 
 
     }
