@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ItemsAlbumComponent } from './items-album.component';
+import { ItemsAlbumComponent } from './catalogue-items-album.component';
 
 describe('ItemsAlbumComponent', () => {
   let component: ItemsAlbumComponent;

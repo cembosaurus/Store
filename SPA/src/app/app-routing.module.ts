@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
-import { ItemsAlbumComponent } from './items-album/items-album.component';
+import { ItemsAlbumComponent } from './API_Services/Inventory/CatalogueItem/catalogue-items-album/catalogue-items-album.component';
 
 const routes: Routes = [
   {

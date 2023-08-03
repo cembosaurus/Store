@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { ItemsService } from '../_services/items.service';
-import { Item } from '../_models/item';
+import { ItemsService } from '../../../../_services/items.service';
+import { Item } from '../../../../_models/item';
 import { map, take } from 'rxjs';
-import { CatalogueItem } from '../_models/catalogueItem';
-import { APIServiceResult } from '../_models/APIServiceResult';
-import { environment } from '../environments/environment';
-import { AuthService } from '../_services/auth.service';
+import { CatalogueItem } from '../../../../_models/catalogueItem';
+import { APIServiceResult } from '../../../../_models/APIServiceResult';
+import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../../_services/auth.service';
 
 
 
 @Component({
   selector: 'app-items-album',
-  templateUrl: './items-album.component.html',
-  styleUrls: ['./items-album.component.css']
+  templateUrl: './catalogue-items-album.component.html',
+  styleUrls: ['./catalogue-items-album.component.css']
 })
 export class ItemsAlbumComponent implements OnInit {
 
@@ -41,6 +41,11 @@ export class ItemsAlbumComponent implements OnInit {
     console.log("----------------------> ITEM ID: ", itemId);
   }
 
+
+  removeFromCart(itemId: number)
+  {
+    console.log("----------------------> ITEM ID: ", itemId);
+  }
 
 
   getPhoto(id: string)
