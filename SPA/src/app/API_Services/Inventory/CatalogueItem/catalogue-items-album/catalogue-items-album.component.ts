@@ -52,7 +52,7 @@ export class ItemsAlbumComponent implements OnInit {
     .open(AddCatalogueItemPopUpComponent, { data: itemId })
     .afterClosed().subscribe(
       (res)=>{
-        console.log("--------------------------->" + res);
+        console.log("------------------> AMOUNT TO CART", res);
       }
     );
   }
