@@ -6,6 +6,9 @@ import { CatalogueItem } from '../../../../_models/catalogueItem';
 import { APIServiceResult } from '../../../../_models/APIServiceResult';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../../_services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { AddCatalogueItemPopUpComponent } from 'src/app/API_Services/Ordering/Cart/add-catalogue-item-pop-up/add-catalogue-item-pop-up.component';
+import { Observable } from 'rxjs';
 
 
 
@@ -18,13 +21,20 @@ export class ItemsAlbumComponent implements OnInit {
 
   _photosURL = environment.gatewayUrl + 'photos/';
   _catalogueItems: CatalogueItem[] | undefined;
+  _inCart: [itemId: number, amount: number] = [0, 0];
 
-  constructor(private itemsService: ItemsService, authService: AuthService) { }
+  constructor(private itemsService: ItemsService, authService: AuthService, private addItemPopUpDialog: MatDialog) { }
 
 
   ngOnInit(): void {
     this.getItems();
   }
+
+
+
+  // ............................................................. To Do: _inCart should be populated by response from Dialog pop up ..........................
+
+
 
 
   getItems()
@@ -34,6 +44,19 @@ export class ItemsAlbumComponent implements OnInit {
         this._catalogueItems = result.data;
       });
   }
+
+
+
+  openAddItemDialog(itemId: number) {
+    this.addItemPopUpDialog
+    .open(AddCatalogueItemPopUpComponent, { data: itemId })
+    .afterClosed().subscribe(
+      (res)=>{
+        console.log("--------------------------->" + res);
+      }
+    );
+  }
+
 
 
   addToCart(itemId: number)
