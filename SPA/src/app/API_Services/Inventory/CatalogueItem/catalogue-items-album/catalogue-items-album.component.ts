@@ -21,7 +21,7 @@ export class ItemsAlbumComponent implements OnInit {
 
   _photosURL = environment.gatewayUrl + 'photos/';
   _catalogueItems: CatalogueItem[] | undefined;
-  _inCart: [itemId: number, amount: number] = [0, 0];
+  _selectedItems: {itemId: number, amount: number}[] = new Array;
 
   constructor(private itemsService: ItemsService, authService: AuthService, private addItemPopUpDialog: MatDialog) { }
 
@@ -29,11 +29,6 @@ export class ItemsAlbumComponent implements OnInit {
   ngOnInit(): void {
     this.getItems();
   }
-
-
-
-  // ............................................................. To Do: _inCart should be populated by response from Dialog pop up ..........................
-
 
 
 
@@ -48,13 +43,61 @@ export class ItemsAlbumComponent implements OnInit {
 
 
   openAddItemDialog(itemId: number) {
+
     this.addItemPopUpDialog
     .open(AddCatalogueItemPopUpComponent, { data: itemId })
     .afterClosed().subscribe(
-      (res)=>{
-        console.log("------------------> AMOUNT TO CART", res);
+      (amount: number)=>{
+
+        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx SELECTED: ", itemId, " --- ", amount);
+
+        this.addItemToList(itemId, amount);
+
       }
     );
+
+  }
+
+
+
+  // ------------------- To Do  ------------------------------------- prevent duplicate ID value in array:
+
+  addItemToList(itemId: number, amountToAdd: number)
+  {
+    var index = this._selectedItems.findIndex(i => i.itemId === itemId);
+
+    if(index < 0)
+    {
+      this._selectedItems?.push({itemId: itemId, amount: amountToAdd});
+    }
+    else{
+      this._selectedItems.forEach(item => {
+        if(item.itemId === itemId)
+        {
+          this._selectedItems[index].amount += amountToAdd;
+        }
+      });
+    }
+  }
+
+
+  getItemFromList(itemId: number): any
+  {
+    var result = undefined;
+
+    var index = this._selectedItems.findIndex(i => i.itemId === itemId);
+
+    if(index > -1)
+    {
+      this._selectedItems.forEach(item => {
+        if(item.itemId === itemId)
+        {
+          result = item;
+        }
+      });
+    }
+
+    return result;
   }
 
 

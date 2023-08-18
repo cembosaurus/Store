@@ -14,6 +14,17 @@ export class AddCatalogueItemPopUpComponent implements OnInit {
   _itemId: number = 0;
 
 
+
+
+
+
+//--------------------------------------- To Do: input amount on cart to work with
+
+
+
+
+
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: number, private dialogRef: MatDialogRef<AddCatalogueItemPopUpComponent>) {
     this._itemId = data;
   }
