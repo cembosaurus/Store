@@ -22,7 +22,6 @@ export class CartService {
 
 
 
-
   addItemsToCart(items: CartItemUpdateDTO[]): Observable<APIServiceResult>
   {
     const headers = new HttpHeaders({
