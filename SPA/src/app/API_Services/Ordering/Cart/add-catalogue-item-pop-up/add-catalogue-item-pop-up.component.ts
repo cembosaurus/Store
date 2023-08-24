@@ -16,15 +16,6 @@ export class AddCatalogueItemPopUpComponent implements OnInit {
 
 
 
-
-
-//--------------------------------------- To Do: input amount on cart to work with
-
-
-
-
-
-
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<AddCatalogueItemPopUpComponent>) {
     this._itemId = data.itemId;
     this._amountOnCart = data.amount;
@@ -32,10 +23,8 @@ export class AddCatalogueItemPopUpComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  ngOnDestroy(){
-
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ", this._amountOnCart);
-
+  ngOnDestroy()
+  {
     this.dialogRef.close(this._amountOnCart); 
   }
 

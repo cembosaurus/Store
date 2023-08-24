@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { Observable, map } from 'rxjs';
 import { APIServiceResult } from '../_models/APIServiceResult';
+import { CartItemUpdateDTO } from '../_models/CartItemUpdateDTO';
 
 
 
@@ -14,27 +15,23 @@ import { APIServiceResult } from '../_models/APIServiceResult';
 export class CartService {
 
   _APIServiceResult: APIServiceResult | undefined;
-  _inventoryUrl = environment.InventoryServiceUrl;
+  _orderingUrl = environment.OrderingServiceUrl;
+
 
   constructor(private http: HttpClient) { }
 
 
 
 
-  addItemToCart(): Observable<APIServiceResult>
+  addItemsToCart(items: CartItemUpdateDTO[]): Observable<APIServiceResult>
   {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     })
 
-    return this.http.post<APIServiceResult>(this._inventoryUrl, { headers: headers });// To DO: add body //////!
-
-
-
-
+    return this.http.post<APIServiceResult>(this._orderingUrl + "cart/items", {Items: items},{ headers: headers });
 
   }
 }
 
-// "{UserId}/items"
