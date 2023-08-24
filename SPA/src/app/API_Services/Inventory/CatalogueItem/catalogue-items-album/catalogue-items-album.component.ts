@@ -44,12 +44,12 @@ export class ItemsAlbumComponent implements OnInit {
 
   openAddItemDialog(itemId: number) {
 
+    var item = this.getItemFromList(itemId);
+
     this.addItemPopUpDialog
-    .open(AddCatalogueItemPopUpComponent, { data: itemId })
+    .open(AddCatalogueItemPopUpComponent, { data: item ?? {itemId: itemId, amount: 0} })
     .afterClosed().subscribe(
       (amount: number)=>{
-
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx SELECTED: ", itemId, " --- ", amount);
 
         this.addItemToList(itemId, amount);
 
@@ -59,8 +59,6 @@ export class ItemsAlbumComponent implements OnInit {
   }
 
 
-
-  // ------------------- To Do  ------------------------------------- prevent duplicate ID value in array:
 
   addItemToList(itemId: number, amountToAdd: number)
   {
@@ -74,7 +72,7 @@ export class ItemsAlbumComponent implements OnInit {
       this._selectedItems.forEach(item => {
         if(item.itemId === itemId)
         {
-          this._selectedItems[index].amount += amountToAdd;
+          this._selectedItems[index].amount = amountToAdd;
         }
       });
     }

@@ -10,8 +10,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export class AddCatalogueItemPopUpComponent implements OnInit {
 
   @Output() _itemAmountEmiter = new EventEmitter<any>();
-  _amountOnCart: number = 0;
-  _itemId: number = 0;
+  _amountOnCart: number;
+  _itemId: number;
 
 
 
@@ -25,13 +25,17 @@ export class AddCatalogueItemPopUpComponent implements OnInit {
 
 
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: number, private dialogRef: MatDialogRef<AddCatalogueItemPopUpComponent>) {
-    this._itemId = data;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private dialogRef: MatDialogRef<AddCatalogueItemPopUpComponent>) {
+    this._itemId = data.itemId;
+    this._amountOnCart = data.amount;
   }
 
   ngOnInit(): void { }
 
   ngOnDestroy(){
+
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ", this._amountOnCart);
+
     this.dialogRef.close(this._amountOnCart); 
   }
 
