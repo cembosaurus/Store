@@ -117,16 +117,24 @@ export class ItemsAlbumComponent implements OnInit {
 
 
 
+
+
+
+
+// ------------------- To Do: load items on cart from API to add or delete --------------------------
+
+
+
+
+
   addToCart()
   {
+    console.log("--------- ADD to cart -------------> ITEM ID: ", this._selectedItems);
+
     this.cartService.addItemsToCart(this._selectedItems)
     .subscribe(data => {
       console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX API RESPONSE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", data);
-    });
-
-
-    console.log("--------- ADD to cart -------------> ITEM ID: ", this._selectedItems);
-    
+    });    
   }
 
 

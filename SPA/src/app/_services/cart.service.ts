@@ -21,6 +21,13 @@ export class CartService {
   constructor(private http: HttpClient) { }
 
 
+  //----------------------------------------------- To Do:
+  getItemsFromCart()
+  {
+    
+  }
+
+
 
   addItemsToCart(items: CartItemUpdateDTO[]): Observable<APIServiceResult>
   {
@@ -30,7 +37,16 @@ export class CartService {
     })
 
     return this.http.post<APIServiceResult>(this._orderingUrl + "cart/items", {Items: items},{ headers: headers });
-
   }
+
+
+
+  // removeItemsFromCart(): Observable<APIServiceResult>
+  // {
+
+  // }
+
+
+
 }
 
