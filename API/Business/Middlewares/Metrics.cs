@@ -29,6 +29,7 @@ namespace Business.Middlewares
             {
                 context.Response.Headers.Add("TimeIn", _timeIn.ToString());
                 context.Response.Headers.Add("TimeOut", DateTime.UtcNow.ToString());
+
                 return Task.CompletedTask;
             });
 
