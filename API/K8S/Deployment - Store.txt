@@ -7,33 +7,33 @@
 
 HTTP:
 
-docker build -t cembo/store_api_gateway -f api_gateway/Dockerfile .
+docker build -t cembo/store_api_gateway -f api/api_gateway/Dockerfile .
 docker push cembo/store_api_gateway
 
-docker build -t cembo/store_identity -f services/identity/Dockerfile .
+docker build -t cembo/store_identity -f api/services/identity/Dockerfile .
 docker push cembo/store_identity
 
-docker build -t cembo/store_inventory -f services/inventory/Dockerfile .
+docker build -t cembo/store_inventory -f api/services/inventory/Dockerfile .
 docker push cembo/store_inventory
 
-docker build -t cembo/store_ordering -f services/ordering/Dockerfile .
+docker build -t cembo/store_ordering -f api/services/ordering/Dockerfile .
 docker push cembo/store_ordering
 
-docker build -t cembo/store_payment -f services/payment/Dockerfile .
+docker build -t cembo/store_payment -f api/services/payment/Dockerfile .
 docker push cembo/store_payment
 
-docker build -t cembo/store_scheduler -f services/scheduler/Dockerfile .
+docker build -t cembo/store_scheduler -f api/services/scheduler/Dockerfile .
 docker push cembo/store_scheduler
 
-docker build -t cembo/store_static_content -f services/staticcontent/Dockerfile .
+docker build -t cembo/store_static_content -f api/services/staticcontent/Dockerfile .
 docker push cembo/store_static_content
 
 AMQP:
 
-docker build -t cembo/store_inventory_amqp_publisher -f Inventory.Publisher/Dockerfile .
+docker build -t cembo/store_inventory_amqp_publisher -f api/Inventory.Publisher/Dockerfile .
 docker push cembo/store_inventory_amqp_publisher
 
-docker build -t cembo/store_inventory_amqp_consumer -f Inventory.Consumer/Dockerfile .
+docker build -t cembo/store_inventory_amqp_consumer -f api/Inventory.Consumer/Dockerfile .
 docker push cembo/store_inventory_amqp_consumer
 
 
@@ -205,23 +205,23 @@ kubectl delete secret inventory-amqp-mssql
 BUILD:
 
 
-docker build -t cembo/store_api_gateway -f api_gateway/Dockerfile .
+docker build -t cembo/store_api_gateway -f api/api_gateway/Dockerfile .
 docker push cembo/store_api_gateway
-docker build -t cembo/store_identity -f services/identity/Dockerfile .
+docker build -t cembo/store_identity -f api/services/identity/Dockerfile .
 docker push cembo/store_identity
-docker build -t cembo/store_inventory -f services/inventory/Dockerfile .
+docker build -t cembo/store_inventory -f api/services/inventory/Dockerfile .
 docker push cembo/store_inventory
-docker build -t cembo/store_ordering -f services/ordering/Dockerfile .
+docker build -t cembo/store_ordering -f api/services/ordering/Dockerfile .
 docker push cembo/store_ordering
-docker build -t cembo/store_payment -f services/payment/Dockerfile .
+docker build -t cembo/store_payment -f api/services/payment/Dockerfile .
 docker push cembo/store_payment
-docker build -t cembo/store_scheduler -f services/scheduler/Dockerfile .
+docker build -t cembo/store_scheduler -f api/services/scheduler/Dockerfile .
 docker push cembo/store_scheduler
-docker build -t cembo/store_static_content -f services/staticcontent/Dockerfile .
+docker build -t cembo/store_static_content -f api/services/staticcontent/Dockerfile .
 docker push cembo/store_static_content
-docker build -t cembo/store_inventory_amqp_publisher -f Inventory.Publisher/Dockerfile .
+docker build -t cembo/store_inventory_amqp_publisher -f api/Inventory.Publisher/Dockerfile .
 docker push cembo/store_inventory_amqp_publisher
-docker build -t cembo/store_inventory_amqp_consumer -f Inventory.Consumer/Dockerfile .
+docker build -t cembo/store_inventory_amqp_consumer -f api/Inventory.Consumer/Dockerfile .
 docker push cembo/store_inventory_amqp_consumer
 cls
 
@@ -234,26 +234,26 @@ kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0r
 kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
 kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
 kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-pvc.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-pvc.yaml
-kubectl apply -f k8s/services.sync/identity/identity-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-mssql-depl.yaml
+kubectl apply -f api/k8s/services.sync/identity/identity-pvc.yaml
+kubectl apply -f api/k8s/services.sync/inventory/inventory-pvc.yaml
+kubectl apply -f api/k8s/services.sync/ordering/ordering-pvc.yaml
+kubectl apply -f api/k8s/services.sync/scheduler/scheduler-pvc.yaml
+kubectl apply -f api/k8s/services.sync/identity/identity-mssql-depl.yaml
+kubectl apply -f api/k8s/services.sync/inventory/inventory-mssql-depl.yaml
+kubectl apply -f api/k8s/services.sync/ordering/ordering-mssql-depl.yaml
+kubectl apply -f api/k8s/services.sync/scheduler/scheduler-mssql-depl.yaml
 kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-pvc.yaml
-kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-mssql-depl.yaml
-kubectl apply -f k8s/api_gateway/api-gateway-service-depl.yaml
-kubectl apply -f k8s/services.sync/identity/identity-service-depl.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-service-depl.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-service-depl.yaml
-kubectl apply -f k8s/services.sync/payment/payment-service-depl.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-service-depl.yaml
-kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.yaml
-kubectl apply -f k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
-kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
+kubectl apply -f api/k8s/services.async/inventory/consumer/inventory-amqp-pvc.yaml
+kubectl apply -f api/k8s/services.async/inventory/consumer/inventory-amqp-mssql-depl.yaml
+kubectl apply -f api/k8s/api_gateway/api-gateway-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/identity/identity-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/inventory/inventory-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/ordering/ordering-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/payment/payment-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/scheduler/scheduler-service-depl.yaml
+kubectl apply -f api/k8s/services.sync/static_content/static-content-service-depl.yaml
+kubectl apply -f api/k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
+kubectl apply -f api/k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
 kubectl get pods
 
 ---

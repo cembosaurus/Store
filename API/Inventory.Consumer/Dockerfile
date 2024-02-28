@@ -6,14 +6,14 @@ ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Inventory.Consumer/Inventory.Consumer.csproj", "Inventory.Consumer/"]
-COPY ["Business/Business.csproj", "Business/"]
+COPY ["API/Inventory.Consumer/Inventory.Consumer.csproj", "Inventory.Consumer/"]
+COPY ["API/Business/Business.csproj", "Business/"]
 RUN dotnet restore "Inventory.Consumer/Inventory.Consumer.csproj"
 COPY . .
-RUN dotnet build "Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/build
+RUN dotnet build "API/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "API/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

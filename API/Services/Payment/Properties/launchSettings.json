@@ -12,7 +12,7 @@
     "Payment": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:10001;http://localhost:10000",
       "environmentVariables": {

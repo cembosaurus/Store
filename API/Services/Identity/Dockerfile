@@ -6,14 +6,14 @@ ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Services/Identity/Identity.csproj", "Services/Identity/"]
-COPY ["Business/Business.csproj", "Business/"]
+COPY ["API/Services/Identity/Identity.csproj", "Services/Identity/"]
+COPY ["API/Business/Business.csproj", "Business/"]
 RUN dotnet restore "Services/Identity/Identity.csproj"
 COPY . .
-RUN dotnet build "Services/Identity/Identity.csproj" -c Release -o /app/build
+RUN dotnet build "API/Services/Identity/Identity.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Services/Identity/Identity.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "API/Services/Identity/Identity.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

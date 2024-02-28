@@ -3,6 +3,7 @@ using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Middlewares;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.Services;
 using Inventory.Services.Interfaces;
@@ -23,12 +24,15 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddFluentValidation(conf => {
-    conf.DisableDataAnnotationsValidation = true;
-    //conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
-    conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
-    conf.AutomaticValidationEnabled = true;
-});
+//builder.Services.AddFluentValidation(conf => {
+//    conf.DisableDataAnnotationsValidation = true;
+//    //conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
+//    conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
+//    conf.AutomaticValidationEnabled = true;
+//});
+builder.Services.AddFluentValidationAutoValidation(opt => opt.DisableDataAnnotationsValidation = true);
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssembly(typeof(ValidationFilter).Assembly);
 
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });         // Allow optional argument in controller's action
 builder.Services.AddDbContext<InventoryContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("InventoryConnStr"), opt => opt.EnableRetryOnFailure()));
@@ -95,6 +99,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+app.UseMiddleware<Metrics>();
+
 
 // Custom Exception Handler:
 app.UseMiddleware<ErrorHandlerMiddleware>();

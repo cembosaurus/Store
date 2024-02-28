@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Services.Identity.Controllers
 {
 
-    //[Authorize]       // No need to authorize for Register and Login:
     [Route("api/[controller]")]
     [ApiController]
     public class IdentityController : ControllerBase

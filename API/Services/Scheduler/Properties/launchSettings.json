@@ -12,7 +12,7 @@
     "Scheduler": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:20001;http://localhost:20000",
       "environmentVariables": {
