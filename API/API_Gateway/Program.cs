@@ -165,6 +165,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<Metrics>();
+
 // Custom Exception Handler:
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
