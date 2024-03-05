@@ -7,11 +7,11 @@ using System.Net.Http.Headers;
 
 namespace Business.Middlewares
 {
-    public class ApiKeyAuthMiddleware
+    public class ApiKeyAuth_MW
     {
         private RequestDelegate _next;
 
-        public ApiKeyAuthMiddleware(RequestDelegate next)
+        public ApiKeyAuth_MW(RequestDelegate next)
         {
             _next = next;
         }

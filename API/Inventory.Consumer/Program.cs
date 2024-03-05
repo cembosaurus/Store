@@ -93,7 +93,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Custom Exception Handler:
-app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<ErrorHandler_MW>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

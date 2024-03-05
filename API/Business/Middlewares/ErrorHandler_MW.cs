@@ -5,11 +5,11 @@ using System.Text.Json;
 
 namespace Business.Middlewares
 {
-    public class ErrorHandlerMiddleware
+    public class ErrorHandler_MW
     {
         private readonly RequestDelegate _next;
 
-        public ErrorHandlerMiddleware(RequestDelegate next)
+        public ErrorHandler_MW(RequestDelegate next)
         {
             _next = next;
         }

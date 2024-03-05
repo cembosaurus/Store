@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Publisher", "Inve
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Consumer", "Inventory.Consumer\Inventory.Consumer.csproj", "{66884615-2ABF-4D6B-ACAE-318B66A92742}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_Metrics", "API_Metrics\API_Metrics.csproj", "{154992D7-CC06-4A6C-AD38-F6775C3212E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{66884615-2ABF-4D6B-ACAE-318B66A92742}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66884615-2ABF-4D6B-ACAE-318B66A92742}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66884615-2ABF-4D6B-ACAE-318B66A92742}.Release|Any CPU.Build.0 = Release|Any CPU
+		{154992D7-CC06-4A6C-AD38-F6775C3212E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{154992D7-CC06-4A6C-AD38-F6775C3212E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{154992D7-CC06-4A6C-AD38-F6775C3212E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{154992D7-CC06-4A6C-AD38-F6775C3212E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

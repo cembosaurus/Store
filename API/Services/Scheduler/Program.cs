@@ -132,10 +132,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<Metrics>();
+app.UseMiddleware<Metrics_MW>();
 
 // Custom Exception Handler:
-app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<ErrorHandler_MW>();
 
 
 //app.Use(async (context, next) => 
@@ -148,7 +148,7 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 
 
 // Custom Exception Handler:
-app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<ErrorHandler_MW>();
 
 
 // Configure the HTTP request pipeline.
@@ -172,7 +172,7 @@ app.MapControllers();
 
 
 // ApiKey Auth:
-app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.UseMiddleware<ApiKeyAuth_MW>();
 
 
 
