@@ -4,12 +4,14 @@ using API_Gateway.HttpServices.Inventory;
 using API_Gateway.HttpServices.Inventory.Interfaces;
 using API_Gateway.HttpServices.Ordering;
 using API_Gateway.HttpServices.Ordering.Interfaces;
-using API_Gateway.Services.Identity;
-using API_Gateway.Services.Identity.Interfaces;
-using API_Gateway.Services.Inventory;
-using API_Gateway.Services.Inventory.Interfaces;
-using API_Gateway.Services.Ordering;
-using API_Gateway.Services.Ordering.Interfaces;
+using API_Gateway.Services.Business.Identity;
+using API_Gateway.Services.Business.Identity.Interfaces;
+using API_Gateway.Services.Business.Inventory;
+using API_Gateway.Services.Business.Inventory.Interfaces;
+using API_Gateway.Services.Business.Ordering;
+using API_Gateway.Services.Business.Ordering.Interfaces;
+using API_Gateway.Services.Management;
+using API_Gateway.Services.Management.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Clients;
 using Business.Identity.Http.Clients.Interfaces;
@@ -48,6 +50,7 @@ builder.Services.AddScoped<IItemPriceService, ItemPriceService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddSingleton<IRemoteServices, RemoteServices>();
 
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpUserService, HttpUserService>();
@@ -60,31 +63,31 @@ builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
 builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpUserClient, HttpUserClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpCartItemClient, HttpCartItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
 });
 builder.Services.AddHttpClient<IHttpOrderClient, HttpOrderClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService").Value);
+    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
 });
 
 

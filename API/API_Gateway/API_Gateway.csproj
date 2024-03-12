@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Scheduler\" />
-    <Folder Include="Controllers\Payment\" />
+    <Folder Include="Controllers\Business\Scheduler\" />
+    <Folder Include="Controllers\Business\Payment\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Business.Middlewares.DTO;
+﻿using Business.Management.Services.DTO;
 using Microsoft.AspNetCore.Http;
 
 namespace Business.Middlewares
@@ -21,7 +21,7 @@ namespace Business.Middlewares
             if (context.Request.Path == "/svcid")
             {
                 await context.Response.WriteAsync(
-                    Newtonsoft.Json.JsonConvert.SerializeObject(new ServiceIdDTO { Id = _serviceId, Name = _serviceName })
+                    Newtonsoft.Json.JsonConvert.SerializeObject(new ServiceIdReadDTO { Id = _serviceId, Name = _serviceName })
                     );          
             }
             // auto - data in header (Service Id only):

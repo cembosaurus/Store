@@ -24,7 +24,7 @@ namespace Business.Inventory.Http
         public HttpItemClient(HttpClient httpClient, IConfiguration config, IHttpContextAccessor accessor)
         {
             _httpClient = httpClient;
-            _baseUri = config.GetSection("RemoteServices:AMQP:InventoryService").Value + "/api/item";
+            _baseUri = config.GetSection("RemoteServices:InventoryService").Value + "/api/item";
             _accessor = accessor;
         }
 
