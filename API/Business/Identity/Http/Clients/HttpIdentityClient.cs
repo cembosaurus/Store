@@ -11,9 +11,12 @@ namespace Business.Identity.Http.Clients
     public class HttpIdentityClient : IHttpIdentityClient
     {
 
-        private HttpRequestMessage _request;
+        private HttpRequestMessage _requestMessage;
         private readonly HttpClient _httpClient;
-        private readonly string _baseUri;
+        private readonly string _requestUri;
+        private string _requestQuery;
+        private HttpMethod _method;
+        private HttpContent _content;
         private readonly Encoding _encoding = Encoding.UTF8;
         private readonly string _mediaType = "application/json";
 
@@ -23,7 +26,7 @@ namespace Business.Identity.Http.Clients
         public HttpIdentityClient(HttpClient httpClient, IConfiguration config, IHttpContextAccessor accessor)
         {
             _httpClient = httpClient;
-            _baseUri = config.GetSection("RemoteServices:IdentityService").Value + "/api";
+            _requestUri = config.GetSection("RemoteServices:IdentityService").Value + "/api";
             _accessor = accessor;
         }
 
@@ -33,59 +36,59 @@ namespace Business.Identity.Http.Clients
 
         public async Task<HttpResponseMessage> Register(UserToRegisterDTO user)
         {
-            InitializeHttpRequestMessage(
-                HttpMethod.Post,
-                $"/identity/register",
-                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType)
-            );
+            _method = HttpMethod.Post;
+            _requestQuery = $"/identity/register";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
+
+            InitializeHttpRequestMessage();
 
             Console.WriteLine($"---> REGISTERING user '{user.Name}' ....");
 
-            return await _httpClient.SendAsync(_request);
+            return await _httpClient.SendAsync(_requestMessage);
         }
 
 
 
         public async Task<HttpResponseMessage> Login(UserToLoginDTO user)
         {
-            InitializeHttpRequestMessage(
-                HttpMethod.Post,
-                $"/identity/login",
-                new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType)
-            );
+            _method = HttpMethod.Post;
+            _requestQuery = $"/identity/login";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
+
+            InitializeHttpRequestMessage();
 
             Console.WriteLine($"---> LOGGING IN user '{user.Name}' ....");
 
-            return await _httpClient.SendAsync(_request);
+            return await _httpClient.SendAsync(_requestMessage);
         }
 
 
         public async Task<HttpResponseMessage> AuthenticateService(string apiKey)
         {
-            InitializeHttpRequestMessage(
-                HttpMethod.Post,
-                $"/identity/service/authenticate"
-            );
+            _method = HttpMethod.Post;
+            _requestQuery = $"/identity/service/authenticate";
 
-            // Api Key sent in header, not in body:
-            _request.Headers.Add("ApiKey", apiKey);
+            InitializeHttpRequestMessage();
+
+            // Api Key transported in header, not in body:
+            _requestMessage.Headers.Add("ApiKey", apiKey);
 
             Console.WriteLine($"--> AUTHENTICATING service ....");
 
-            return await _httpClient.SendAsync(_request);
+            return await _httpClient.SendAsync(_requestMessage);
         }
 
 
 
 
 
-        private void InitializeHttpRequestMessage(HttpMethod method, string uri, HttpContent content = default)
+        private void InitializeHttpRequestMessage()
         {
-            _request = new HttpRequestMessage { RequestUri = new Uri(_baseUri + uri) };
-            _request.Method = method;
-            _request.Content = content;
-            _request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+            _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestUri + _requestQuery) };         //----- To Do: Base URL not fetched !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            _requestMessage.Method = _method;
+            _requestMessage.Content = _content;
+            _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+            _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
     }
 }

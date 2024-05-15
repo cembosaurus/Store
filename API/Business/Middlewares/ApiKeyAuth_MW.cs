@@ -1,9 +1,7 @@
 ﻿using Business.Identity.Http.Services.Interfaces;
 using Business.Scheduler.JWT.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
-using System.Net.Http.Headers;
 
 namespace Business.Middlewares
 {
@@ -21,7 +19,7 @@ namespace Business.Middlewares
             if (string.IsNullOrWhiteSpace(context.Request.Headers[HeaderNames.Authorization].ToString()) &&
                 (string.IsNullOrWhiteSpace(tokenStore.Token) || tokenStore.IsExipred))
             {
-                var authResult = await httpApiKeyAuthService.AuthenticateService();
+                var authResult = await httpApiKeyAuthService.LoginWithApiKey();
 
                 if (authResult == null || !authResult.Status)
                     Console.WriteLine($"--> Service FAILED to authenticate ! {(authResult == null ? string.Empty : "Reason: '" + authResult.Message)}'");

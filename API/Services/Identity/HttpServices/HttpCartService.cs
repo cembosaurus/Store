@@ -1,7 +1,7 @@
 ﻿using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
-using Business.Ordering.Http.Interfaces;
+using Business.Ordering.Http.Clients.Interfaces;
 using Identity.HttpServices.Interfaces;
 
 namespace Identity.HttpServices

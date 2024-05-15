@@ -9,6 +9,6 @@ namespace Business.Identity.Http.Services.Interfaces
 {
     public interface IHttpApiKeyAuthService
     {
-        Task<IServiceResult<string>> AuthenticateService();
+        Task<IServiceResult<string>> LoginWithApiKey();
     }
 }

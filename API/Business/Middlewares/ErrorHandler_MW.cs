@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.ComponentModel;
+﻿using Business.Exceptions.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
+
+
 
 namespace Business.Middlewares
 {
     public class ErrorHandler_MW
     {
         private readonly RequestDelegate _next;
+        private readonly IExId _exId;
 
-        public ErrorHandler_MW(RequestDelegate next)
+        public ErrorHandler_MW(RequestDelegate next, IExId exId)
         {
             _next = next;
+            _exId = exId;
         }
 
         public async Task Invoke(HttpContext context)
@@ -31,23 +35,9 @@ namespace Business.Middlewares
                 {
                     case HttpRequestException ex:
 
-                        var w32ex = error as Win32Exception;
-
-                        if (w32ex == null)
-                            w32ex = error.InnerException as Win32Exception;
-
-                        if (w32ex != null)
-                        {
-                            int code = w32ex.ErrorCode;
-
-                            // winsock connection error:
-                            context.Response.StatusCode =
-                                code == 10061
-                                ? (int)HttpStatusCode.ServiceUnavailable
-                                : response.StatusCode;
-
-                            Console.WriteLine($"--> Could NOT get response !");
-                        }
+                        context.Response.StatusCode = _exId.Http_503(error) 
+                            ? (int)HttpStatusCode.ServiceUnavailable
+                            : response.StatusCode;
 
                         break;
 
@@ -79,6 +69,9 @@ namespace Business.Middlewares
                 await response.WriteAsync(result);
             }
         }
+
+
     }
+
 }
 

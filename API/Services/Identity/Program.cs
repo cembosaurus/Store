@@ -1,12 +1,23 @@
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
+using Business.Filters.Validation;
+using Business.Http.Interfaces;
+using Business.Http;
 using Business.Identity.Enums;
-using Business.Libraries.Http.Interfaces;
-using Business.Libraries.Http;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Ordering.Http;
-using Business.Ordering.Http.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Data;
+using Business.Management.Data.Interfaces;
+using Business.Management.Http.Services;
+using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
+using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
+using FluentValidation.AspNetCore;
 using Identity.Data;
 using Identity.Data.Repositories;
 using Identity.Data.Repositories.Interfaces;
@@ -26,9 +37,10 @@ using Services.Identity.Data.Repositories;
 using Services.Identity.Data.Repositories.Interfaces;
 using Services.Identity.Models;
 using System.Text;
-using Business.Filters.Validation;
-using FluentValidation.AspNetCore;
-using Business.Middlewares;
+using Business.Identity.Http.Services.Interfaces;
+using Business.Identity.Http.Services;
+using Business.Ordering.Http.Clients.Interfaces;
+using Business.Ordering.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +55,14 @@ builder.Services.AddFluentValidation(conf => {
     //conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
     conf.AutomaticValidationEnabled = true;
 });
+
+builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
+builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
+builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnStr")));
@@ -62,6 +82,10 @@ builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>(client => {
     client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService").Value);
 });
 
+// To replace other Http Clients:
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+
+
 builder.Services.AddIdentityCore<AppUser>(opt => {
     opt.Password.RequireNonAlphanumeric = false;    // Add more options to customize password complexity.
     opt.Password.RequireDigit = false;
@@ -77,7 +101,7 @@ builder.Services.AddIdentityCore<AppUser>(opt => {
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("AppSettings:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters

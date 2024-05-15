@@ -1,8 +1,10 @@
-﻿using API_Gateway.HttpServices.Identity.Interfaces;
-using API_Gateway.Services.Business.Identity.Interfaces;
+﻿using API_Gateway.Services.Business.Identity.Interfaces;
 using Business.Identity.DTOs;
+using Business.Identity.Http.Services.Interfaces;
 using Business.Identity.Models;
 using Business.Libraries.ServiceResult.Interfaces;
+
+
 
 namespace API_Gateway.Services.Business.Identity
 {

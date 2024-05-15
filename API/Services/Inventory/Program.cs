@@ -1,3 +1,5 @@
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
@@ -17,7 +19,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddControllers(opt =>
 {
@@ -50,7 +52,7 @@ builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("AppSettings:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters

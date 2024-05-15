@@ -49,10 +49,10 @@ namespace Services.Identity.Controllers
 
 
         // Filter attr.:
-        // Services authentication - 'ApiKey' value from request header
+        // Services authentication - 'ApiKey' value from request header. Returns JWT as user login
         [ApiKeyAuth]
         [HttpPost("service/authenticate")]
-        public async Task<IActionResult> Authenticate()
+        public async Task<IActionResult> LoginWithApiKey()
         {
             var result = await _identityService.CreateTokenForService();
 

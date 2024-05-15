@@ -15,8 +15,8 @@ namespace API_Gateway.Controllers.Business.StaticContent
 
         public PhotosController(IConfiguration config)
         {
-            _staticContentBaseUrl = config.GetSection("RemoteServices:StaticContentService:REST:BaseURL").Value;
-            _staticContentItemsUrl = config.GetSection("RemoteServices:StaticContentService:REST:ItemsURL").Value;
+            _staticContentBaseUrl = config.GetSection("RemoteServices_old:StaticContentService:REST:BaseURL").Value;
+            _staticContentItemsUrl = config.GetSection("RemoteServices_old:StaticContentService:REST:ItemsURL").Value;
         }
 
 

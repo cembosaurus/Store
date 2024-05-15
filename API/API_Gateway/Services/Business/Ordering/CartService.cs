@@ -1,7 +1,9 @@
-﻿using API_Gateway.HttpServices.Ordering.Interfaces;
-using API_Gateway.Services.Business.Ordering.Interfaces;
+﻿using API_Gateway.Services.Business.Ordering.Interfaces;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
+
+
 
 namespace API_Gateway.Services.Business.Ordering
 {

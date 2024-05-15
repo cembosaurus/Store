@@ -1,15 +1,28 @@
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
+using Business.Filters.Validation;
+using Business.Http.Interfaces;
+using Business.Http;
 using Business.Identity.Enums;
+using Business.Identity.Http.Clients;
 using Business.Identity.Http.Clients.Interfaces;
-using Business.Inventory.Http;
-using Business.Inventory.Http.Interfaces;
-using Business.Libraries.Http.Interfaces;
-using Business.Libraries.Http;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Data;
+using Business.Management.Data.Interfaces;
+using Business.Management.Http.Services;
+using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
+using Business.Middlewares;
 using Business.Payment.Http;
 using Business.Payment.Http.Interfaces;
 using Business.Scheduler.Http;
 using Business.Scheduler.Http.Interfaces;
+using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +36,10 @@ using Ordering.OrderingBusinessLogic;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services;
 using Ordering.Services.Interfaces;
-using System.Text;
-using Business.Identity.Http.Clients;
-using MediatR;
 using System.Reflection;
-using Business.Filters.Validation;
-using FluentValidation.AspNetCore;
-using Business.Middlewares;
+using System.Text;
+using Business.Inventory.Http.Clients.Interfaces;
+using Business.Inventory.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +49,13 @@ builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ValidationFilter>();
 });
+
+builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
+builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;
@@ -62,12 +79,19 @@ builder.Services.AddScoped<IHttpSchedulerService, HttpSchedulerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>();
-builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>();
+//builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>();
 builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
-builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
+//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
 builder.Services.AddHttpClient<IHttpPaymentClient, HttpPaymentClient>();
 builder.Services.AddHttpClient<IHttpSchedulerClient, HttpSchedulerClient>();
 builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>();
+//builder.Services.AddHttpClient<IHttpManagementClient, HttpManagementClient>(client => {
+//    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices_old:OrderingService:REST:BaseURL").Value);
+//});
+
+// To replace other Http Clients:
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
@@ -84,7 +108,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("AppSettings:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters

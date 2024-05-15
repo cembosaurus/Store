@@ -1,0 +1,14 @@
+﻿using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Models;
+
+namespace Business.Management.Services.Interfaces
+{
+    public interface IRemoteServicesInfoService
+    {
+        IServiceResult<string> BuildServiceURL(string serviceName, string pathName);
+        IServiceResult<ServiceURL> GetServiceURLByBaseURL(string baseURL);
+        IServiceResult<ServiceURL> GetServiceURLByName(string name);
+        Task<IServiceResult<IEnumerable<ServiceURL>>> LoadAllRemoteServicesURL();
+        IServiceResult<IEnumerable<ServiceURL>> InitializeRemoteServicesURLs(IEnumerable<ServiceURL> servicesURLs);
+    }
+}

@@ -1,16 +1,28 @@
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Identity.Enums;
-using Business.Identity.Http.Clients;
-using Business.Identity.Http.Clients.Interfaces;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
-using Business.Inventory.Http;
-using Business.Inventory.Http.Interfaces;
+using Business.Inventory.Http.Clients;
+using Business.Inventory.Http.Clients.Interfaces;
+using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Data;
+using Business.Management.Data.Interfaces;
+using Business.Management.Http.Services;
+using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
 using Business.Middlewares;
-using Business.Ordering.Http;
-using Business.Ordering.Http.Interfaces;
+using Business.Ordering.Http.Clients;
+using Business.Ordering.Http.Clients.Interfaces;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
 using FluentValidation.AspNetCore;
@@ -21,8 +33,6 @@ using Quartz;
 using Scheduler.Data;
 using Scheduler.Data.Repositories;
 using Scheduler.Data.Repositories.Interfaces;
-using Scheduler.HttpServices;
-using Scheduler.HttpServices.Interfaces;
 using Scheduler.Modules;
 using Scheduler.Services;
 using Scheduler.Services.Interfaces;
@@ -39,6 +49,13 @@ builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ValidationFilter>();
 });
+
+builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
+builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;
@@ -59,7 +76,6 @@ builder.Services.AddTransient<ICartItemLocker, CartItemLocker>();
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddScoped<ICartItemLockRepository, CartItemLockRepository>();
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 // Multiple interfaces in one service:
 builder.Services.AddScoped<OrderingService>();
@@ -77,13 +93,17 @@ builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 
 builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
 builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>();
-builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
+//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
+
+// To replace other Http Clients:
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("AppSettings:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters

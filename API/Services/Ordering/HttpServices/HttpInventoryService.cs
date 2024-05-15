@@ -1,7 +1,7 @@
 ﻿using Business.Inventory.DTOs.CatalogueItem;
 using Business.Inventory.DTOs.Item;
 using Business.Inventory.DTOs.ItemPrice;
-using Business.Inventory.Http.Interfaces;
+using Business.Inventory.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Ordering.HttpServices.Interfaces;

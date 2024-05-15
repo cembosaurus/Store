@@ -1,28 +1,38 @@
-using API_Gateway.HttpServices.Identity;
-using API_Gateway.HttpServices.Identity.Interfaces;
-using API_Gateway.HttpServices.Inventory;
-using API_Gateway.HttpServices.Inventory.Interfaces;
-using API_Gateway.HttpServices.Ordering;
-using API_Gateway.HttpServices.Ordering.Interfaces;
 using API_Gateway.Services.Business.Identity;
 using API_Gateway.Services.Business.Identity.Interfaces;
 using API_Gateway.Services.Business.Inventory;
 using API_Gateway.Services.Business.Inventory.Interfaces;
 using API_Gateway.Services.Business.Ordering;
 using API_Gateway.Services.Business.Ordering.Interfaces;
-using API_Gateway.Services.Management;
-using API_Gateway.Services.Management.Interfaces;
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Clients;
 using Business.Identity.Http.Clients.Interfaces;
-using Business.Inventory.Http;
-using Business.Inventory.Http.Interfaces;
+using Business.Identity.Http.Services;
+using Business.Identity.Http.Services.Interfaces;
+using Business.Inventory.Http.Clients;
+using Business.Inventory.Http.Clients.Interfaces;
+using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
+using Business.Management.Data;
+using Business.Management.Data.Interfaces;
+using Business.Management.Http.Services;
+using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
 using Business.Middlewares;
-using Business.Ordering.Http;
-using Business.Ordering.Http.Interfaces;
-using Business.Ordering.Http.temp;
+using Business.Ordering.Http.Clients;
+using Business.Ordering.Http.Clients.Interfaces;
+using Business.Ordering.Http.Services;
+using Business.Ordering.Http.Services.Interfaces;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,11 +45,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddSingleton<IExId, ExId>();
+
+builder.Services.Configure<List<ServiceURL>>(builder.Configuration.GetSection("RemoteServices"));
+builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
+builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IJWTTokenStore, JWTTokenStore>();
+builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -50,7 +70,6 @@ builder.Services.AddScoped<IItemPriceService, ItemPriceService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddSingleton<IRemoteServices, RemoteServices>();
 
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpUserService, HttpUserService>();
@@ -62,33 +81,19 @@ builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
-builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpUserClient, HttpUserClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:IdentityService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:InventoryService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpCartItemClient, HttpCartItemClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
-});
-builder.Services.AddHttpClient<IHttpOrderClient, HttpOrderClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService:REST:BaseURL").Value);
-});
+//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
+builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>();
+builder.Services.AddHttpClient<IHttpUserClient, HttpUserClient>();
+//builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>();
+builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
+builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>();
+builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>();
+builder.Services.AddHttpClient<IHttpCartItemClient, HttpCartItemClient>();
+builder.Services.AddHttpClient<IHttpOrderClient, HttpOrderClient>();
+
+// To replace other Http Clients:
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+
 
 
 
@@ -98,7 +103,7 @@ builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("AppSettings:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -166,7 +171,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSwaggerGen();
 
+
+
 var app = builder.Build();
+
+
 
 app.UseMiddleware<Metrics_MW>();
 
@@ -196,5 +205,21 @@ app.UseAuthorization();
 //app.MapGet("/", () => "Zedous !");
 
 app.MapControllers();
+
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var service = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfoService>();
+
+    // load all remote services URLs from, Management service:
+    try { 
+        await service.LoadAllRemoteServicesURL(); 
+    }
+    catch (HttpRequestException ex) {
+        Console.WriteLine(ex.Message);
+    }
+}
+
 
 app.Run();

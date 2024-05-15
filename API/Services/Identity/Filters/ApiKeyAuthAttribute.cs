@@ -23,7 +23,7 @@ namespace Identity.Filters
 
             var conf = context.HttpContext.RequestServices.GetService<IConfiguration>();
 
-            var apiKey = conf.GetSection("ApiKey").Value;
+            var apiKey = conf.GetSection("Auth:ApiKey").Value;
 
 
             if (!apiKey.Equals(_secretApiKey))

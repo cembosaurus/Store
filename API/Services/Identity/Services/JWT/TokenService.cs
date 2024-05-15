@@ -20,7 +20,7 @@ namespace Identity.Services.JWT
 
         public TokenService(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
         {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("AppSettings:JWTKey").Value));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Auth:JWTKey").Value));
             _userManager = userManager;
             _resultFact = resultFact;
         }

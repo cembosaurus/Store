@@ -44,7 +44,7 @@ namespace Scheduler.Startup
         {
             try
             {
-                await _httpApiKeyAuthService.AuthenticateService();
+                await _httpApiKeyAuthService.LoginWithApiKey();
 
                 isAuthenticated = true;
             }

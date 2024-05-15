@@ -32,6 +32,7 @@
   <ItemGroup>
     <Folder Include="Controllers\Business\Scheduler\" />
     <Folder Include="Controllers\Business\Payment\" />
+    <Folder Include="Services\Management\" />
   </ItemGroup>
 
 </Project>

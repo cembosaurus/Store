@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Scheduler.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Scheduler.Data.Repositories.Interfaces;
-using Scheduler.HttpServices.Interfaces;
 using Scheduler.Models;
 using Scheduler.Services.Interfaces;
 

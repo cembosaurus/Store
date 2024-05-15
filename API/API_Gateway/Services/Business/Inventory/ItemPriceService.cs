@@ -1,7 +1,9 @@
-﻿using API_Gateway.HttpServices.Inventory.Interfaces;
-using API_Gateway.Services.Business.Inventory.Interfaces;
+﻿using API_Gateway.Services.Business.Inventory.Interfaces;
 using Business.Inventory.DTOs.ItemPrice;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+
+
 
 namespace API_Gateway.Services.Business.Inventory
 {
