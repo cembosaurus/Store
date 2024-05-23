@@ -47,7 +47,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IExId, ExId>();
 
-builder.Services.Configure<List<ServiceURL>>(builder.Configuration.GetSection("RemoteServices"));
+builder.Services.Configure<Config_Global>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
@@ -210,11 +210,11 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var service = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfoService>();
+    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfoService>();
 
     // load all remote services URLs from, Management service:
     try { 
-        await service.LoadAllRemoteServicesURL(); 
+        await remoteServicesInfoService.LoadURLs(); 
     }
     catch (HttpRequestException ex) {
         Console.WriteLine(ex.Message);

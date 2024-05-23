@@ -14,6 +14,8 @@ using Business.Management.Data;
 using Business.Management.Data.Interfaces;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
 using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
@@ -22,11 +24,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
+builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddHostedService<Management_Worker>();
 builder.Services.AddSingleton<FileSystemWatcher>();
@@ -38,7 +44,9 @@ builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.Configure<List<ServiceURL>>(builder.Configuration.GetSection("RemoteServices"));
+// Appsettings:
+//builder.Services.Configure<List<ServiceURL_AS>>(builder.Configuration.GetSection("RemoteServices"));
+builder.Services.Configure<Config_Global>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();

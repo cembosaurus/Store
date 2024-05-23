@@ -1,4 +1,6 @@
-﻿using Business.Management.Appsettings.Interfaces;
+﻿using Business.Filters.Identity;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,29 +15,29 @@ namespace Management.Controllers
     public class RemoteServiceController : ControllerBase
     {
 
-        private readonly IAppsettingsService _appsettings;
+        private readonly IAppsettingsService _appsettingsService;
 
 
 
-        public RemoteServiceController(IAppsettingsService appsettings)
+        public RemoteServiceController(IAppsettingsService appsettingsService)
         {
-            _appsettings = appsettings;
+            _appsettingsService = appsettingsService;
         }
 
 
 
 
-        [Authorize(Policy = "Everyone")]
+        [ApiKeyAuth]
         [HttpGet("url/all")]
         public ActionResult GetAllServicesURL()
         {
-            var result = _appsettings.GetAllRemoteServicesURL();
+            var result = _appsettingsService.GetAllRemoteServicesURL();
 
             return result.Status ? Ok(result) : BadRequest(result);
         }
 
 
-
+        //[Authorize(Policy = "Everyone")]
         //[HttpGet("{id}", Name = "GetServiceById")]
         //public async Task<ActionResult> GetServiceInfoById([FromRoute]Guid id)
         //{

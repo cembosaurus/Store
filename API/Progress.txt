@@ -30,7 +30,7 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
 
 
 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     --- ORDERING SERVICE is DISABLED - causing problem witrh HttpItemClient because HttpItemClient is uder re-construction !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     --- ORDERING SERVICE and PAYMENT SERVICE are DISABLED - causing problem witrh HttpItemClient because HttpItemClient is uder re-construction !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 

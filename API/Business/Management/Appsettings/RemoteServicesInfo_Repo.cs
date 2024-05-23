@@ -22,40 +22,40 @@ namespace Business.Management.Appsettings
 
 
 
-        public List<ServiceURL> GetAllURLs()
+        public List<ServiceURL_AS> GetAllURLs()
         { 
             return _remoteServicesInfo_DB.URLs.ToList();
         }
 
-        public ServiceURL GetByName(string name)
+        public ServiceURL_AS GetByName(string name)
         {
             return _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Name == name);
         }
 
-        public ServiceURL GetByBaseURL(string baseURL)
+        public ServiceURL_AS GetByBaseURL(string baseURL)
         {
             return _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
         }
 
-        public List<ServiceURL> GetByPathName(string pathName)
+        public List<ServiceURL_AS> GetByPathName(string pathName)
         {
             return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName)));
         }
 
 
-        public List<ServiceURL> GetByPathRoure(string pathRoute)
+        public List<ServiceURL_AS> GetByPathRoure(string pathRoute)
         {
             return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute)));
         }
 
 
-        public List<ServiceURL> GetByType(string type)
+        public List<ServiceURL_AS> GetByType(string type)
         {
             return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(st => st.Name == type));
         }
 
 
-        public bool UpdateByName(string name, ServiceURL serviceURL)
+        public bool UpdateByName(string name, ServiceURL_AS serviceURL)
         { 
             var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Name == name);
 
@@ -70,7 +70,7 @@ namespace Business.Management.Appsettings
         }
 
 
-        public bool UpdateByBaseURL(string baseURL, ServiceURL serviceURL)
+        public bool UpdateByBaseURL(string baseURL, ServiceURL_AS serviceURL)
         {
             var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
@@ -116,7 +116,7 @@ namespace Business.Management.Appsettings
 
 
 
-        public bool InitializeDB(List<ServiceURL> data)
+        public bool InitializeDB(List<ServiceURL_AS> data)
         {
             if(data.IsNullOrEmpty())
                 return false;

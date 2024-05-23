@@ -1,10 +1,10 @@
 ﻿using Business.Management.Enums;
 using Microsoft.AspNetCore.Http;
-using static Business.Management.Appsettings.Models.ServiceURL.ServiceType;
+using static Business.Management.Appsettings.Models.ServiceURL_AS.ServiceType;
 
 namespace Business.Management.Appsettings.Models
 {
-    public class ServiceURL
+    public class ServiceURL_AS
     {
 
 
@@ -22,10 +22,6 @@ namespace Business.Management.Appsettings.Models
                 get { return _name; }
                 set 
                 {
-                    //foreach (var st in Enum.GetValues(typeof(TypeOfService)))
-                    //{
-                    //    _name = value == st.ToString() ? value : TypeOfService.Undefined.ToString();
-                    //}
                     foreach (var st in Enum.GetValues(typeof(TypeOfService)))
                     {
                         if (value == st.ToString())
@@ -61,7 +57,9 @@ namespace Business.Management.Appsettings.Models
         }
 
 
-        public string GetUrl(TypeOfService type, bool isProdEnv)
+
+
+        public string GetBaseUrl(TypeOfService type, bool isProdEnv)
         {
             var url = Type.FirstOrDefault(t => t.Name == type.ToString()).BaseURL;
 
@@ -69,7 +67,7 @@ namespace Business.Management.Appsettings.Models
         }
 
 
-        public string GetPathByName(string name, TypeOfService type)
+        public string GetPathByName(TypeOfService type, string name)
         {
             return Type.FirstOrDefault(t => t.Name == type.ToString()).Paths.FirstOrDefault(p => p.Name == name).Route;
         }
@@ -78,6 +76,18 @@ namespace Business.Management.Appsettings.Models
         public IEnumerable<URLPath> GetPaths(TypeOfService type)
         { 
             return Type.Where(t => t.Name == type.ToString()).SelectMany(s => s.Paths);
+        }
+
+
+        public string GetUrlWithPath(TypeOfService type, string pathName, bool isProdEnv)
+        {
+            var url = GetBaseUrl(type, isProdEnv);
+            var path = GetPathByName(TypeOfService.REST, pathName);
+
+            if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
+                return "";
+
+            return url += "/" + path;
         }
 
     }

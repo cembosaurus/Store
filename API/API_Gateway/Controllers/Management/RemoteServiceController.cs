@@ -28,9 +28,9 @@ namespace API_Gateway.Controllers.Management
 
         [Authorize(Policy = "Everyone")]
         [HttpPut()]
-        public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<ServiceURL> servicesURLs)
+        public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<ServiceURL_AS> servicesURLs)
         {
-            var result = _remoteServicesInfoService.InitializeRemoteServicesURLs(servicesURLs);
+            var result = _remoteServicesInfoService.UpdateURLs(servicesURLs);
 
             return result.Status ? Ok(result) : BadRequest(result);
         }

@@ -4,8 +4,8 @@ using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-
-
+using Business.Management.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Business.Identity.Http.Services
 {
@@ -15,8 +15,8 @@ namespace Business.Identity.Http.Services
         private readonly IServiceResultFactory _resultFact;
 
 
-        public HttpIdentityService(IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
-            : base(httpAppClient)
+        public HttpIdentityService(IHostingEnvironment env, IHttpAppClient httpAppClient, IRemoteServicesInfoService remoteServicesInfoService, IServiceResultFactory resultFact)
+            : base(env, httpAppClient, remoteServicesInfoService)
         {
             _resultFact = resultFact;
         }

@@ -1,12 +1,18 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
+using Business.Management.Enums;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -19,9 +25,12 @@ namespace Business.Http
 
         private readonly IExId _exId;
         private static IHttpContextAccessor _accessor;
+        private readonly bool _isProdEnv;
         private readonly IHttpAppClient _httpAppClient;
         private readonly IRemoteServicesInfoService _remoteServicesInfoService;
 
+        protected IAppsettingsService _appsettingsService;
+        protected ServiceURL_AS _serviceURL;
         protected HttpRequestMessage _requestMessage;
         protected string _remoteServiceName;
         protected string _remoteServicePathName;
@@ -37,15 +46,18 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHttpAppClient httpAppClient, IRemoteServicesInfoService remoteServicesInfoService)
+        public HttpBaseService(IHostingEnvironment env, IHttpAppClient httpAppClient, IRemoteServicesInfoService remoteServicesInfoService)
         {
+            _isProdEnv = env.IsProduction();
             _httpAppClient = httpAppClient;
             _remoteServicesInfoService = remoteServicesInfoService;
         }
 
         // to prevent circulatory DI with RemoteServicesInfoService. Other Http Services need RemoteServicesInfoService:
-        public HttpBaseService(IHttpAppClient httpAppClient)
+        public HttpBaseService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient)
         {
+            _isProdEnv = env.IsProduction();
+            _appsettingsService = appsettingsService;
             _httpAppClient = httpAppClient;
         }
 
@@ -55,75 +67,49 @@ namespace Business.Http
         // ... if Management API service is not reached then there is no logic in trying to update Management API service's URL from the same Management API service :)))
         protected async virtual Task<HttpResponseMessage> Send()
         {
-            var URLStringResult = BuildServiceURL();
+            _requestURL = _serviceURL.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
-            if (URLStringResult.Status)
-                _requestURL = BuildServiceURL().Data ?? "";
-
-
-
-
-
-
-
-            //.............................................................. URL DB should be loaded before this request on app startup. !!!!!!!!! But if Management service is not ON on startup then load URLs now !!!
-
-            // ................................... Handle the URLs reload on empty DB in RemoteServicesInfoService ????????????????????
-
-
-
-
-
-
-
-            try
+            if (!string.IsNullOrWhiteSpace(_requestURL))
             {
-                InitializeHttpRequestMessage();
-
-                return await _httpAppClient.Send(_requestMessage);
-            }
-            catch (Exception ex) when (_exId.Http_503(ex))
-            {
-                // Catch ex 503: local URL definition is obsolete or wrong, request failed !
-                // Update Remote Service URL to avoid 503 exception and try request again:
-
-                var URLResult = await _remoteServicesInfoService.LoadAllRemoteServicesURL();
-
-                if (!URLResult.Status)
-                    throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {URLResult.Message}");
-
-
-                URLStringResult = BuildServiceURL();
-
-                if (!URLStringResult.Status)
-                    throw new HttpRequestException($"Could NOT get Remote Service URL ! Reason: '{URLStringResult.Message}'");
-
-
-                _requestURL = URLStringResult.Data ?? "";
-
                 try
                 {
-                    // Rebuild the http request message, to prevent "Request already sent" error:
                     InitializeHttpRequestMessage();
 
                     return await _httpAppClient.Send(_requestMessage);
                 }
-                catch
+                catch (Exception ex) when (_exId.Http_503(ex))
                 {
-                    throw;
+                    // Catch ex 503: local URL definition is obsolete or wrong, request failed !
+                    // Update Remote Service URL to avoid 503 exception and try request again:
+
+                    var URLResult = await _remoteServicesInfoService.LoadURLs();
+
+                    if (!URLResult.Status)
+                        throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {URLResult.Message}");
+
+
+                    _requestURL = _serviceURL.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
+
+                    if (string.IsNullOrWhiteSpace(_requestURL))
+                        throw new HttpRequestException("Could NOT get Remote Service URL ! Request URL was NOTY constructed !");
+
+                    try
+                    {
+                        // Rebuild the http request message, to prevent "Request already sent" error:
+                        InitializeHttpRequestMessage();
+
+                        return await _httpAppClient.Send(_requestMessage);
+                    }
+                    catch
+                    {
+                        throw;
+                    }
                 }
+
             }
 
-
+            return _requestMessage.CreateErrorResponse(HttpStatusCode.BadRequest, "Request URL was NOT constructed !");
         }
-
-
-
-        protected virtual IServiceResult<string> BuildServiceURL()
-        {
-            return _remoteServicesInfoService.BuildServiceURL(_remoteServiceName, _remoteServicePathName);
-        }
-
 
 
         protected void InitializeHttpRequestMessage()
@@ -132,7 +118,8 @@ namespace Business.Http
             _requestMessage.Method = _method;
             _requestMessage.Content = _content;
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+            if(!string.IsNullOrWhiteSpace(_token))
+                _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             if (!_headers.IsNullOrEmpty())
             {
                 foreach (var h in _headers)
@@ -141,6 +128,28 @@ namespace Business.Http
                 }
             }
             _headers.Clear();
+        }
+
+
+
+        protected bool AddApiKeyToHeader()
+        {
+            var apiKeyResult = _appsettingsService.GetApiKey();
+
+            if (apiKeyResult.Status)
+            {
+                _headers.Add("ApiKey", apiKeyResult.Data);
+
+                return true;
+            }
+
+            return false;
+        }
+
+
+        protected void Initialize()
+        {
+            _serviceURL = _appsettingsService.GetRemoteServiceURL(_remoteServiceName).Data;
         }
 
     }

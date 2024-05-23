@@ -11,22 +11,22 @@ namespace Business.Management.Appsettings
     public class AppsettingsService : IAppsettingsService
     {
 
-        private IOptionsMonitor<List<ServiceURL>> _monitorServicesURLs;
+        private IOptionsMonitor<Config_Global> _config_global;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
-        public AppsettingsService(IOptionsMonitor<List<ServiceURL>> monitorServicesURLs, IServiceScopeFactory serviceFactory)
+        public AppsettingsService(IOptionsMonitor<Config_Global> config_global, IServiceScopeFactory serviceFactory)
         {
-            _monitorServicesURLs = monitorServicesURLs;
+            _config_global = config_global;
             _serviceFactory = serviceFactory;
         }
 
 
 
 
-        public IServiceResult<IEnumerable<ServiceURL>> GetAllRemoteServicesURL()
+        public IServiceResult<IEnumerable<ServiceURL_AS>> GetAllRemoteServicesURL()
         {
-            var urlResult = _monitorServicesURLs.CurrentValue;
+            var urlResult = _config_global.CurrentValue.RemoteServices;
 
 
             // create scope of IServiceResultFactory inside this singleton:
@@ -34,14 +34,14 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                return resultFact.Result<IEnumerable<ServiceURL>>(urlResult, true);
+                return resultFact.Result(urlResult, true);
             }
         }
 
 
-        public IServiceResult<ServiceURL> GetRemoteServiceURL(string name)
+        public IServiceResult<ServiceURL_AS> GetRemoteServiceURL(string name)
         {
-            var urlResult = _monitorServicesURLs.CurrentValue;
+            var urlResult = _config_global.CurrentValue.RemoteServices;
 
             var url = urlResult.FirstOrDefault(url => url.Name == name);
 
@@ -56,6 +56,27 @@ namespace Business.Management.Appsettings
                 }
                 
                 return resultFact.Result(url, true);
+            }
+        }
+
+
+
+        public IServiceResult<string> GetApiKey()
+        {
+            var apiKey = _config_global.CurrentValue.Auth.ApiKey;
+
+
+            // create scope of IServiceResultFactory inside this singleton:
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
+
+                if (string.IsNullOrWhiteSpace(apiKey))
+                {
+                    return resultFact.Result("", false, $"API-Key was NOT found in Appsettings !");
+                }
+
+                return resultFact.Result(apiKey, true);
             }
         }
 

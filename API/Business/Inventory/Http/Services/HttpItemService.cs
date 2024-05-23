@@ -5,8 +5,7 @@ using Business.Inventory.DTOs.Item;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
-
-
+using Microsoft.AspNetCore.Hosting;
 
 namespace Business.Inventory.Http.Services
 {
@@ -17,8 +16,8 @@ namespace Business.Inventory.Http.Services
 
 
 
-        public HttpItemService(IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfoService remoteServicesInfoService)
-            : base(httpAppClient, remoteServicesInfoService)
+        public HttpItemService(IHostingEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfoService remoteServicesInfoService)
+            : base(env, httpAppClient, remoteServicesInfoService)
         {
             _resultFact = resultFact;
 

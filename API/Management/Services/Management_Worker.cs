@@ -25,10 +25,10 @@ namespace Management.Services
 
 
 
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
             Console.WriteLine("TEST");
         }
-
 
 
         public void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
@@ -44,9 +44,9 @@ namespace Management.Services
 
             using (var scope = _serviceFactory.CreateScope())
             {
-                var authService = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
+                var service = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
 
-                authService.LoginWithApiKey();
+                service.LoginWithApiKey();
             }
 
 
@@ -54,6 +54,7 @@ namespace Management.Services
         }
 
 
+        // ................................................................ To Do: also appsettings production:
         private void Initialize()
         {
             _watcher.Path = Directory.GetCurrentDirectory();
@@ -65,7 +66,7 @@ namespace Management.Services
             //                    | NotifyFilters.LastAccess
             //                    | NotifyFilters.Security
             //                    | NotifyFilters.Size;
-            _watcher.Filter = "appsettings.Development.json";
+            _watcher.Filter = "appsettings.Development.json";               
             _watcher.Changed += new FileSystemEventHandler(OnAppsettingsUpdated);
             _watcher.EnableRaisingEvents = true;
         }

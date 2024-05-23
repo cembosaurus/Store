@@ -6,9 +6,9 @@ namespace Business.Management.Services.Interfaces
     public interface IRemoteServicesInfoService
     {
         IServiceResult<string> BuildServiceURL(string serviceName, string pathName);
-        IServiceResult<ServiceURL> GetServiceURLByBaseURL(string baseURL);
-        IServiceResult<ServiceURL> GetServiceURLByName(string name);
-        Task<IServiceResult<IEnumerable<ServiceURL>>> LoadAllRemoteServicesURL();
-        IServiceResult<IEnumerable<ServiceURL>> InitializeRemoteServicesURLs(IEnumerable<ServiceURL> servicesURLs);
+        IServiceResult<ServiceURL_AS> GetServiceURLByBaseURL(string baseURL);
+        IServiceResult<ServiceURL_AS> GetServiceURLByName(string name);
+        Task<IServiceResult<IEnumerable<ServiceURL_AS>>> LoadURLs();
+        IServiceResult<IEnumerable<ServiceURL_AS>> UpdateURLs(IEnumerable<ServiceURL_AS> servicesURLs);
     }
 }
