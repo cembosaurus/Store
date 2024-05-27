@@ -17,7 +17,7 @@ namespace Business.Inventory.Http.Services
 
 
         public HttpItemService(IHostingEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfoService remoteServicesInfoService)
-            : base(env, httpAppClient, remoteServicesInfoService)
+            : base(env, httpAppClient, remoteServicesInfoService, resultFact)
         {
             _resultFact = resultFact;
 

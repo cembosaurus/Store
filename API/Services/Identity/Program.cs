@@ -61,7 +61,7 @@ builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
-builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
+//builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

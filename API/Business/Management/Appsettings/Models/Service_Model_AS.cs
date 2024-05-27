@@ -1,21 +1,24 @@
 ﻿using Business.Management.Enums;
-using Microsoft.AspNetCore.Http;
-using static Business.Management.Appsettings.Models.ServiceURL_AS.ServiceType;
+using static Business.Management.Appsettings.Models.Service_Model_AS.ServiceType;
+
+
 
 namespace Business.Management.Appsettings.Models
 {
-    public class ServiceURL_AS
+    public class Service_Model_AS
     {
 
 
         public string Name { get; set; }
-        public IEnumerable<ServiceType> Type { get; set; }
+        public ICollection<ServiceType> Type { get; set; } = new List<ServiceType>();
 
 
 
         public class ServiceType
         {
+
             private string _name;
+
 
             public string Name 
             {
@@ -36,7 +39,7 @@ namespace Business.Management.Appsettings.Models
                 }
             }
             public SchemeHostPort BaseURL { get; set; }
-            public IEnumerable<URLPath> Paths { get; set; }
+            public ICollection<URLPath> Paths { get; set; } = new List<URLPath>();
 
 
 
@@ -73,9 +76,9 @@ namespace Business.Management.Appsettings.Models
         }
 
 
-        public IEnumerable<URLPath> GetPaths(TypeOfService type)
+        public ICollection<URLPath> GetPaths(TypeOfService type)
         { 
-            return Type.Where(t => t.Name == type.ToString()).SelectMany(s => s.Paths);
+            return Type.Where(t => t.Name == type.ToString()).SelectMany(s => s.Paths).ToList();
         }
 
 

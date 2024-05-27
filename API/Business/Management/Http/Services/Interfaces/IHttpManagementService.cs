@@ -5,6 +5,6 @@ namespace Business.Management.Http.Services.Interfaces
 {
     public interface IHttpManagementService
     {
-        Task<IServiceResult<IEnumerable<ServiceURL_AS>>> GetAllRemoteServicesURLs();
+        Task<IServiceResult<IEnumerable<Service_Model_AS>>> GetAllRemoteServices();
     }
 }

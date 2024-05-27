@@ -28,6 +28,7 @@ namespace Management.Controllers
 
 
         [ApiKeyAuth]
+        [AllowAnonymous]
         [HttpGet("url/all")]
         public ActionResult GetAllServicesURL()
         {

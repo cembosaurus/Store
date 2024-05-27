@@ -30,11 +30,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddHostedService<Management_Worker>();
+
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+
 builder.Services.AddSingleton<IExId, ExId>();
-builder.Services.AddHostedService<Management_Worker>();
 builder.Services.AddSingleton<FileSystemWatcher>();
 builder.Services.AddSingleton<IAppsettingsService, AppsettingsService>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
@@ -46,7 +48,7 @@ builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
 // Appsettings:
 //builder.Services.Configure<List<ServiceURL_AS>>(builder.Configuration.GetSection("RemoteServices"));
-builder.Services.Configure<Config_Global>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
@@ -65,7 +67,7 @@ builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters

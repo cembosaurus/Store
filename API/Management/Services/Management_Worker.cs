@@ -27,7 +27,7 @@ namespace Management.Services
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
-            Console.WriteLine("TEST");
+            Console.WriteLine("--> Management Service: Background worker is running ...");
         }
 
 

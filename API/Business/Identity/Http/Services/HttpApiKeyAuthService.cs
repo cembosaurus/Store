@@ -22,7 +22,7 @@ namespace Business.Identity.Http.Services
         {
             _httpIdentityService = httpIdentityService;
             _resultFact = resultFact;
-            _apiKey = "KOKOT";// config.GetSection("Auth:ApiKey").Value ?? "";
+            _apiKey = config.GetSection("Auth:ApiKey").Value ?? "";
             _accessor = accessor;
             _ = _accessor.HttpContext ?? new DefaultHttpContext();
             _jwtTokenStore = jwtTokenStore;

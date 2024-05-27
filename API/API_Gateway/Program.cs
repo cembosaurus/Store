@@ -47,7 +47,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IExId, ExId>();
 
-builder.Services.Configure<Config_Global>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
@@ -212,12 +212,13 @@ using (var scope = app.Services.CreateScope())
 {
     var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfoService>();
 
-    // load all remote services URLs from, Management service:
+    // load all remote services models from, Management service:
     try { 
-        await remoteServicesInfoService.LoadURLs(); 
+        var result = await remoteServicesInfoService.LoadServiceModels();
+        Console.WriteLine($"--> Loading remote services info models from Management service: {(result.Status ? "Success !" : $"Failed: {result.Message}")}");
     }
     catch (HttpRequestException ex) {
-        Console.WriteLine(ex.Message);
+        Console.WriteLine($"--> Remote service info models were NOT loaded from Management service ! EX: {ex.Message}");
     }
 }
 

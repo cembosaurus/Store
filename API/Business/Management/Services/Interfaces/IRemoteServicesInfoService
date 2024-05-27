@@ -5,10 +5,11 @@ namespace Business.Management.Services.Interfaces
 {
     public interface IRemoteServicesInfoService
     {
-        IServiceResult<string> BuildServiceURL(string serviceName, string pathName);
-        IServiceResult<ServiceURL_AS> GetServiceURLByBaseURL(string baseURL);
-        IServiceResult<ServiceURL_AS> GetServiceURLByName(string name);
-        Task<IServiceResult<IEnumerable<ServiceURL_AS>>> LoadURLs();
-        IServiceResult<IEnumerable<ServiceURL_AS>> UpdateURLs(IEnumerable<ServiceURL_AS> servicesURLs);
+        IServiceResult<Service_Model_AS> GetServiceByBaseURL(string baseURL);
+        IServiceResult<Service_Model_AS> GetServiceByName(string name);
+        IServiceResult<string> GetServiceURL_WithPath(Service_Model_AS serviceUrl, string pathName);
+        IServiceResult<string> GetServiceURL_WithPath(string serviceName, string pathName);
+        Task<IServiceResult<IEnumerable<Service_Model_AS>>> LoadServiceModels();
+        IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesURLs);
     }
 }

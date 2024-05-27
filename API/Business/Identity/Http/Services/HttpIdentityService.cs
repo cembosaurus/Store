@@ -16,8 +16,9 @@ namespace Business.Identity.Http.Services
 
 
         public HttpIdentityService(IHostingEnvironment env, IHttpAppClient httpAppClient, IRemoteServicesInfoService remoteServicesInfoService, IServiceResultFactory resultFact)
-            : base(env, httpAppClient, remoteServicesInfoService)
+            : base(env, httpAppClient, remoteServicesInfoService, resultFact)
         {
+            _remoteServiceName = "ManagementService";
             _resultFact = resultFact;
         }
 
@@ -69,7 +70,7 @@ namespace Business.Identity.Http.Services
         {
             _method = HttpMethod.Post;
             _requestQuery = $"/identity/service/authenticate";
-            _headers.Add("ApiKey", apiKey);
+            _requestHeaders.Add("ApiKey", apiKey);
 
             var response = await Send();
 
