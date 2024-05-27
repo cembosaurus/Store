@@ -8,13 +8,14 @@ namespace Business.Management.Appsettings.Interfaces
     {
         bool DeleteByBaseURL(string baseURL);
         bool DeleteByName(string name);
-        List<Service_Model_AS> GetAllURLs();
+        List<Service_Model_AS> GetAll();
         Service_Model_AS GetByBaseURL(string baseURL);
         Service_Model_AS GetByName(string name);
         List<Service_Model_AS> GetByPathName(string pathName);
         List<Service_Model_AS> GetByPathRoure(string pathRoute);
         List<Service_Model_AS> GetByType(string type);
         bool InitializeDB(List<Service_Model_AS> data);
+        bool IsEmpty();
         bool UpdateByBaseURL(string baseURL, Service_Model_AS serviceURL);
         bool UpdateByName(string name, Service_Model_AS serviceURL);
     }

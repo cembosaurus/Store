@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Management.Services
 {
-    public class RemoteServicesInfoService : IRemoteServicesInfoService
+    public class RemoteServicesInfo_Provider : IRemoteServicesInfo_Provider
     {
         private readonly bool _isProdEnv;
         private IRemoteServicesInfo_Repo _remoteServicesInfo_Repo;
@@ -19,7 +19,7 @@ namespace Business.Management.Services
 
 
 
-        public RemoteServicesInfoService(IHostingEnvironment env, IServiceResultFactory resultFact, IRemoteServicesInfo_Repo remoteServicesInfo_repo, IHttpManagementService httpManagementService)
+        public RemoteServicesInfo_Provider(IHostingEnvironment env, IServiceResultFactory resultFact, IRemoteServicesInfo_Repo remoteServicesInfo_repo, IHttpManagementService httpManagementService)
         {
             _isProdEnv = env.IsProduction();
             _remoteServicesInfo_Repo = remoteServicesInfo_repo;
@@ -32,21 +32,27 @@ namespace Business.Management.Services
 
 
 
+        public IServiceResult<bool> IsEmpty()
+        {
+            return _resultFact.Result(_remoteServicesInfo_Repo.IsEmpty(), true);
+        }
+
+
         public IServiceResult<Service_Model_AS> GetServiceByName(string name) 
         {
             if(string.IsNullOrWhiteSpace(name))
                 return _resultFact.Result<Service_Model_AS>(null, false, "Remote Service name was NOT provided !");
-            if(_remoteServicesInfo_Repo.GetAllURLs().IsNullOrEmpty())
+            if(_remoteServicesInfo_Repo.IsEmpty())
                 return _resultFact.Result<Service_Model_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
 
-            var serviceURL = _remoteServicesInfo_Repo.GetByName(name);
+            var serviceModel = _remoteServicesInfo_Repo.GetByName(name);
 
-            if (serviceURL == null)
+            if (serviceModel == null)
                 return _resultFact.Result<Service_Model_AS>(null, false, $"Service '{name}' was NOT found ! n\\ Possible solution: Get URL from Management service.");
-            if (string.IsNullOrWhiteSpace(serviceURL.GetBaseUrl(TypeOfService.REST, _isProdEnv)))
+            if (string.IsNullOrWhiteSpace(serviceModel.GetBaseUrl(TypeOfService.REST, _isProdEnv)))
                 return _resultFact.Result<Service_Model_AS>(null, false, $"Service '{name}' was found but there is missing Base URL !");
 
-            return _resultFact.Result(serviceURL, true);
+            return _resultFact.Result(serviceModel, true);
         }
 
 
@@ -54,7 +60,7 @@ namespace Business.Management.Services
         {
             if (string.IsNullOrWhiteSpace(baseURL))
                 return _resultFact.Result<Service_Model_AS>(null, false, "Remote Service Base URL was NOT provided !");
-            if (_remoteServicesInfo_Repo.GetAllURLs().IsNullOrEmpty())
+            if (_remoteServicesInfo_Repo.GetAll().IsNullOrEmpty())
                 return _resultFact.Result<Service_Model_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
 
             var serviceURL = _remoteServicesInfo_Repo.GetByBaseURL(baseURL);

@@ -4,6 +4,6 @@ namespace Business.Management.Data.Interfaces
 {
     public interface IRemoteServicesInfo_DB
     {
-        List<Service_Model_AS> URLs { get; set; }
+        List<Service_Model_AS> Services { get; set; }
     }
 }

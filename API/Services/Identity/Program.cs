@@ -58,7 +58,7 @@ builder.Services.AddFluentValidation(conf => {
 
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
 //builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();

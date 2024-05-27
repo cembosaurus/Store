@@ -34,7 +34,7 @@ builder.Services.AddHostedService<Management_Worker>();
 
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
 
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddSingleton<FileSystemWatcher>();

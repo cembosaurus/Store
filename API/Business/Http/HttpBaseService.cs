@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
@@ -22,7 +23,7 @@ namespace Business.Http
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IRemoteServicesInfoService _remoteServicesInfoService;
+        private readonly IRemoteServicesInfo_Provider _remoteServicesInfo_Provider;
         private IAppsettingsService _appsettingsService;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
@@ -44,11 +45,12 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IHttpAppClient httpAppClient, IRemoteServicesInfoService remoteServicesInfoService, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfo_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
+            _appsettingsService = appsettingsService;
             _httpAppClient = httpAppClient;
-            _remoteServicesInfoService = remoteServicesInfoService;
+            _remoteServicesInfo_Provider = remoteServicesInfo_Provider;
             _resultFact = resultFact;
         }
 
@@ -82,16 +84,16 @@ namespace Business.Http
                     // Catch ex 503: local URL definition is obsolete or wrong, request failed !
                     // Update Remote Service URL to avoid 503 exception and try request again:
 
-                    var URLResult = await _remoteServicesInfoService.LoadServiceModels();
+                    var servicesModelsResult = await _remoteServicesInfo_Provider.LoadServiceModels();
 
-                    if (!URLResult.Status)
-                        throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {URLResult.Message}");
+                    if (!servicesModelsResult.Status)
+                        throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {servicesModelsResult.Message}");
 
 
                     _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
                     if (string.IsNullOrWhiteSpace(_requestURL))
-                        throw new HttpRequestException("Could NOT get Remote Service URL ! Request URL was NOTY constructed !");
+                        throw new HttpRequestException("Could NOT get Remote Service URL ! Request URL was NOT constructed !");
 
                     try
                     {
@@ -112,12 +114,14 @@ namespace Business.Http
         }
 
 
-
+        //------------------------------------------------------------------------------------------------------------------------------------------------------- To DO: if not Management then model is NULL -> let it be handled in SEND() !!!!!! reloading from Management
         protected IServiceResult<bool> InitializeRequest()
         {
-            _service_model = _appsettingsService.GetRemoteServiceURL(_remoteServiceName).Data;
-            if (_service_model == null)
+            var serviceResult = _appsettingsService.GetRemoteServiceURL(_remoteServiceName);
+            if (!serviceResult.Status)
                 return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found in Appsettings !");
+
+            _service_model = serviceResult.Data;
 
             _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
             if (string.IsNullOrWhiteSpace(_requestURL))

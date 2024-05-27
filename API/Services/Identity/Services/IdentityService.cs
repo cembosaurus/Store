@@ -125,9 +125,6 @@ namespace Identity.Services
 
         public async Task<IServiceResult<string>> CreateTokenForService()
         {
-            Console.WriteLine("--> CREATING token for service ....");
-
-
             return await _tokenService.CreateTokenForService();
         }
 

@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Management\Services\Interfaces\IRemoteServicesInfoService" />
+    <None Remove="Management\Services\Interfaces\IRemoteServicesInfo_Provider" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Management\Services\Interfaces\IRemoteServicesInfoService" />
+    <Compile Include="Management\Services\Interfaces\IRemoteServicesInfo_Provider" />
   </ItemGroup>
 
   <ItemGroup>

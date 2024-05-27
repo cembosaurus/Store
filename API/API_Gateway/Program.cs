@@ -50,7 +50,7 @@ builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfoService, RemoteServicesInfoService>();
+builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
 
@@ -103,7 +103,7 @@ builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -210,7 +210,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfoService>();
+    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfo_Provider>();
 
     // load all remote services models from, Management service:
     try { 

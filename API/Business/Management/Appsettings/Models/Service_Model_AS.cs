@@ -9,7 +9,7 @@ namespace Business.Management.Appsettings.Models
     {
 
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public ICollection<ServiceType> Type { get; set; } = new List<ServiceType>();
 
 
@@ -17,7 +17,7 @@ namespace Business.Management.Appsettings.Models
         public class ServiceType
         {
 
-            private string _name;
+            private string _name = "";
 
 
             public string Name 
@@ -38,7 +38,7 @@ namespace Business.Management.Appsettings.Models
                     }
                 }
             }
-            public SchemeHostPort BaseURL { get; set; }
+            public SchemeHostPort BaseURL { get; set; } = new SchemeHostPort();
             public ICollection<URLPath> Paths { get; set; } = new List<URLPath>();
 
 
@@ -46,14 +46,14 @@ namespace Business.Management.Appsettings.Models
 
             public class SchemeHostPort
             {
-                public string Dev { get; set; }
-                public string Prod { get; set; }
+                public string Dev { get; set; } = "";
+                public string Prod { get; set; } = "";
             }
 
             public class URLPath
             {
-                public string Name { get; set; }
-                public string Route { get; set; }
+                public string Name { get; set; } = "";
+                public string Route { get; set; } = "";
             }
 
 

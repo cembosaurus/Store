@@ -22,42 +22,47 @@ namespace Business.Management.Appsettings
 
 
 
-        public List<Service_Model_AS> GetAllURLs()
+        public bool IsEmpty()
         { 
-            return _remoteServicesInfo_DB.URLs.ToList();
+            return _remoteServicesInfo_DB.Services.IsNullOrEmpty();
+        }
+
+        public List<Service_Model_AS> GetAll()
+        { 
+            return _remoteServicesInfo_DB.Services.ToList();
         }
 
         public Service_Model_AS GetByName(string name)
         {
-            return _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Name == name);
+            return _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
         }
 
         public Service_Model_AS GetByBaseURL(string baseURL)
         {
-            return _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
+            return _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
         }
 
         public List<Service_Model_AS> GetByPathName(string pathName)
         {
-            return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName)));
+            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName)));
         }
 
 
         public List<Service_Model_AS> GetByPathRoure(string pathRoute)
         {
-            return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute)));
+            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute)));
         }
 
 
         public List<Service_Model_AS> GetByType(string type)
         {
-            return _remoteServicesInfo_DB.URLs.FindAll(url => url.Type.Any(st => st.Name == type));
+            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(st => st.Name == type));
         }
 
 
         public bool UpdateByName(string name, Service_Model_AS serviceURL)
         { 
-            var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
 
             if (url != null) 
             {
@@ -72,7 +77,7 @@ namespace Business.Management.Appsettings
 
         public bool UpdateByBaseURL(string baseURL, Service_Model_AS serviceURL)
         {
-            var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
@@ -87,11 +92,11 @@ namespace Business.Management.Appsettings
 
         public bool DeleteByName(string name) 
         {
-            var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
 
             if (url != null)
             {
-                _remoteServicesInfo_DB.URLs.Remove(url);
+                _remoteServicesInfo_DB.Services.Remove(url);
 
                 return true;
             }
@@ -102,11 +107,11 @@ namespace Business.Management.Appsettings
 
         public bool DeleteByBaseURL(string baseURL)
         {
-            var url = _remoteServicesInfo_DB.URLs.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
-                _remoteServicesInfo_DB.URLs.Remove(url);
+                _remoteServicesInfo_DB.Services.Remove(url);
 
                 return true;
             }
@@ -121,7 +126,7 @@ namespace Business.Management.Appsettings
             if(data.IsNullOrEmpty())
                 return false;
 
-            _remoteServicesInfo_DB.URLs = data;
+            _remoteServicesInfo_DB.Services = data;
 
             return true;
         }

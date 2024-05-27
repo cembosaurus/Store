@@ -3,13 +3,14 @@ using Business.Management.Appsettings.Models;
 
 namespace Business.Management.Services.Interfaces
 {
-    public interface IRemoteServicesInfoService
+    public interface IRemoteServicesInfo_Provider
     {
         IServiceResult<Service_Model_AS> GetServiceByBaseURL(string baseURL);
         IServiceResult<Service_Model_AS> GetServiceByName(string name);
         IServiceResult<string> GetServiceURL_WithPath(Service_Model_AS serviceUrl, string pathName);
         IServiceResult<string> GetServiceURL_WithPath(string serviceName, string pathName);
+        IServiceResult<bool> IsEmpty();
         Task<IServiceResult<IEnumerable<Service_Model_AS>>> LoadServiceModels();
-        IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesURLs);
+        IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesModels);
     }
 }
