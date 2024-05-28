@@ -7,6 +7,7 @@ using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Business.Management.Appsettings.Interfaces;
+using Business.Exceptions.Interfaces;
 
 namespace Business.Inventory.Http.Services
 {
@@ -17,14 +18,13 @@ namespace Business.Inventory.Http.Services
 
 
 
-        public HttpItemService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
-            : base(env, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
+        public HttpItemService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
             _resultFact = resultFact;
 
             // get URL from local singleton
             _remoteServiceName = "InventoryService";
-            _remoteServicePathName = "Item";
         }
 
 
@@ -33,6 +33,8 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = default)
         {
+            _remoteServicePathName = "Item";
+
             _method = HttpMethod.Get;
             _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "/all")}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
@@ -53,6 +55,8 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<ItemReadDTO>> GetItemById(int itemId)
         {
+            _remoteServicePathName = "Item";
+
             _method = HttpMethod.Get;
             _requestQuery = $"/{itemId}";
             //_content.Dispose();
@@ -73,6 +77,8 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<ItemReadDTO>> AddItem(ItemCreateDTO itemDTO)
         {
+            _remoteServicePathName = "Item";
+
             _method = HttpMethod.Post;
             _requestQuery = $"";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemDTO), _encoding, _mediaType);
@@ -93,6 +99,8 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<ItemReadDTO>> DeleteItem(int itemId)
         {
+            _remoteServicePathName = "Item";
+
             _method = HttpMethod.Delete;
             _requestQuery = $"{_requestURL}/{itemId}";
             //_content.Dispose();
@@ -113,6 +121,8 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<ItemReadDTO>> UpdateItem(int itemId, ItemUpdateDTO itemDTO)
         {
+            _remoteServicePathName = "Item";
+
             _method = HttpMethod.Put;
             _requestQuery = $"{_requestURL}/{itemId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemDTO), _encoding, _mediaType);

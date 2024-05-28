@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Inventory.Publisher.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ItemController : ControllerBase, IItemController
     {

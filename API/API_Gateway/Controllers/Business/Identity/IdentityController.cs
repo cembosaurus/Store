@@ -8,7 +8,7 @@ namespace API_Gateway.Controllers.Business.Identity
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class IdentityController : ControllerBase
     {

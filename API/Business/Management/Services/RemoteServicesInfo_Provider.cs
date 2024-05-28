@@ -101,8 +101,9 @@ namespace Business.Management.Services
                 return _resultFact.Result("", false, "Remote Service name is missing !");
             if (string.IsNullOrWhiteSpace(pathName))
                 return _resultFact.Result("", false, $"Path for Remote Service '{serviceUrl.Name}' was NOT provided !");
-            if (string.IsNullOrWhiteSpace(serviceUrl.GetPathByName(TypeOfService.REST, pathName)))
-                return _resultFact.Result("", false, $"Path '{pathName}' for Remote Service '{serviceUrl.Name}' NOT found !");
+            //................................... NOT every remote service URL has path .......................................
+            //if (string.IsNullOrWhiteSpace(serviceUrl.GetPathByName(TypeOfService.REST, pathName)))
+            //    return _resultFact.Result("", false, $"Path '{pathName}' for Remote Service '{serviceUrl.Name}' NOT found !");
 
             var urlWithPath = serviceUrl.GetUrlWithPath(TypeOfService.REST, pathName, _isProdEnv);
 
@@ -138,12 +139,12 @@ namespace Business.Management.Services
         // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of old/faulty URL.
         public IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesModels)
         {
-            Console.WriteLine($"--> UPDATING Services URLs'......");
+            Console.WriteLine($"--> UPDATING Services models ......");
 
             if (servicesModels.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Services URLs for Management service was NOT provided !");
+                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Services models for Management service was NOT provided !");
 
-            var message = "Warning ! There were missing data in provided Services URLs:";
+            var message = "Warning ! There were missing data in provided Services models:";
 
             foreach (var model in servicesModels)
             {

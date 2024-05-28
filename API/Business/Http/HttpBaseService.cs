@@ -1,4 +1,5 @@
-﻿using Business.Exceptions.Interfaces;
+﻿using Business.Exceptions;
+using Business.Exceptions.Interfaces;
 using Business.Http.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
@@ -45,9 +46,10 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfo_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfo_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
+            _exId = exId;
             _appsettingsService = appsettingsService;
             _httpAppClient = httpAppClient;
             _remoteServicesInfo_Provider = remoteServicesInfo_Provider;
@@ -107,7 +109,6 @@ namespace Business.Http
                         throw;
                     }
                 }
-
             }
 
             return _requestMessage.CreateErrorResponse(HttpStatusCode.BadRequest, "Request URL was NOT constructed !");
@@ -115,11 +116,23 @@ namespace Business.Http
 
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------- To DO: if not Management then model is NULL -> let it be handled in SEND() !!!!!! reloading from Management
-        protected IServiceResult<bool> InitializeRequest()
+        protected async Task<IServiceResult<bool>> InitializeRequest()
         {
+            if(string.IsNullOrWhiteSpace(_remoteServiceName))
+                return _resultFact.Result(false, false, $"Remote Service name was NOT provided !");
+
             var serviceResult = _appsettingsService.GetRemoteServiceURL(_remoteServiceName);
             if (!serviceResult.Status)
-                return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found in Appsettings !");
+            {
+                var result = await _remoteServicesInfo_Provider.LoadServiceModels();
+
+                if(!result.Status)
+                    return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
+
+                serviceResult = _remoteServicesInfo_Provider.GetServiceByName(_remoteServiceName);
+                if (!serviceResult.Status)
+                    return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
+            }
 
             _service_model = serviceResult.Data;
 

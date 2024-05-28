@@ -10,7 +10,7 @@ namespace Management.Controllers
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class RemoteServiceController : ControllerBase
     {

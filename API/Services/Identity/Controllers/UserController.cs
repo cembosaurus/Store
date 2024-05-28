@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace Services.Identity.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {

@@ -8,7 +8,7 @@ namespace Services.Inventory.Controllers
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ItemController : ControllerBase, IItemController
     {

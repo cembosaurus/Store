@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API_Gateway.Controllers.Business.Identity
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AddressController : ControllerBase
     {

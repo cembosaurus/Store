@@ -5,7 +5,7 @@ namespace StaticContent.Controllers
 {
 
     //[Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PhotosController : ControllerBase
     {

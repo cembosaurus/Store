@@ -7,7 +7,7 @@ namespace Scheduler.Controllers
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class SchedulerController : ControllerBase
     {

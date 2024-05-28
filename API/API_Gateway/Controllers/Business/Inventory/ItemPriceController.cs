@@ -7,7 +7,7 @@ namespace API_Gateway.Controllers.Business.Inventory
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ItemPriceController : ControllerBase
     {

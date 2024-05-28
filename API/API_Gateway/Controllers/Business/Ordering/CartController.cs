@@ -8,7 +8,7 @@ namespace API_Gateway.Controllers.Business.Ordering
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CartController : ControllerBase
     {

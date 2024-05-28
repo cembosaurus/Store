@@ -8,7 +8,7 @@ namespace Identity.Controllers
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AddressController : ControllerBase
     {

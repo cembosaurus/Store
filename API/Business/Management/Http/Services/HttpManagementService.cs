@@ -43,7 +43,7 @@ namespace Business.Management.Http.Services
             _method = HttpMethod.Get;
             _requestQuery = $"{"url/all"}";
 
-            var initResponse = InitializeRequest();
+            var initResponse = await InitializeRequest();
 
             if (!initResponse.Status)
                 return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Request for remote service '{_remoteServiceName}' was NOT initialized ! Reason: {initResponse.Message}");

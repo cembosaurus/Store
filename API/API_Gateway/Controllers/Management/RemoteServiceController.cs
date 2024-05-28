@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API_Gateway.Controllers.Management
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class RemoteServiceController : ControllerBase
     {

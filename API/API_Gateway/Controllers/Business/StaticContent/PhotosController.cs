@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API_Gateway.Controllers.Business.StaticContent
 {
     //[Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PhotosController : ControllerBase
     {

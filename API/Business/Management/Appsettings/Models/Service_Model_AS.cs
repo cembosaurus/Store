@@ -1,4 +1,5 @@
 ﻿using Business.Management.Enums;
+using Microsoft.IdentityModel.Tokens;
 using static Business.Management.Appsettings.Models.Service_Model_AS.ServiceType;
 
 
@@ -84,6 +85,9 @@ namespace Business.Management.Appsettings.Models
 
         public string GetUrlWithPath(TypeOfService type, string pathName, bool isProdEnv)
         {
+            if(string.IsNullOrWhiteSpace(pathName) || GetPaths(type).IsNullOrEmpty())
+                return GetBaseUrl(type, isProdEnv);
+
             var url = GetBaseUrl(type, isProdEnv);
             var path = GetPathByName(TypeOfService.REST, pathName);
 
