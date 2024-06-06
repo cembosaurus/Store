@@ -1,13 +1,16 @@
 ﻿using Business.Inventory.DTOs.ItemPrice;
-using Inventory.Models;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Scheduler.DTOs;
+using Business.Scheduler.Http.Services.Interfaces;
+using Inventory.Models;
 using Moq;
 using NUnit.Framework;
-using Ordering.HttpServices.Interfaces;
 using Ordering.OrderingBusinessLogic;
 using Services.Ordering.Models;
+
+
 
 namespace Store.Test.Services.Ordering.OrderingBusinessLogic
 {
@@ -16,7 +19,8 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
     {
         private OrderingTools _orderingHelper;
 
-        private Mock<IHttpInventoryService> _httpInventoryService = new Mock<IHttpInventoryService>();
+        private Mock<IHttpCatalogueItemService> _httpCatalogueItemService = new Mock<IHttpCatalogueItemService>();
+        private Mock<IHttpItemPriceService> _httpItemPriceService = new Mock<IHttpItemPriceService>();
         private Mock<IHttpSchedulerService> _httpSchedulerService = new Mock<IHttpSchedulerService>();
         private IServiceResultFactory _resultFact = new ServiceResultFactory();
 
@@ -75,7 +79,7 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
                 + _cart.CartItems.ElementAt(1).Amount * _itemPrice2.SalePrice 
                 + _cart.CartItems.ElementAt(2).Amount * _itemPrice3.SalePrice;
 
-            _orderingHelper = new OrderingTools(_resultFact, _httpInventoryService.Object, _httpSchedulerService.Object);
+            _orderingHelper = new OrderingTools(_resultFact, _httpCatalogueItemService.Object, _httpItemPriceService.Object, _httpSchedulerService.Object);
         }
 
 
@@ -87,9 +91,9 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
         [Test]
         public void UpdateCartTotal_WhenCalled_UpdatesCartTotal()
         {
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem1.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice1ReadDTO, true)));
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem2.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice2ReadDTO, true)));
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem3.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice3ReadDTO, true)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem1.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice1ReadDTO, true)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem2.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice2ReadDTO, true)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem3.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice3ReadDTO, true)));
 
 
             var result = _orderingHelper.UpdateCartTotal(_cart).Result;
@@ -105,9 +109,9 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
         {
             var message = "Test Message";
 
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem1.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice1ReadDTO, true)));
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem2.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice2ReadDTO, false, message)));
-            _httpInventoryService.Setup(i => i.GetItemPriceById(_cartItem3.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice3ReadDTO, true)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem1.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice1ReadDTO, true)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem2.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice2ReadDTO, false, message)));
+            _httpItemPriceService.Setup(i => i.GetItemPriceById(_cartItem3.ItemId)).Returns(Task.FromResult(_resultFact.Result(_itemPrice3ReadDTO, true)));
 
 
             var result = _orderingHelper.UpdateCartTotal(_cart).Result;
@@ -152,7 +156,7 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
             var newCartItems = new List<CartItem> { new CartItem { ItemId = _item1_Id, Amount = 10 } };
             var item1_AmountInCartBeforeAdding = _cart.CartItems.ElementAt(0).Amount;
 
-            _httpInventoryService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(_item1_CountInStock, true)));
+            _httpCatalogueItemService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(_item1_CountInStock, true)));
 
 
             var result = _orderingHelper.AddItemsToCart(_cart, newCartItems).Result;
@@ -170,7 +174,7 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
             var newCartItems = new List<CartItem> { new CartItem { ItemId = _item1_Id, Amount = 10 } };
             var item1_AmountInCartBeforeAdding = _cart.CartItems.ElementAt(0).Amount;
 
-            _httpInventoryService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(It.IsAny<int>(), false)));
+            _httpCatalogueItemService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(It.IsAny<int>(), false)));
 
 
             var result = _orderingHelper.AddItemsToCart(_cart, newCartItems).Result;
@@ -188,7 +192,7 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
             var newCartItems = new List<CartItem> { new CartItem { ItemId = _item1_Id, Amount = _item1_CountInStock + 1 } };
             var item1_AmountInCartBeforeAdding = _cart.CartItems.ElementAt(0).Amount;
 
-            _httpInventoryService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(_item1_CountInStock, true)));
+            _httpCatalogueItemService.Setup(i => i.GetInstockCount(It.IsAny<int>())).Returns(Task.FromResult(_resultFact.Result(_item1_CountInStock, true)));
 
 
             var result = _orderingHelper.AddItemsToCart(_cart, newCartItems).Result;

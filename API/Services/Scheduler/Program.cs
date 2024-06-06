@@ -6,8 +6,6 @@ using Business.Http.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
-using Business.Inventory.Http.Clients;
-using Business.Inventory.Http.Clients.Interfaces;
 using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
@@ -21,8 +19,6 @@ using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
 using Business.Middlewares;
-using Business.Ordering.Http.Clients;
-using Business.Ordering.Http.Clients.Interfaces;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
 using FluentValidation.AspNetCore;
@@ -86,16 +82,10 @@ builder.Services.AddScoped<IOrderService>(sp => sp.GetService<OrderingService>()
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 
-builder.Services.AddScoped<IHttpInventoryService, HttpInventoryService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 
-builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
-builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>();
-//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
-
-// To replace other Http Clients:
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
 
@@ -194,15 +184,6 @@ app.MapControllers();
 // ApiKey Auth:
 app.UseMiddleware<ApiKeyAuth_MW>();
 
-
-
-//app.Use(async (context, next) =>
-//{
-//    Console.WriteLine($".... LAST middleware BEFORE .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-//    await next.Invoke(context);
-//    Console.WriteLine($".... LAST middleware AFTER .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-
-//});
 
 using (var scope = app.Services.CreateScope())
 {

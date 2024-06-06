@@ -1,15 +1,17 @@
 ﻿using AutoMapper;
 using Business.Identity.DTOs;
+using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Moq;
 using NUnit.Framework;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices.Interfaces;
 using Ordering.Services;
 using Ordering.Services.Interfaces;
 using Services.Ordering.Models;
+
+
 
 namespace Store.Test.Services.Ordering.Services
 {
@@ -19,7 +21,7 @@ namespace Store.Test.Services.Ordering.Services
         private IArchiveService _archiveService;
 
         private Mock<IArchiveRepository> _archiveRepo = new Mock<IArchiveRepository>();
-        private Mock<IHttpAddressService> _httpIdentityService = new Mock<IHttpAddressService>();
+        private Mock<IHttpAddressService> _httpAddressService = new Mock<IHttpAddressService>();
         private Mock<IMapper> _mapper = new Mock<IMapper>();
         private IServiceResultFactory _resultFact = new ServiceResultFactory();
 
@@ -56,7 +58,7 @@ namespace Store.Test.Services.Ordering.Services
             _orderReadDTO3 = new OrderReadDTO { OrderDetails = new OrderDetailsReadDTO { Address = _addressReadDTO3 } };
             _orderReadDTOs_List = new List<OrderReadDTO> { _orderReadDTO1, _orderReadDTO2, _orderReadDTO3 };
 
-            _archiveService = new ArchiveService(_archiveRepo.Object, _resultFact, _mapper.Object, _httpIdentityService.Object);
+            _archiveService = new ArchiveService(_archiveRepo.Object, _resultFact, _mapper.Object, _httpAddressService.Object);
         }
 
 
@@ -68,7 +70,7 @@ namespace Store.Test.Services.Ordering.Services
         {
             _archiveRepo.Setup(r => r.GetAllOrders()).Returns(Task.FromResult(_orders_List));
 
-            _httpIdentityService.Setup(i => i.GetAddressesByAddressIds(_addressIds_List))
+            _httpAddressService.Setup(i => i.GetAddressesByAddressIds(_addressIds_List))
                 .Returns(Task.FromResult(_resultFact.Result(_addressesReadDTO_List, true)));
 
             _mapper.Setup(m => m.Map<IEnumerable<OrderReadDTO>>(_orders_List)).Returns(_orderReadDTOs_List);
@@ -106,7 +108,7 @@ namespace Store.Test.Services.Ordering.Services
 
             _archiveRepo.Setup(r => r.GetAllOrders()).Returns(Task.FromResult(_orders_List));
 
-            _httpIdentityService.Setup(i => i.GetAddressesByAddressIds(_addressIds_List))
+            _httpAddressService.Setup(i => i.GetAddressesByAddressIds(_addressIds_List))
                 .Returns(Task.FromResult(_resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, addressNotFountMessage)));
 
 
@@ -128,7 +130,7 @@ namespace Store.Test.Services.Ordering.Services
 
             _archiveRepo.Setup(ar => ar.GetOrderByCartId(_cart1Id)).Returns(Task.FromResult(_order1));
 
-            _httpIdentityService.Setup(i => i.GetAddressByAddressId(_address1Id)).Returns(Task.FromResult(_resultFact.Result(_addressReadDTO1, true)));
+            _httpAddressService.Setup(i => i.GetAddressByAddressId(_address1Id)).Returns(Task.FromResult(_resultFact.Result(_addressReadDTO1, true)));
 
             _mapper.Setup(m => m.Map<OrderReadDTO>(_order1)).Returns(_orderReadDTO1);
 

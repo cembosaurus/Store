@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Identity.HttpServices.Interfaces;
 using Identity.Models;
 using Identity.Services.JWT;
 using Identity.Services.JWT.Interfaces;

@@ -19,7 +19,7 @@ namespace Business.Middlewares
             if (string.IsNullOrWhiteSpace(context.Request.Headers[HeaderNames.Authorization].ToString()) &&
                 (string.IsNullOrWhiteSpace(tokenStore.Token) || tokenStore.IsExipred))
             {
-                var authResult = await httpApiKeyAuthService.LoginWithApiKey();
+                var authResult = await httpApiKeyAuthService.Authenticate();
 
                 if (authResult == null || !authResult.Status)
                     Console.WriteLine($"--> Service FAILED to authenticate ! {(authResult == null ? string.Empty : "Reason: '" + authResult.Message)}'");

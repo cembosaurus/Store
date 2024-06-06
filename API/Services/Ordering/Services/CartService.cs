@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices.Interfaces;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
 using Services.Ordering.Models;
+
+
 
 namespace Ordering.Services
 {
@@ -14,17 +16,19 @@ namespace Ordering.Services
     {
 
         private readonly ICartRepository _cartRepo;
+        private readonly IHttpItemService _httpItemService;
+        private readonly IHttpItemPriceService _httpItemPriceService;
         private readonly ICartItemService _cartItemsService;
-        private readonly IHttpInventoryService _httpInventoryService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
         private readonly ICartBusinessLogic _cartBusinessLogic;
 
-        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService, ICartItemService cartItemsService)
+        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpItemService httpItemService, IHttpItemPriceService httpItemPriceService, ICartItemService cartItemsService)
         {
             _cartRepo = cartRepo;
+            _httpItemService = httpItemService;
+            _httpItemPriceService = httpItemPriceService;
             _cartItemsService = cartItemsService;
-            _httpInventoryService = httpInventoryService;
             _resultFact = resultFact;
             _mapper = mapper;
             _cartBusinessLogic = cartBusinessLogic;
@@ -67,7 +71,7 @@ namespace Ordering.Services
 
             var itemIds = cart.CartItems.Select(i => i.ItemId).ToList();
 
-            var itemsResult = await _httpInventoryService.GetItems(itemIds);
+            var itemsResult = await _httpItemService.GetItems(itemIds);
 
             if (itemsResult != null || itemsResult.Status)
             {
@@ -77,7 +81,7 @@ namespace Ordering.Services
                 {
                     ci.Name = itemsResult.Data.FirstOrDefault(i => i.Id == ci.ItemId).Name;
 
-                    var itemPriceResult = await _httpInventoryService.GetItemPriceById(ci.ItemId);
+                    var itemPriceResult = await _httpItemPriceService.GetItemPriceById(ci.ItemId);
 
                     if (itemPriceResult.Status)
                     {

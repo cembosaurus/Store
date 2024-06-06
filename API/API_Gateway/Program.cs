@@ -9,12 +9,8 @@ using Business.Exceptions.Interfaces;
 using Business.Http;
 using Business.Http.Interfaces;
 using Business.Identity.Enums;
-using Business.Identity.Http.Clients;
-using Business.Identity.Http.Clients.Interfaces;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
-using Business.Inventory.Http.Clients;
-using Business.Inventory.Http.Clients.Interfaces;
 using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
@@ -29,8 +25,6 @@ using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
 using Business.Middlewares;
-using Business.Ordering.Http.Clients;
-using Business.Ordering.Http.Clients.Interfaces;
 using Business.Ordering.Http.Services;
 using Business.Ordering.Http.Services.Interfaces;
 using Business.Scheduler.JWT;
@@ -81,21 +75,7 @@ builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
-//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
-builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>();
-builder.Services.AddHttpClient<IHttpUserClient, HttpUserClient>();
-//builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>();
-builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
-builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>();
-builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>();
-builder.Services.AddHttpClient<IHttpCartItemClient, HttpCartItemClient>();
-builder.Services.AddHttpClient<IHttpOrderClient, HttpOrderClient>();
-
-// To replace other Http Clients:
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
-
-
-
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
@@ -207,6 +187,15 @@ app.UseAuthorization();
 app.MapControllers();
 
 
+//app.Use(async (context, next) =>
+//{
+//    Console.WriteLine($".... LAST middleware BEFORE .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
+//    await next.Invoke(context);
+//    Console.WriteLine($".... LAST middleware AFTER .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
+
+//});
+
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -214,7 +203,7 @@ using (var scope = app.Services.CreateScope())
 
     // load all remote services models from, Management service:
     try { 
-        var result = await remoteServicesInfoService.LoadServiceModels();
+        var result = await remoteServicesInfoService.ReLoad();
         Console.WriteLine($"--> Loading remote services info models from Management service: {(result.Status ? "Success !" : $"Failed: {result.Message}")}");
     }
     catch (HttpRequestException ex) {

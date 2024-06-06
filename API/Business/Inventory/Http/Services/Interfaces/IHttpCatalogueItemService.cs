@@ -15,7 +15,7 @@ namespace Business.Inventory.Http.Services.Interfaces
         Task<IServiceResult<int>> GetInstockCount(int id);
         Task<IServiceResult<CatalogueItemReadDTO>> RemoveCatalogueItem(int id);
         Task<IServiceResult<ExtrasReadDTO>> RemoveExtrasFromCatalogueItem(int id, ExtrasRemoveDTO extrasRemoveDTO);
-        Task<IServiceResult<int>> RemoveFromStockAmount(int itemId, int amount);
+        Task<IServiceResult<int>> RemoveAmountFromStock(int itemId, int amount);
         Task<IServiceResult<CatalogueItemReadDTO>> UpdateCatalogueItem(int itemId, CatalogueItemUpdateDTO catalogueItemUpdateDTO);
     }
 }

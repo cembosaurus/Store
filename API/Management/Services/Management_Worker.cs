@@ -46,7 +46,7 @@ namespace Management.Services
             {
                 var service = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
 
-                service.LoginWithApiKey();
+                service.Authenticate();
             }
 
 

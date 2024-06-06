@@ -218,7 +218,7 @@ namespace Services.Inventory.Data
             }
             else
             {
-                Console.WriteLine("---> SEED was not performed. Data are already present.");
+                Console.WriteLine("---> SEED was not performed ! Data is already present in DB.");
             }
 
         }

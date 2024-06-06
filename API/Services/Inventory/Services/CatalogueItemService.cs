@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Services.Inventory.Data.Repositories.Interfaces;
 
 
+
 namespace Inventory.Services
 {
     public class CatalogueItemService: ICatalogueItemService
@@ -29,27 +30,15 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<IEnumerable<CatalogueItemReadDTO>>> GetCatalogueItems(IEnumerable<int> itemIds = null)
         {
-            Console.WriteLine($"--> GETTING catalogue items ......");
-
-            var message = "";
-
-
             var catalogueItems = await _catalogueItemRepo.GetCatalogueItems(itemIds);
 
-            if (!catalogueItems.Any())
-                message = "NO catalogue items found !";
-
-            return _resultFact.Result(_mapper.Map<IEnumerable<CatalogueItemReadDTO>>(catalogueItems), true, message);
+            return _resultFact.Result(_mapper.Map<IEnumerable<CatalogueItemReadDTO>>(catalogueItems), true, !catalogueItems.Any() ? "NO catalogue items found !" : "");
         }
 
 
         public async Task<IServiceResult<CatalogueItemReadDTO>> GetCatalogueItemById(int id)
         {
-            Console.WriteLine($"--> GETTING catalogue item '{id}' ......");
-
             var message = "";
-
-
             var catalogueItem = await _catalogueItemRepo.GetCatalogueItemById(id);
 
             if (catalogueItem == null)
@@ -67,9 +56,6 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<bool>> ExistsCatalogueItemById(int id)
         {
-            Console.WriteLine($"--> EXISTS catalogue item '{id}' ......");
-
-
             var catalogueItemResult = await _catalogueItemRepo.ExistsById(id);
 
             return _resultFact.Result(catalogueItemResult, true, catalogueItemResult ? "" : $"Catalogue item '{id}' does NOT exist !");
@@ -80,10 +66,6 @@ namespace Inventory.Services
         public async Task<IServiceResult<CatalogueItemReadDTOWithExtras>> GetCatalogueItemWithExtrasById(int id)
         {
             var message = "";
-
-            Console.WriteLine($"--> GETTING catalogue item '{id}' with extras ......");
-
-
             var catalogueItemWithExtras = await _catalogueItemRepo.GetCatalogueItemWithExtrasById(id);
 
             if(catalogueItemWithExtras == null)
@@ -133,10 +115,6 @@ namespace Inventory.Services
 
             catalogueItemCreateDTO.Instock = (catalogueItemCreateDTO.Instock == null || catalogueItemCreateDTO.Instock < 0) ? 0 : catalogueItemCreateDTO.Instock;
 
-
-            Console.WriteLine($"--> CREATING catalogue item '{itemId}'......");
-
-
             var catalogueItem = _mapper.Map<CatalogueItem>(item);
 
             _mapper.Map(catalogueItemCreateDTO, catalogueItem);
@@ -160,10 +138,6 @@ namespace Inventory.Services
 
             catalogueItem.Accessories = catalogueItem.Accessories ?? new List<AccessoryItem>();
             catalogueItem.SimilarProducts = catalogueItem.SimilarProducts ?? new List<SimilarProductItem>();
-
-
-            Console.WriteLine($"--> ADDING extras to catalogue item '{catalogueItem.ItemId}': '{catalogueItem.Item.Name}'......");
-
 
             var availableAccessories = new List<AccessoryItem>();
 
@@ -226,10 +200,6 @@ namespace Inventory.Services
 
             catalogueItemUpdateDTO.Instock = (catalogueItemUpdateDTO.Instock == null || catalogueItemUpdateDTO.Instock < 0) ? 0 : catalogueItemUpdateDTO.Instock;
 
-
-            Console.WriteLine($"--> UPDATING catalogue item '{catalogueItem.ItemId}': '{catalogueItem.Item.Name}'......");
-
-
             _mapper.Map(catalogueItemUpdateDTO, catalogueItem);
 
             if (_catalogueItemRepo.SaveChanges() < 1)
@@ -248,10 +218,6 @@ namespace Inventory.Services
             if (catalogueItemToRemove == null)
                 return _resultFact.Result<CatalogueItemReadDTO>(null, false, $"Catalogue item with id '{id}' was NOT found !");
 
-
-            Console.WriteLine($"--> REMOVING catalogue item '{catalogueItemToRemove.ItemId}': '{catalogueItemToRemove.Item.Name}'......");
-
-
             var resultState = await _catalogueItemRepo.RemoveCatalogueItem(catalogueItemToRemove);
 
             if (resultState != EntityState.Deleted || _catalogueItemRepo.SaveChanges() < 1)
@@ -268,10 +234,6 @@ namespace Inventory.Services
 
             if (catalogueItem == null)
                 return _resultFact.Result<ExtrasReadDTO>(null, false, $"Catalogue item with id '{id}' NOT found !");
-
-
-            Console.WriteLine($"--> REMOVING extras from catalogue item '{id}' ......");
-
 
             if (extrasRemoveDTO.AccessoryIds != null && extrasRemoveDTO.AccessoryIds.Any())
             {
@@ -297,14 +259,9 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<int>> GetInstockCount(int id)
         {
-            Console.WriteLine($"--> GETTING catalogue item '{id}' instock count ......");
-
-            var message = "";
-
-
             if (!await _catalogueItemRepo.ExistsById(id))
             {
-                message = $"Catalogue Item with id '{id}' NOT found";
+                var message = $"Catalogue Item with id '{id}' NOT found";
 
                 if (await _itemRepo.ExistsById(id))
                     message += $", but Item with id '{id}' exists and it's not registered in catalogue !";
@@ -321,9 +278,6 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<int>> RemoveFromStockAmount(int id, int amount)
         {
-            Console.WriteLine($"--> REMOVING item '{id}' amount '{amount}' from stock ......");
-
-
             var catalogueItem = await _catalogueItemRepo.GetCatalogueItemById(id);
 
             if (catalogueItem == null)
@@ -343,7 +297,7 @@ namespace Inventory.Services
             if (_catalogueItemRepo.SaveChanges() < 1)
                 return _resultFact.Result(0, false, $"Catalogue item '{id}' instock amount was NOT changed !");
 
-            return _resultFact.Result(catalogueItem.Instock, true, instock - amount < 0 ? $"Insufficient amount in stock ! Only {instock} catalogue items were removed from stock !" : null);
+            return _resultFact.Result(catalogueItem.Instock, true, instock - amount < 0 ? $"Insufficient amount in stock ! Only {instock} catalogue items were removed from stock !" : "");
         }
 
 
@@ -352,10 +306,6 @@ namespace Inventory.Services
         {
             if (amount < 0)
                 return _resultFact.Result(0, false, "Only positive number can be added to stock amount !");
-
-
-            Console.WriteLine($"--> ADDING item '{itemId}' amount '{amount}' to stock ......");
-
 
             var catalogueItem = await _catalogueItemRepo.GetCatalogueItemById(itemId);
 

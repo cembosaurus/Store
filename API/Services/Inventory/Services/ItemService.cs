@@ -6,6 +6,8 @@ using Inventory.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Services.Inventory.Data.Repositories.Interfaces;
 
+
+
 namespace Inventory.Services
 {
     public class ItemService : IItemService
@@ -27,43 +29,24 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = null)
         {
-            Console.WriteLine($"--> GETTING items ......");
-
-            var message = "";
-
-
             var items = await _repo.GetItems(itemIds);
 
-            if (!items.Any())
-                message = "NO items found !";
-
-            return _resultFact.Result(_mapper.Map<IEnumerable<ItemReadDTO>>(items), true, message);
+            return _resultFact.Result(_mapper.Map<IEnumerable<ItemReadDTO>>(items), true, !items.Any() ? "NO items found !" : "");
         }
 
 
 
         public async Task<IServiceResult<ItemReadDTO>> GetItemById(int id)
         {
-            Console.WriteLine($"--> GETTING item '{id}' ......");
-
-            var message = "";
-
-
             var item = await _repo.GetItemById(id);
 
-            if (item == null)
-                message = $"Item '{id}' was NOT found !";
-
-            return _resultFact.Result(_mapper.Map<ItemReadDTO>(item), true, message);
+            return _resultFact.Result(_mapper.Map<ItemReadDTO>(item), true, item == null ? $"Item '{id}' was NOT found !" : "");
         }
 
 
 
         public async Task<IServiceResult<ItemReadDTO>> AddItem(ItemCreateDTO itemCreateDTO)
         {
-            Console.WriteLine($"--> ADDING item '{itemCreateDTO.Name}'......");
-
-
             if (await _repo.ExistsByName(itemCreateDTO.Name))
                 return _resultFact.Result<ItemReadDTO>(null, false, $"Item '{itemCreateDTO.Name}' already EXISTS !");
 
@@ -89,10 +72,6 @@ namespace Inventory.Services
             if(await _repo.ExistsByName(itemUpdateDTO.Name))
                 return _resultFact.Result<ItemReadDTO>(null, false, $"Item with name: '{itemUpdateDTO.Name}' already exists !");
 
-
-            Console.WriteLine($"--> UPDATING item '{item.Id}': '{item.Name}'......");
-
-
             _mapper.Map(itemUpdateDTO, item);
 
             if (_repo.SaveChanges() < 1)
@@ -112,10 +91,6 @@ namespace Inventory.Services
 
             if(item.Archived)
                 return _resultFact.Result<ItemReadDTO>(null, false, $"Item '{id}' can NOT be deleted because it is ARCHIVED !");
-
-
-            Console.WriteLine($"--> DELETING item '{id}'......");
-
 
             var resultState = await _repo.DeleteItem(item);
 

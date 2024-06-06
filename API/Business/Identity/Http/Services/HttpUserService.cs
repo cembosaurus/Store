@@ -1,23 +1,24 @@
-﻿using Business.Identity.DTOs;
-using Business.Identity.Http.Clients.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
+using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
-using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 
 
 namespace Business.Identity.Http.Services
 {
-    public class HttpUserService : IHttpUserService
+    public class HttpUserService : HttpBaseService, IHttpUserService
     {
 
-        private readonly IHttpUserClient _httpUserClient;
-        private readonly IServiceResultFactory _resultFact;
-
-        public HttpUserService(IHttpUserClient httpUserClient, IServiceResultFactory resultFact)
+        public HttpUserService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfoService, IServiceResultFactory resultFact) :
+        base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpUserClient = httpUserClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "IdentityService";
         }
 
 
@@ -26,112 +27,77 @@ namespace Business.Identity.Http.Services
 
         public async Task<IServiceResult<IEnumerable<string>>> EditUserRoles(int id, IEnumerable<string> roles)
         {
-            var response = await _httpUserClient.EditUserRoles(id, roles);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/user/{id}/changeroles";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(roles), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<string>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<string>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<string>>();
         }
 
 
 
         public async Task<IServiceResult<IEnumerable<UserReadDTO>>> GetAllUsers()
         {
-            var response = await _httpUserClient.GetAllUsers();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<UserReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<UserReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<UserReadDTO>>();
         }
 
 
 
         public async Task<IServiceResult<IEnumerable<UserWithRolesReadDTO>>> GetAllUsersWithRoles()
         {
-            var response = await _httpUserClient.GetAllUsersWithRoles();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/withroles";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<UserWithRolesReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<UserWithRolesReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<UserWithRolesReadDTO>>();
         }
 
 
 
         public async Task<IServiceResult<UserReadDTO>> GetCurrentUser()
         {
-            var response = await _httpUserClient.GetCurrentUser();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/current";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<UserReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<UserReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<UserReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<UserReadDTO>> GetUserById(int id)
         {
-            var response = await _httpUserClient.GetUserById(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/{id}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<UserReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<UserReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<UserReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<UserReadDTO>> GetUserByName(string name)
         {
-            var response = await _httpUserClient.GetUserByName(name);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/name/{name}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<UserReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<UserReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<UserReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<UserWithRolesReadDTO>> GetUserWithRoles(int id)
         {
-            var response = await _httpUserClient.GetUserWithRoles(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/{id}/withroles";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<UserWithRolesReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
 
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<UserWithRolesReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<UserWithRolesReadDTO>();
         }
     }
 }

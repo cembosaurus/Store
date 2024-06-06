@@ -1,21 +1,26 @@
-﻿using Business.Libraries.ServiceResult.Interfaces;
+﻿using Business.Inventory.Http.Services.Interfaces;
+using Business.Libraries.ServiceResult.Interfaces;
 using Business.Scheduler.DTOs;
-using Ordering.HttpServices.Interfaces;
+using Business.Scheduler.Http.Services.Interfaces;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Services.Ordering.Models;
 using System.Text;
+
+
 
 namespace Ordering.OrderingBusinessLogic
 {
     public class OrderingTools : ICartBusinessLogic, IOrderBusinessLogic
     {
-        private readonly IHttpInventoryService _httpInventoryService;
+        private readonly IHttpItemPriceService _httpItemPriceService;
+        private readonly IHttpCatalogueItemService _httpCatalogueItemService;
         private readonly IHttpSchedulerService _httpSchedulerService;
         private readonly IServiceResultFactory _resultFact;
 
-        public OrderingTools(IServiceResultFactory resultFact, IHttpInventoryService httpInventoryService, IHttpSchedulerService httpSchedulerService)
+        public OrderingTools(IServiceResultFactory resultFact, IHttpCatalogueItemService httpCatalogueItemService, IHttpItemPriceService httpItemPriceService, IHttpSchedulerService httpSchedulerService)
         {
-            _httpInventoryService = httpInventoryService;
+            _httpItemPriceService = httpItemPriceService;
+            _httpCatalogueItemService = httpCatalogueItemService;
             _httpSchedulerService = httpSchedulerService;
             _resultFact = resultFact;
         }
@@ -38,7 +43,7 @@ namespace Ordering.OrderingBusinessLogic
 
             foreach (var ci in cart.CartItems)
             {
-                var priceResult = await _httpInventoryService.GetItemPriceById(ci.ItemId);
+                var priceResult = await _httpItemPriceService.GetItemPriceById(ci.ItemId);
 
                 if (priceResult == null || !priceResult.Status)
                 {
@@ -72,7 +77,7 @@ namespace Ordering.OrderingBusinessLogic
 
             foreach (var itemToAdd in source)
             {
-                var inStockResult = await _httpInventoryService.GetInstockCount(itemToAdd.ItemId);
+                var inStockResult = await _httpCatalogueItemService.GetInstockCount(itemToAdd.ItemId);
 
                 if (inStockResult == null || !inStockResult.Status)
                 {
@@ -171,7 +176,7 @@ namespace Ordering.OrderingBusinessLogic
             if (itemId < 1 || amount < 1)
                 return _resultFact.Result(0, false, $"Item Id and Amount was not provided !");
 
-            return await _httpInventoryService.AddAmountToStock(itemId, amount);
+            return await _httpCatalogueItemService.AddAmountToStock(itemId, amount);
         }
 
 
@@ -180,7 +185,7 @@ namespace Ordering.OrderingBusinessLogic
             if (itemId < 1 || amount < 1)
                 return _resultFact.Result(0, false, $"Item Id and Amount was not provided !");
 
-            return await _httpInventoryService.RemoveAmountFromStock(itemId, amount);
+            return await _httpCatalogueItemService.RemoveAmountFromStock(itemId, amount);
         }
 
 

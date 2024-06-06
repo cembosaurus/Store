@@ -4,8 +4,8 @@ using Business.Management.Appsettings.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Xml.Linq;
-using System;
+
+
 
 namespace Business.Management.Appsettings
 {
@@ -26,42 +26,42 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesURL()
+        public IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesModels()
         {
            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var urlResult = _config_global.CurrentValue.RemoteServices;
-                if(urlResult.IsNullOrEmpty())
-                    return resultFact.Result(urlResult, false, $"Global config data were NOT found in Appsettings !");
+                var configResult = _config_global.CurrentValue.RemoteServices;
+                if(configResult.IsNullOrEmpty())
+                    return resultFact.Result(configResult, false, $"Global config data were NOT found in Appsettings !");
 
-                return resultFact.Result(urlResult, true);
+                return resultFact.Result(configResult, true);
             }
         }
 
 
-        public IServiceResult<Service_Model_AS> GetRemoteServiceURL(string name)
+        public IServiceResult<Service_Model_AS> GetRemoteServiceModel(string name)
         {
             // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var urlResult = _config_global.CurrentValue.RemoteServices;
+                var configResult = _config_global.CurrentValue.RemoteServices;
 
-                if (urlResult.IsNullOrEmpty())
+                if (configResult.IsNullOrEmpty())
                     return resultFact.Result<Service_Model_AS>(null, false, $"Global config data were NOT found in Appsettings !");
 
-                var url = urlResult.FirstOrDefault(url => url.Name == name);
+                var model = configResult.FirstOrDefault(url => url.Name == name);
 
-                if (url == null)
+                if (model == null)
                 {
-                    return resultFact.Result(url, false, $"URL for service '{name}' NOT found in Appsettings !");
+                    return resultFact.Result(model, false, $"URL for service '{name}' NOT found in Appsettings !");
                 }
                 
-                return resultFact.Result(url, true);
+                return resultFact.Result(model, true);
             }
         }
 

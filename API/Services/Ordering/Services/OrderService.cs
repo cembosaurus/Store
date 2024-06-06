@@ -1,14 +1,16 @@
 ﻿using AutoMapper;
+using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Business.Payment.DTOs;
+using Business.Payment.Http.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices;
-using Ordering.HttpServices.Interfaces;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
 using Services.Ordering.Models;
+
+
 
 namespace Ordering.Services
 {

@@ -4,6 +4,8 @@ using Business.Libraries.ServiceResult.Interfaces;
 using Inventory.Services.Interfaces;
 using Services.Inventory.Data.Repositories.Interfaces;
 
+
+
 namespace Inventory.Services
 {
     public class ItemPriceService: IItemPriceService
@@ -25,18 +27,10 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<IEnumerable<ItemPriceReadDTO>>> GetItemPrices(IEnumerable<int> itemIds = default)
         {
-            Console.WriteLine($"--> GETTING item prices ......");
-
-
             var itemPrices = await _repo.GetItemPrices(itemIds);
 
             if (itemPrices == null || !itemPrices.Any())
                 return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, true, "NO item prices found !");
-
-
-
-            var vvv = _mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices);
-
 
             return _resultFact.Result(
                 _mapper.Map<IEnumerable<ItemPriceReadDTO>>(itemPrices), 
@@ -48,11 +42,7 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<ItemPriceReadDTO>> GetItemPriceById(int id)
         {
-            Console.WriteLine($"--> GETTING item price '{id}' ......");
-
             var message = "";
-
-
             var itemPrice = await _repo.GetItemPriceById(id);
 
             if (itemPrice == null)
@@ -73,9 +63,6 @@ namespace Inventory.Services
 
         public async Task<IServiceResult<ItemPriceReadDTO>> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceEditDTO)
         {
-            Console.WriteLine($"--> UPDATING item price '{itemId}' ......");
-
-
             var itemPrice = await _repo.GetItemPriceById(itemId);
 
             if (itemPrice == null)

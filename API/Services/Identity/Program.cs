@@ -1,9 +1,11 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
-using Business.Http.Interfaces;
 using Business.Http;
+using Business.Http.Interfaces;
 using Business.Identity.Enums;
+using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
@@ -21,8 +23,6 @@ using FluentValidation.AspNetCore;
 using Identity.Data;
 using Identity.Data.Repositories;
 using Identity.Data.Repositories.Interfaces;
-using Identity.HttpServices;
-using Identity.HttpServices.Interfaces;
 using Identity.Models;
 using Identity.Services;
 using Identity.Services.Interfaces;
@@ -30,6 +30,7 @@ using Identity.Services.JWT;
 using Identity.Services.JWT.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Services.Identity.Data;
@@ -37,10 +38,6 @@ using Services.Identity.Data.Repositories;
 using Services.Identity.Data.Repositories.Interfaces;
 using Services.Identity.Models;
 using System.Text;
-using Business.Identity.Http.Services.Interfaces;
-using Business.Identity.Http.Services;
-using Business.Ordering.Http.Clients.Interfaces;
-using Business.Ordering.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +62,7 @@ builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
 builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnStr")));
+builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Congif.Local:ConnectionStrings:IdentityConnStr").Value));
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -77,12 +74,6 @@ builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-
-builder.Services.AddHttpClient<IHttpCartClient, HttpCartClient>(client => {
-    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices:OrderingService").Value);
-});
-
-// To replace other Http Clients:
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
 
@@ -101,7 +92,7 @@ builder.Services.AddIdentityCore<AppUser>(opt => {
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -176,23 +167,41 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
-// Migrations:
-PrepDB.RunMigrations(app, app.Environment.IsProduction(), app.Configuration);
-
-// Users and Roles:
-using (var scope = app.Services.CreateScope())
+// DB:
+try
 {
-    var service = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-    // Seed roples:
-    await service.AddRoles();
-    // Create admin and manager:
-    await service.AddDefaultUsers();
+    // Migrations:
+    PrepDB.RunMigrations(app, app.Environment.IsProduction(), app.Configuration);
+
+    // Users and Roles:
+    using (var scope = app.Services.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+        // Seed roples:
+        await service.AddRoles();
+        // Create admin and manager:
+        await service.AddDefaultUsers();
+    }
+
+    // Seed DB:
+    PrepDB.PrepPopulation(app);
 }
+catch (SqlException ex)
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
 
-// Seed DB:
-PrepDB.PrepPopulation(app);
+    switch (ex.Number)
+    {
+        case 11001:
+            Console.WriteLine($"\n\n\n--> DB Connection failed ! Reason: {ex.Message}\n\n\n");
+            break;
+        default:
+            Console.WriteLine($"\n\n\n--> SQL Error ! Reason: {ex.Message}\n\n\n");
+            break;
+    }
 
+    Console.ResetColor();
+}
 
 
 app.Run();

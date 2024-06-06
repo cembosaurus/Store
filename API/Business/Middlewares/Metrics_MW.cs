@@ -15,7 +15,7 @@ namespace Business.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            _timeIn= DateTime.UtcNow;
+            _timeIn = DateTime.UtcNow;
 
            
             context.Response.OnStarting(() =>

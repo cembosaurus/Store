@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Business.Identity.DTOs;
 using Business.Identity.Enums;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
-using Identity.HttpServices.Interfaces;
 using Identity.Models;
 using Identity.Services.Interfaces;
 using Identity.Services.JWT.Interfaces;
@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Identity.Models;
 using System.Net.Http.Headers;
+
+
 
 namespace Identity.Services
 {
@@ -47,12 +49,6 @@ namespace Identity.Services
             if (await _userManager.Users.AnyAsync(u => u.UserName == userToRegister.Name.ToLower()))
                 return _resultFact.Result<UserAuthDTO>(null, false, $"User name '{userToRegister.Name}' is not available !");
 
-
-            var message = string.Empty;
-
-            Console.WriteLine($"--> REGISTERING user '{userToRegister.Name}' .....");
-
-
             var user = _mapper.Map<AppUser>(userToRegister);
 
             user.UserName = userToRegister.Name.ToLower();
@@ -79,19 +75,12 @@ namespace Identity.Services
 
             userAuthDTO.Token = tokenResult.Data;
 
-
-            Console.WriteLine($"--> CREATING Cart for User '{user.UserName}' Id: '{user.Id} ....");
-
-
             _accessor.HttpContext.Request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", userAuthDTO.Token).ToString();
 
             var cartCreateResult = await _httpCartService.CreateCart(user.Id);
 
-            if (cartCreateResult == null || !cartCreateResult.Status)
-                message += Environment.NewLine + $"Failed to create Cart for User '{user.UserName}' Id: '{user.Id}' !";
 
-
-            return _resultFact.Result(userAuthDTO, true, message);
+            return _resultFact.Result(userAuthDTO, true, cartCreateResult == null || !cartCreateResult.Status ? $"Failed to create Cart for User '{user.UserName}' Id: '{user.Id}' !" : "");
         }
 
 
@@ -103,11 +92,7 @@ namespace Identity.Services
             if (userFromRepo == null)
                 return _resultFact.Result<string>(null, false , $"User '{user.Name}' NOT found !");
 
-
-            Console.WriteLine($"--> LOGGING IN user '{user.Name}' .....");
-
-
-            var result = await _signInManager.CheckPasswordSignInAsync(userFromRepo, user.Password, false);                 // 'false' - not locking out user if unsuccessful log in    
+            var result = await _signInManager.CheckPasswordSignInAsync(userFromRepo, user.Password, false);                 // 'false' = not locking out user if unsuccessful log in    
 
             if (!result.Succeeded)
                 return _resultFact.Result<string>(null, false, $"User '{user.Name}' is NOT authorozed !");

@@ -20,9 +20,7 @@ namespace Business.Middlewares
             // manual - data in body (Service Id, Name, ... etc):
             if (context.Request.Path == "/svcid")
             {
-                await context.Response.WriteAsync(
-                    Newtonsoft.Json.JsonConvert.SerializeObject(new ServiceIdReadDTO { Id = _serviceId, Name = _serviceName })
-                    );          
+                await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(new ServiceIdReadDTO { Id = _serviceId, Name = _serviceName }));          
             }
             // auto - data in header (Service Id only):
             else

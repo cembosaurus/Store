@@ -29,7 +29,7 @@ namespace API_Gateway.Controllers.Management
         [HttpPut()]
         public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<Service_Model_AS> servicesURLs)
         {
-            var result = _remoteServicesInfoService.UpdateServiceModels(servicesURLs);
+            var result = _remoteServicesInfoService.Update(servicesURLs);
 
             return result.Status ? Ok(result) : BadRequest(result);
         }

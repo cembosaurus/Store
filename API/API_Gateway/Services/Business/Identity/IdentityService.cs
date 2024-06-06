@@ -28,14 +28,14 @@ namespace API_Gateway.Services.Business.Identity
 
         public async Task<IServiceResult<string>> Login(UserToLoginDTO user)
         {
-            return await _httpIdentityService.Login(user);
+            return await _httpIdentityService.Login_UserPassword(user);
         }
 
 
 
         public async Task<IServiceResult<string>> AuthenticateService(string apiKey)
         {
-            return await _httpIdentityService.AuthenticateService(apiKey);
+            return await _httpIdentityService.Login_ApiKey(apiKey);
         }
 
     }

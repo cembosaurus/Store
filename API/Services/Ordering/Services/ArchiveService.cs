@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices.Interfaces;
 using Ordering.Services.Interfaces;
+
+
 
 namespace Ordering.Services
 {

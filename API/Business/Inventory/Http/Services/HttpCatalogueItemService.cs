@@ -1,216 +1,153 @@
-﻿using Business.Inventory.Http.Services.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Inventory.DTOs.CatalogueItem;
-using Business.Inventory.DTOs.Item;
-using Business.Inventory.Http.Clients.Interfaces;
-using Business.Libraries.ServiceResult;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
+
+
 
 namespace Business.Inventory.Http.Services
 {
-    public class HttpCatalogueItemService : IHttpCatalogueItemService
+    public class HttpCatalogueItemService : HttpBaseService, IHttpCatalogueItemService
     {
 
-        private readonly IHttpCatalogueItemClient _httpCatalogueItemClient;
-        private readonly IServiceResultFactory _resultFact;
-
-        public HttpCatalogueItemService(IHttpCatalogueItemClient httpCatalogueItemClient, IServiceResultFactory resultFact)
+        public HttpCatalogueItemService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpCatalogueItemClient = httpCatalogueItemClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "InventoryService";
+            _remoteServicePathName = "CatalogueItem";
         }
 
 
 
 
 
-        public async Task<IServiceResult<ExtrasReadDTO>> AddExtrasToCatalogueItem(int id, ExtrasAddDTO extrasAddDTO)
+        public async Task<IServiceResult<ExtrasReadDTO>> AddExtrasToCatalogueItem(int itemId, ExtrasAddDTO extrasAddDTO)
         {
-            var response = await _httpCatalogueItemClient.AddExtrasToCatalogueItem(id, extrasAddDTO);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/{itemId}/extras";
+            _content = new StringContent(JsonConvert.SerializeObject(extrasAddDTO), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<ExtrasReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<ExtrasReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<ExtrasReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<int>> AddAmountToStock(int itemId, int amount)
         {
-            var response = await _httpCatalogueItemClient.AddAmountToStock(itemId, amount);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{itemId}/tostock/{amount}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(0, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<int>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<int>();
         }
 
 
 
         public async Task<IServiceResult<CatalogueItemReadDTO>> CreateCatalogueItem(int itemId, CatalogueItemCreateDTO catalogueItemCreateDTO)
         {
-            var response = await _httpCatalogueItemClient.CreateCatalogueItem(itemId, catalogueItemCreateDTO);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/{itemId}";
+            _content = new StringContent(JsonConvert.SerializeObject(catalogueItemCreateDTO), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CatalogueItemReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CatalogueItemReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CatalogueItemReadDTO>();
         }
 
 
 
-        public async Task<IServiceResult<bool>> ExistsCatalogueItemById(int id)
+        public async Task<IServiceResult<bool>> ExistsCatalogueItemById(int itemId)
         {
-            var response = await _httpCatalogueItemClient.ExistsCatalogueItemById(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{itemId}/exists";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(false, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<bool>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<bool>();
         }
 
 
 
-        public async Task<IServiceResult<CatalogueItemReadDTO>> GetCatalogueItemById(int id)
+        public async Task<IServiceResult<CatalogueItemReadDTO>> GetCatalogueItemById(int itemId)
         {
-            var response = await _httpCatalogueItemClient.GetCatalogueItemById(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{itemId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CatalogueItemReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CatalogueItemReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CatalogueItemReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<IEnumerable<CatalogueItemReadDTO>>> GetCatalogueItems(IEnumerable<int> itemIds = null)
         {
-            var response = await _httpCatalogueItemClient.GetCatalogueItems(itemIds);
+            _method = HttpMethod.Get;
+            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "/all")}";
+            _content = new StringContent(JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CatalogueItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CatalogueItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CatalogueItemReadDTO>>();
         }
 
 
 
-        public async Task<IServiceResult<CatalogueItemReadDTOWithExtras>> GetCatalogueItemWithExtrasById(int id)
+        public async Task<IServiceResult<CatalogueItemReadDTOWithExtras>> GetCatalogueItemWithExtrasById(int itemId)
         {
-            var response = await _httpCatalogueItemClient.GetCatalogueItemWithExtrasById(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{itemId}/extras";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CatalogueItemReadDTOWithExtras>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CatalogueItemReadDTOWithExtras>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CatalogueItemReadDTOWithExtras>();
         }
 
 
 
-        public async Task<IServiceResult<int>> GetInstockCount(int id)
+        public async Task<IServiceResult<int>> GetInstockCount(int itemId)
         {
-            var response = await _httpCatalogueItemClient.GetInstockCount(id);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{itemId}/instock";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(0, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<int>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<int>();
         }
 
 
 
-        public async Task<IServiceResult<CatalogueItemReadDTO>> RemoveCatalogueItem(int id)
+        public async Task<IServiceResult<CatalogueItemReadDTO>> RemoveCatalogueItem(int itemId)
         {
-            var response = await _httpCatalogueItemClient.RemoveCatalogueItem(id);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{itemId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CatalogueItemReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CatalogueItemReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CatalogueItemReadDTO>();
         }
 
 
 
-        public async Task<IServiceResult<ExtrasReadDTO>> RemoveExtrasFromCatalogueItem(int id, ExtrasRemoveDTO extrasRemoveDTO)
+        public async Task<IServiceResult<ExtrasReadDTO>> RemoveExtrasFromCatalogueItem(int itemId, ExtrasRemoveDTO extrasRemoveDTO)
         {
-            var response = await _httpCatalogueItemClient.RemoveExtrasFromCatalogueItem(id, extrasRemoveDTO);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{itemId}/extras";
+            _content = new StringContent(JsonConvert.SerializeObject(extrasRemoveDTO), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<ExtrasReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<ExtrasReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<ExtrasReadDTO>();
         }
 
 
 
-        public async Task<IServiceResult<int>> RemoveFromStockAmount(int itemId, int amount)
+        public async Task<IServiceResult<int>> RemoveAmountFromStock(int itemId, int amount)
         {
-            var response = await _httpCatalogueItemClient.RemoveFromStockAmount(itemId, amount);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{itemId}/fromstock/{amount}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(0, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<int>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<int>();
         }
 
 
 
         public async Task<IServiceResult<CatalogueItemReadDTO>> UpdateCatalogueItem(int itemId, CatalogueItemUpdateDTO catalogueItemUpdateDTO)
         {
-            var response = await _httpCatalogueItemClient.UpdateCatalogueItem(itemId, catalogueItemUpdateDTO);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/{itemId}";
+            _content = new StringContent(JsonConvert.SerializeObject(catalogueItemUpdateDTO), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CatalogueItemReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CatalogueItemReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CatalogueItemReadDTO>();
         }
     }
 }

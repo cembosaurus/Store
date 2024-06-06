@@ -1,8 +1,7 @@
-﻿using Business.Inventory.DTOs.Item;
-using Business.Libraries.ServiceResult.Interfaces;
+﻿using Business.Libraries.ServiceResult.Interfaces;
 using Business.Scheduler.DTOs;
 
-namespace Ordering.HttpServices.Interfaces
+namespace Business.Scheduler.Http.Services.Interfaces
 {
     public interface IHttpSchedulerService
     {

@@ -8,7 +8,7 @@ namespace Business.Inventory.Http.Services.Interfaces
     {
         Task<IServiceResult<IEnumerable<CartItemReadDTO>>> AddItemsToCart(int cartId, IEnumerable<CartItemUpdateDTO> itemsToAdd);
         Task<IServiceResult<IEnumerable<CartItemReadDTO>>> DeleteCartItems(int userId, IEnumerable<int> itemIds);
-        Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCardItems();
+        Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCartsItems();
         Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetCartItems(int userId);
         Task<IServiceResult<IEnumerable<CartItemReadDTO>>> RemoveCartItems(int cartId, IEnumerable<CartItemUpdateDTO> itemsToRemove);
     }

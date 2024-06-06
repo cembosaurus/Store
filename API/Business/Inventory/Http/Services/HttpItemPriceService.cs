@@ -1,72 +1,57 @@
-﻿using Business.Inventory.DTOs.ItemPrice;
-using Business.Inventory.Http.Clients.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
+using Business.Inventory.DTOs.ItemPrice;
 using Business.Inventory.Http.Services.Interfaces;
-using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 
 
 namespace Business.Inventory.Http.Services
 {
-    public class HttpItemPriceService : IHttpItemPriceService
+    public class HttpItemPriceService : HttpBaseService, IHttpItemPriceService
     {
 
-        private readonly IHttpItemPriceClient _httpItemPriceClient;
-        private readonly IServiceResultFactory _resultFact;
-
-        public HttpItemPriceService(IHttpItemPriceClient httpItemPriceClient, IServiceResultFactory resultFact)
+        public HttpItemPriceService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfoService, IServiceResultFactory resultFact)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpItemPriceClient = httpItemPriceClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "InventoryService";
+            _remoteServicePathName = "ItemPrice";
         }
 
 
-
-
-        public async Task<IServiceResult<ItemPriceReadDTO>> GetItemPriceById(int id)
-        {
-            var response = await _httpItemPriceClient.GetItemPriceById(id);
-
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<ItemPriceReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<ItemPriceReadDTO>>(content);
-
-            return result;
-        }
 
 
 
         public async Task<IServiceResult<IEnumerable<ItemPriceReadDTO>>> GetItemPrices(IEnumerable<int> itemIds = default)
         {
-            var response = await _httpItemPriceClient.GetItemPrices(itemIds);
+            _method = HttpMethod.Get;
+            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "/all")}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<ItemPriceReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<ItemPriceReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<ItemPriceReadDTO>>();
         }
 
 
-
-        public async Task<IServiceResult<ItemPriceReadDTO>> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceEditDTO)
+        public async Task<IServiceResult<ItemPriceReadDTO>> GetItemPriceById(int itemId)
         {
-            var response = await _httpItemPriceClient.UpdateItemPrice(itemId, itemPriceEditDTO);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{itemId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<ItemPriceReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
+            return await HTTP_Request_Handler<ItemPriceReadDTO>();
+        }
 
-            var content = response.Content.ReadAsStringAsync().Result;
 
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<ItemPriceReadDTO>>(content);
+        public async Task<IServiceResult<ItemPriceReadDTO>> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO)
+        {
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{itemId}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemPriceUpdateDTO), _encoding, _mediaType);
 
-            return result;
+            return await HTTP_Request_Handler<ItemPriceReadDTO>();
         }
     }
 }

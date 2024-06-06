@@ -1,22 +1,26 @@
-﻿using Business.Libraries.ServiceResult;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
 using Business.Ordering.DTOs;
-using Business.Ordering.Http.Clients.Interfaces;
 using Business.Ordering.Http.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 
 
 namespace Business.Ordering.Http.Services
 {
-    public class HttpOrderService : IHttpOrderService
+    public class HttpOrderService : HttpBaseService, IHttpOrderService
     {
-        private readonly IHttpOrderClient _httpOrderClient;
-        private readonly IServiceResultFactory _resultFact;
 
-        public HttpOrderService(IHttpOrderClient httpOrderClient, IServiceResultFactory resultFact)
+
+        public HttpOrderService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpOrderClient = httpOrderClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "OrderingService";
+            _remoteServicePathName = "Order";
         }
 
 
@@ -25,128 +29,84 @@ namespace Business.Ordering.Http.Services
 
         public async Task<IServiceResult<OrderReadDTO>> CompleteOrder(int userId)
         {
-            var response = await _httpOrderClient.CompleteOrder(userId);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{userId}/complete";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<OrderReadDTO>> CreateOrder(int userId, OrderCreateDTO orderCreateDTO)
         {
-            var response = await _httpOrderClient.CreateOrder(userId, orderCreateDTO);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/{userId}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderCreateDTO }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<OrderReadDTO>> DeleteOrder(int userId)
         {
-            var response = await _httpOrderClient.DeleteOrder(userId);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{userId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()
         {
-            var response = await _httpOrderClient.GetAllOrders();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/all";
 
-            //if (!response.IsSuccessStatusCode)
-            //    return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<OrderReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<OrderReadDTO>>();
         }
 
 
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByCartId(Guid cartId)
         {
-            var response = await _httpOrderClient.GetOrderByCartId(cartId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/cart";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
-        public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string code)
+        public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string orderCode)
         {
-            var response = await _httpOrderClient.GetOrderByOrderCode(code);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/ordercode";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderCode }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByUserId(int userId)
         {
-            var response = await _httpOrderClient.GetOrderByUserId(userId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/user/{userId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
 
 
 
         public async Task<IServiceResult<OrderReadDTO>> UpdateOrder(int userId, OrderUpdateDTO orderUpdateDTO)
         {
-            var response = await _httpOrderClient.UpdateOrder(userId, orderUpdateDTO);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{userId}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderUpdateDTO }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<OrderReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<OrderReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<OrderReadDTO>();
         }
     }
 }

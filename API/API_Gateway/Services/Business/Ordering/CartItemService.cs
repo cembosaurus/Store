@@ -22,7 +22,7 @@ namespace API_Gateway.Services.Business.Ordering
 
         public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCardItems()
         {
-            return await _httpCartItemService.GetAllCardItems();
+            return await _httpCartItemService.GetAllCartsItems();
         }
 
 

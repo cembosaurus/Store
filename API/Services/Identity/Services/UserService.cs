@@ -34,17 +34,9 @@ namespace Identity.Services
 
         public async Task<IServiceResult<IEnumerable<UserReadDTO>>> GetAllUsers()
         {
-            Console.WriteLine($"--> GETTING all users ......");
-
-            var message = "";
-
-
             var users = await _repo.GetAllUsers();
 
-            if (!users.Any())
-                message = "NO users found !";
-
-            return _resultFact.Result(_mapper.Map<IEnumerable<UserReadDTO>>(users), true, message);
+            return _resultFact.Result(_mapper.Map<IEnumerable<UserReadDTO>>(users), true, users.Any() ? "" : "NO users found !");
         }
 
 
@@ -52,17 +44,9 @@ namespace Identity.Services
 
         public async Task<IServiceResult<UserReadDTO>> GetUserById(int id)
         {
-            Console.WriteLine($"--> GETTING user '{id}' ......");
-
-            var message = "";
-
-
             var user = await _repo.GetUserById(id);
 
-            if (user == null)
-                message = $"User '{id}' was NOT found !";
-
-            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, message);
+            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, user != null ? "" : $"User '{id}' was NOT found !");
         }
 
 
@@ -70,17 +54,9 @@ namespace Identity.Services
 
         public async Task<IServiceResult<UserReadDTO>> GetUserByName(string name)
         {
-            Console.WriteLine($"--> GETTING user '{name}' ......");
-
-            var message = "";
-
-
             var user = await _userManager.FindByNameAsync(name);
 
-            if (user == null)
-                message = $"User '{name}' was NOT found !";
-
-            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, message);
+            return _resultFact.Result(_mapper.Map<UserReadDTO>(user), true, user != null ? "" : $"User '{name}' was NOT found !");
         }
 
 
@@ -88,9 +64,6 @@ namespace Identity.Services
 
         public async Task<IServiceResult<IEnumerable<UserWithRolesReadDTO>>> GetAllUsersWithRoles()
         {
-            Console.WriteLine($"--> GETTING users with roles ......");
-
-
             var users = _userManager.Users.AsQueryable();
 
             if (!users.Any())
@@ -119,9 +92,6 @@ namespace Identity.Services
 
         public async Task<IServiceResult<UserWithRolesReadDTO>> GetUserWithRoles(int id)
         {
-            Console.WriteLine($"--> GETTING users with roles ......");
-
-
             var users = _userManager.Users.AsQueryable();
 
             if (!users.Any())
@@ -155,10 +125,6 @@ namespace Identity.Services
 
             if (user == null)
                 return _resultFact.Result<IEnumerable<string>>(null, false, $"User with ID: '{id}' NOT found !");
-
-
-            Console.WriteLine($"--> EDITING roles for user '{user.Id}': '{user.UserName}' ......");
-
 
             var allExistingRoles = _roleManager.Roles.Select(ar => ar.Name.ToString()).ToList();
 

@@ -5,8 +5,8 @@ namespace Business.Management.Appsettings.Interfaces
 {
     public interface IAppsettingsService
     {
-        IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesURL();
+        IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesModels();
         IServiceResult<string> GetApiKey();
-        IServiceResult<Service_Model_AS> GetRemoteServiceURL(string name);
+        IServiceResult<Service_Model_AS> GetRemoteServiceModel(string name);
     }
 }

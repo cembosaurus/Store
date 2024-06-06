@@ -32,7 +32,7 @@ namespace Management.Controllers
         [HttpGet("url/all")]
         public ActionResult GetAllServicesURL()
         {
-            var result = _appsettingsService.GetAllRemoteServicesURL();
+            var result = _appsettingsService.GetAllRemoteServicesModels();
 
             return result.Status ? Ok(result) : BadRequest(result);
         }

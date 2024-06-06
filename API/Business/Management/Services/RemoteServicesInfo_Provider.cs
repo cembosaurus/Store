@@ -63,12 +63,12 @@ namespace Business.Management.Services
             if (_remoteServicesInfo_Repo.GetAll().IsNullOrEmpty())
                 return _resultFact.Result<Service_Model_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
 
-            var serviceURL = _remoteServicesInfo_Repo.GetByBaseURL(baseURL);
+            var serviceModel = _remoteServicesInfo_Repo.GetByBaseURL(baseURL);
 
-            if (serviceURL == null)
-                return _resultFact.Result(serviceURL, false, $"Service with Base URL '{baseURL}' was NOT found !");
+            if (serviceModel == null)
+                return _resultFact.Result(serviceModel, false, $"Service with Base URL '{baseURL}' was NOT found !");
 
-            return _resultFact.Result(serviceURL, true);
+            return _resultFact.Result(serviceModel, true);
         }
 
 
@@ -80,12 +80,12 @@ namespace Business.Management.Services
             if (string.IsNullOrWhiteSpace(pathName))
                 return _resultFact.Result("", false, $"Path for Remote Service '{serviceName}' was NOT provided !");
 
-            var urlResult = GetServiceByName(serviceName);
+            var modelResult = GetServiceByName(serviceName);
 
-            if(!urlResult.Status)
-                return _resultFact.Result("", false, urlResult.Message);
+            if(!modelResult.Status)
+                return _resultFact.Result("", false, modelResult.Message);
 
-            var urlWithPath = urlResult.Data.GetUrlWithPath(TypeOfService.REST, pathName, _isProdEnv);
+            var urlWithPath = modelResult.Data.GetUrlWithPath(TypeOfService.REST, pathName, _isProdEnv);
 
             if (string.IsNullOrWhiteSpace(urlWithPath))
                 return _resultFact.Result("", false, $"Path: '{pathName}' for Remote Service: '{serviceName}' NOT found !");
@@ -117,15 +117,15 @@ namespace Business.Management.Services
 
 
         // For ALL services !
-        // UPDATE Remote Services URLs by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<Service_Model_AS>>> LoadServiceModels()
+        // UPDATE Remote Services models by GET response from Management service:
+        public async Task<IServiceResult<IEnumerable<Service_Model_AS>>> ReLoad()
         {
             var result = await _httpManagementService.GetAllRemoteServices();
 
             if (!result.Status || result.Data.IsNullOrEmpty())
                 return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Remote Services URLs was NOT received from Management service ! Reason: {result.Message}");
 
-            UpdateServiceModels(result.Data);
+            Update(result.Data);
 
             return result;
         }
@@ -133,11 +133,11 @@ namespace Business.Management.Services
 
 
         // For MANAGEMENT service !
-        // UPDATE Remote Services URLs by incoming PUT request from Management API service:
+        // UPDATE Remote Services models by incoming PUT request from Management API service:
 
         // WARNING: in K8 only one replica (NOT all) of this service will be chosen for PUT request by load balancer!
-        // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of old/faulty URL.
-        public IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesModels)
+        // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
+        public IServiceResult<IEnumerable<Service_Model_AS>> Update(IEnumerable<Service_Model_AS> servicesModels)
         {
             Console.WriteLine($"--> UPDATING Services models ......");
 

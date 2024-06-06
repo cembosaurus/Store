@@ -1,8 +1,13 @@
 ﻿using Business.Scheduler.JWT.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 
+
+
 namespace Business.Scheduler.JWT
 {
+
+	// singleton
+
 	public class JWTTokenStore : IJWTTokenStore
     {
 

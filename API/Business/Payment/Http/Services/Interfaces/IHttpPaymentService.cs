@@ -2,7 +2,7 @@
 using Business.Ordering.DTOs;
 using Business.Payment.DTOs;
 
-namespace Ordering.HttpServices.Interfaces
+namespace Business.Payment.Http.Services.Interfaces
 {
     public interface IHttpPaymentService
     {

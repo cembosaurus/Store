@@ -1,18 +1,20 @@
 ﻿using AutoMapper;
+using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Business.Scheduler.DTOs;
-using Microsoft.VisualBasic;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices.Interfaces;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
 using Services.Ordering.Models;
+
 
 namespace Ordering.Services
 {
     public class CartItemService : ICartItemService
     {
+        private readonly IHttpCatalogueItemService _httpCatalogueItemService;
         private readonly IHttpInventoryService _httpInventoryService;
         private readonly ICartBusinessLogic _cartBusinessLogic;
         private readonly ICartItemsRepository _cartItemRepo;
@@ -20,8 +22,9 @@ namespace Ordering.Services
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
 
-        public CartItemService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpInventoryService httpInventoryService)
+        public CartItemService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpCatalogueItemService httpCatalogueItemService, IHttpInventoryService httpInventoryService)
         {
+            _httpCatalogueItemService = httpCatalogueItemService;
             _httpInventoryService = httpInventoryService;
             _cartBusinessLogic = cartBusinessLogic;
             _cartItemRepo = cartItemRepo;
@@ -85,7 +88,7 @@ namespace Ordering.Services
 
             var ids = itemsToAdd.Select(i => i.ItemId);
 
-            var catalogueItemsResult = await _httpInventoryService.GetCatalogueItems(ids);
+            var catalogueItemsResult = await _httpCatalogueItemService.GetCatalogueItems(ids);
 
             if (!catalogueItemsResult.Status)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, catalogueItemsResult.Status, $"Items for cart '{cart.UserId}' were NOT verified ! Reason: {catalogueItemsResult.Message}");
@@ -166,7 +169,7 @@ namespace Ordering.Services
 
             var ids = itemsToRemove.Select(i => i.ItemId);
 
-            var catalogueItemsResult = await _httpInventoryService.GetCatalogueItems(ids);
+            var catalogueItemsResult = await _httpCatalogueItemService.GetCatalogueItems(ids);
 
             if (!catalogueItemsResult.Status)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, catalogueItemsResult.Status, $"Items for cart '{cart.UserId}' were NOT verified ! Reason: {catalogueItemsResult.Message}");

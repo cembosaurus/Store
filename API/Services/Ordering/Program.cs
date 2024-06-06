@@ -1,11 +1,12 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
-using Business.Http.Interfaces;
 using Business.Http;
+using Business.Http.Interfaces;
 using Business.Identity.Enums;
-using Business.Identity.Http.Clients;
-using Business.Identity.Http.Clients.Interfaces;
+using Business.Identity.Http.Services;
+using Business.Identity.Http.Services.Interfaces;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
@@ -17,10 +18,10 @@ using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
 using Business.Middlewares;
-using Business.Payment.Http;
-using Business.Payment.Http.Interfaces;
-using Business.Scheduler.Http;
-using Business.Scheduler.Http.Interfaces;
+using Business.Payment.Http.Services;
+using Business.Payment.Http.Services.Interfaces;
+using Business.Scheduler.Http.Services;
+using Business.Scheduler.Http.Services.Interfaces;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,16 +31,12 @@ using Microsoft.IdentityModel.Tokens;
 using Ordering.Data;
 using Ordering.Data.Repositories;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.HttpServices;
-using Ordering.HttpServices.Interfaces;
 using Ordering.OrderingBusinessLogic;
 using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services;
 using Ordering.Services.Interfaces;
 using System.Reflection;
 using System.Text;
-using Business.Inventory.Http.Clients.Interfaces;
-using Business.Inventory.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,26 +69,12 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IArchiveService, ArchiveService>();
-builder.Services.AddScoped<IHttpInventoryService, HttpInventoryService>();
 builder.Services.AddScoped<IHttpAddressService, HttpAddressService>();
 builder.Services.AddScoped<IHttpPaymentService, HttpPaymentService>();
 builder.Services.AddScoped<IHttpSchedulerService, HttpSchedulerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-builder.Services.AddHttpClient<IHttpItemPriceClient, HttpItemPriceClient>();
-//builder.Services.AddHttpClient<IHttpItemClient, HttpItemClient>();
-builder.Services.AddHttpClient<IHttpCatalogueItemClient, HttpCatalogueItemClient>();
-//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
-builder.Services.AddHttpClient<IHttpPaymentClient, HttpPaymentClient>();
-builder.Services.AddHttpClient<IHttpSchedulerClient, HttpSchedulerClient>();
-builder.Services.AddHttpClient<IHttpAddressClient, HttpAddressClient>();
-//builder.Services.AddHttpClient<IHttpManagementClient, HttpManagementClient>(client => {
-//    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices_old:OrderingService:REST:BaseURL").Value);
-//});
-
-// To replace other Http Clients:
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
-
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();

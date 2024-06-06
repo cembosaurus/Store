@@ -87,7 +87,7 @@ namespace API_Gateway.Services.Business.Inventory
 
         public async Task<IServiceResult<int>> RemoveFromStockAmount(int itemId, int amount)
         {
-            return await _httpCatalogueItemService.RemoveFromStockAmount(itemId, amount);
+            return await _httpCatalogueItemService.RemoveAmountFromStock(itemId, amount);
         }
 
 

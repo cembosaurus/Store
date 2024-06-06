@@ -1,22 +1,26 @@
-﻿using Business.Libraries.ServiceResult;
-using Business.Libraries.ServiceResult.Interfaces;
-using Business.Ordering.DTOs;
-using Business.Ordering.Http.Clients.Interfaces;
-using Business.Scheduler.DTOs;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Inventory.Http.Services.Interfaces;
+using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Business.Ordering.DTOs;
+using Business.Scheduler.DTOs;
+using Microsoft.AspNetCore.Hosting;
+
+
 
 namespace Business.Inventory.Http.Services
 {
-    public class HttpCartService : IHttpCartService
+    public class HttpCartService : HttpBaseService, IHttpCartService
     {
 
-        private readonly IHttpCartClient _httpCartClient;
-        private readonly IServiceResultFactory _resultFact;
-
-        public HttpCartService(IHttpCartClient httpCartClient, IServiceResultFactory resultFact)
+        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpCartClient = httpCartClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "OrderingService";
+            _remoteServicePathName = "Cart";
         }
 
 
@@ -24,101 +28,62 @@ namespace Business.Inventory.Http.Services
 
         public async Task<IServiceResult<CartReadDTO>> CreateCart(int userId)
         {
-            var response = await _httpCartClient.CreateCart(userId);
+            _method = HttpMethod.Post;
+            _requestQuery = $"";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CartReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CartReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CartReadDTO>();
         }
 
         public async Task<IServiceResult<CartReadDTO>> DeleteCart(int id)
         {
-            var response = await _httpCartClient.DeleteCart(id);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{id}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CartReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CartReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CartReadDTO>();
         }
 
         public async Task<IServiceResult<bool>> ExistsCartByCartId(Guid cartId)
         {
-            var response = await _httpCartClient.ExistsCartByCartId(cartId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/exists";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(false, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<bool>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<bool>();
         }
 
         public async Task<IServiceResult<IEnumerable<CartReadDTO>>> GetCards()
         {
-            var response = await _httpCartClient.GetCards();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/all";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartReadDTO>>();
         }
 
         public async Task<IServiceResult<CartReadDTO>> GetCartByUserId(int userId)
         {
-            var response = await _httpCartClient.GetCartByUserId(userId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{userId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CartReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CartReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CartReadDTO>();
         }
 
         public async Task<IServiceResult<CartReadDTO>> UpdateCart(int userId, CartUpdateDTO cartUpdateDTO)
         {
-            var response = await _httpCartClient.UpdateCart(userId, cartUpdateDTO);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/{userId}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartUpdateDTO }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<CartReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<CartReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<CartReadDTO>();
         }
 
 
         public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
         {
-            var response = await _httpCartClient.RemoveExpiredItemsFromCart(cartItemLocks);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/items/expired";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, response.StatusCode.ToString());
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemsLockReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemsLockReadDTO>>();
         }
     }
 }

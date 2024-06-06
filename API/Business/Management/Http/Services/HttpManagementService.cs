@@ -1,6 +1,5 @@
 ﻿using Business.Http;
 using Business.Http.Interfaces;
-using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
@@ -22,6 +21,7 @@ namespace Business.Management.Http.Services
             : base(env, appsettingsService, httpAppClient, resultFact)
         {
             _remoteServiceName = "ManagementService";
+            _remoteServicePathName = "RemoteService";
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;           
         }
@@ -38,26 +38,10 @@ namespace Business.Management.Http.Services
 
         public async Task<IServiceResult<IEnumerable<Service_Model_AS>>> GetAllRemoteServices()
         {
-            _remoteServicePathName = "RemoteService";
-
             _method = HttpMethod.Get;
             _requestQuery = $"{"url/all"}";
 
-            var initResponse = await InitializeRequest();
-
-            if (!initResponse.Status)
-                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Request for remote service '{_remoteServiceName}' was NOT initialized ! Reason: {initResponse.Message}");
-
-            var response = await Send();
-
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage?.Method}, {response.RequestMessage?.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<Service_Model_AS>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<Service_Model_AS>>();
         }
 
     }

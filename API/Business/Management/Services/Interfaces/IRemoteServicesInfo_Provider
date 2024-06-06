@@ -10,7 +10,7 @@ namespace Business.Management.Services.Interfaces
         IServiceResult<string> GetServiceURL_WithPath(Service_Model_AS serviceUrl, string pathName);
         IServiceResult<string> GetServiceURL_WithPath(string serviceName, string pathName);
         IServiceResult<bool> IsEmpty();
-        Task<IServiceResult<IEnumerable<Service_Model_AS>>> LoadServiceModels();
-        IServiceResult<IEnumerable<Service_Model_AS>> UpdateServiceModels(IEnumerable<Service_Model_AS> servicesModels);
+        Task<IServiceResult<IEnumerable<Service_Model_AS>>> ReLoad();
+        IServiceResult<IEnumerable<Service_Model_AS>> Update(IEnumerable<Service_Model_AS> servicesModels);
     }
 }

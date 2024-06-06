@@ -1,103 +1,80 @@
-﻿using Business.Libraries.ServiceResult;
-using Business.Libraries.ServiceResult.Interfaces;
-using Business.Ordering.DTOs;
-using Business.Ordering.Http.Clients.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
 using Business.Inventory.Http.Services.Interfaces;
+using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Business.Ordering.DTOs;
+using Microsoft.AspNetCore.Hosting;
+
+
 
 namespace Business.Inventory.Http.Services
 {
-    public class HttpCartItemService : IHttpCartItemService
+    public class HttpCartItemService : HttpBaseService, IHttpCartItemService
     {
 
-        private readonly IHttpCartItemClient _httpCartItemClient;
-        private readonly IServiceResultFactory _resultFact;
-
-        public HttpCartItemService(IHttpCartItemClient httpCartItemClient, IServiceResultFactory resultFact)
+        public HttpCartItemService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpCartItemClient = httpCartItemClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "OrderingService";
+            _remoteServicePathName = "Cart";
         }
 
 
 
 
 
-        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> AddItemsToCart(int cartId, IEnumerable<CartItemUpdateDTO> itemsToAdd)
+        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> AddItemsToCart(int userId, IEnumerable<CartItemUpdateDTO> items)
         {
-            var response = await _httpCartItemClient.AddItemsToCart(cartId, itemsToAdd);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/{userId}/items";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemReadDTO>>();
         }
 
 
 
-        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> DeleteCartItems(int userId, IEnumerable<int> itemIds)
+        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> DeleteCartItems(int userId, IEnumerable<int> items)
         {
-            var response = await _httpCartItemClient.DeleteCartItems(userId, itemIds);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{userId}/items/delete";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemReadDTO>>();
         }
 
 
 
-        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCardItems()
+        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCartsItems()
         {
-            var response = await _httpCartItemClient.GetAllCardItems();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/items/all";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemReadDTO>>();
         }
 
 
 
         public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetCartItems(int userId)
         {
-            var response = await _httpCartItemClient.GetCartItems(userId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/{userId}/items";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemReadDTO>>();
         }
 
 
 
-        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> RemoveCartItems(int cartId, IEnumerable<CartItemUpdateDTO> itemsToRemove)
+        public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> RemoveCartItems(int userId, IEnumerable<CartItemUpdateDTO> items)
         {
-            var response = await _httpCartItemClient.RemoveCartItems(cartId, itemsToRemove);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/{userId}/items";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { items }), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<CartItemReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<CartItemReadDTO>>();
         }
     }
 }

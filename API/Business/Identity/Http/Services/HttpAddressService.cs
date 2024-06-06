@@ -1,24 +1,26 @@
-﻿using Business.Identity.DTOs;
-using Business.Identity.Http.Clients.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http;
+using Business.Http.Interfaces;
+using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Identity.Models;
-using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 
 
 namespace Business.Identity.Http.Services
 {
-    public class HttpAddressService : IHttpAddressService
+    public class HttpAddressService : HttpBaseService, IHttpAddressService
     {
 
-        private readonly IHttpAddressClient _httpAddressClient;
-        private readonly IServiceResultFactory _resultFact;
 
-        public HttpAddressService(IHttpAddressClient httpAddressClient, IServiceResultFactory resultFact)
+        public HttpAddressService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfoService, IServiceResultFactory resultFact)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
         {
-            _httpAddressClient = httpAddressClient;
-            _resultFact = resultFact;
+            _remoteServiceName = "IdentityService";
         }
 
 
@@ -27,136 +29,86 @@ namespace Business.Identity.Http.Services
 
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAllAddresses()
         {
-            var response = await _httpAddressClient.GetAllAddresses();
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address/all";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<AddressReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
 
 
         public async Task<IServiceResult<bool>> ExistsAddressByAddressId(int addressId)
         {
-            var response = await _httpAddressClient.ExistsAddressByAddressId(addressId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address/{addressId}/exists";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result(false, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<bool>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<bool>();
         }
 
 
         public async Task<IServiceResult<AddressReadDTO>> GetAddressByAddressId(int addressId)
         {
-            var response = await _httpAddressClient.GetAddressByAddressId(addressId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address/{addressId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<AddressReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<AddressReadDTO>();
         }
 
 
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAddressesByAddressIds(IEnumerable<int> addressesIds)
         {
-            var response = await _httpAddressClient.GetAddressesByAddressIds(addressesIds);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressesIds), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<AddressReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
 
 
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAddressesByUserId(int userId)
         {
-            var response = await _httpAddressClient.GetAddressesByUserId(userId);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address/user/{userId}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<AddressReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
 
 
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> SearchAddress(SearchAddressModel searchModel)
         {
-            var response = await _httpAddressClient.SearchAddress(searchModel);
+            _method = HttpMethod.Get;
+            _requestQuery = $"/address";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(searchModel), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<IEnumerable<AddressReadDTO>>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<IEnumerable<AddressReadDTO>>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
 
 
         public async Task<IServiceResult<AddressReadDTO>> UpdateAddress(int id, AddressUpdateDTO addressDto)
         {
-            var response = await _httpAddressClient.UpdateAddress(id, addressDto);
+            _method = HttpMethod.Put;
+            _requestQuery = $"/address/{id}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<AddressReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<AddressReadDTO>();
         }
 
 
         public async Task<IServiceResult<AddressReadDTO>> AddAddressToUser(int userId, AddressCreateDTO addressDto)
         {
-            var response = await _httpAddressClient.AddAddressToUser(userId, addressDto);
+            _method = HttpMethod.Post;
+            _requestQuery = $"/address/{userId}";
+            _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<AddressReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<AddressReadDTO>();
         }
 
 
         public async Task<IServiceResult<AddressReadDTO>> DeleteAddress(int id)
         {
-            var response = await _httpAddressClient.DeleteAddress(id);
+            _method = HttpMethod.Delete;
+            _requestQuery = $"/address/{id}";
 
-            if (!response.IsSuccessStatusCode)
-                return _resultFact.Result<AddressReadDTO>(null, false, $"{response.ReasonPhrase}: {response.RequestMessage.Method}, {response.RequestMessage.RequestUri}");
-
-            var content = response.Content.ReadAsStringAsync().Result;
-
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<AddressReadDTO>>(content);
-
-            return result;
+            return await HTTP_Request_Handler<AddressReadDTO>();
         }
     }
 }

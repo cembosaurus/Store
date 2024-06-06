@@ -1,13 +1,13 @@
-﻿using Business.Libraries.ServiceResult;
+﻿using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
+using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
-using Business.Ordering.Http.Clients.Interfaces;
-using Identity.HttpServices;
-using Identity.HttpServices.Interfaces;
 using Moq;
 using NUnit.Framework;
 using System.Net;
-using System.Text.Json.Nodes;
+
+
 
 namespace Store.Test.Services.Identity.HttpServices
 {

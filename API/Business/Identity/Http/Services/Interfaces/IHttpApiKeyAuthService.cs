@@ -1,14 +1,11 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace Business.Identity.Http.Services.Interfaces
 {
     public interface IHttpApiKeyAuthService
     {
-        Task<IServiceResult<string>> LoginWithApiKey();
+        Task<IServiceResult<string>> Authenticate();
     }
 }
