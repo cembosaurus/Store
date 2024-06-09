@@ -10,59 +10,71 @@ namespace Business.Management.Appsettings
     public class RemoteServicesInfo_Repo : IRemoteServicesInfo_Repo
     {
 
-        private IRemoteServicesInfo_DB _remoteServicesInfo_DB;
+        ICollection<Service_Model_AS> _remoteServices;
 
 
 
-        public RemoteServicesInfo_Repo(IRemoteServicesInfo_DB remoteServicesInfo_DB)
+        public RemoteServicesInfo_Repo(IAppsettings_DB appsettings_DB)
         {
-            _remoteServicesInfo_DB = remoteServicesInfo_DB;
+            _remoteServices = appsettings_DB.RemoteServices;
         }
 
+
+
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
+
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
+
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
+
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
+
+        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
 
 
 
         public bool IsEmpty()
         { 
-            return _remoteServicesInfo_DB.Services.IsNullOrEmpty();
+            return _remoteServices.IsNullOrEmpty();
         }
 
-        public List<Service_Model_AS> GetAll()
+        public ICollection<Service_Model_AS> GetAll()
         { 
-            return _remoteServicesInfo_DB.Services.ToList();
+            return _remoteServices.ToList();
         }
 
         public Service_Model_AS GetByName(string name)
         {
-            return _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
+            return _remoteServices.FirstOrDefault(url => url.Name == name);
         }
 
         public Service_Model_AS GetByBaseURL(string baseURL)
         {
-            return _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
+            return _remoteServices.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
         }
 
-        public List<Service_Model_AS> GetByPathName(string pathName)
+        public ICollection<Service_Model_AS> GetByPathName(string pathName)
         {
-            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName)));
-        }
-
-
-        public List<Service_Model_AS> GetByPathRoure(string pathRoute)
-        {
-            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute)));
+            return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName))).ToList();
         }
 
 
-        public List<Service_Model_AS> GetByType(string type)
+        public ICollection<Service_Model_AS> GetByPathRoure(string pathRoute)
         {
-            return _remoteServicesInfo_DB.Services.FindAll(url => url.Type.Any(st => st.Name == type));
+            return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute))).ToList();
+        }
+
+
+        public ICollection<Service_Model_AS> GetByType(string type)
+        {
+            return _remoteServices.Where(url => url.Type.Any(st => st.Name == type)).ToList();
         }
 
 
         public bool UpdateByName(string name, Service_Model_AS serviceURL)
         { 
-            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServices.FirstOrDefault(url => url.Name == name);
 
             if (url != null) 
             {
@@ -77,7 +89,7 @@ namespace Business.Management.Appsettings
 
         public bool UpdateByBaseURL(string baseURL, Service_Model_AS serviceURL)
         {
-            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServices.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
@@ -92,11 +104,11 @@ namespace Business.Management.Appsettings
 
         public bool DeleteByName(string name) 
         {
-            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServices.FirstOrDefault(url => url.Name == name);
 
             if (url != null)
             {
-                _remoteServicesInfo_DB.Services.Remove(url);
+                _remoteServices.Remove(url);
 
                 return true;
             }
@@ -107,11 +119,11 @@ namespace Business.Management.Appsettings
 
         public bool DeleteByBaseURL(string baseURL)
         {
-            var url = _remoteServicesInfo_DB.Services.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServices.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
-                _remoteServicesInfo_DB.Services.Remove(url);
+                _remoteServices.Remove(url);
 
                 return true;
             }
@@ -121,12 +133,12 @@ namespace Business.Management.Appsettings
 
 
 
-        public bool InitializeDB(List<Service_Model_AS> data)
+        public bool InitializeDB(ICollection<Service_Model_AS> data)
         {
             if(data.IsNullOrEmpty())
                 return false;
 
-            _remoteServicesInfo_DB.Services = data;
+            _remoteServices = data;
 
             return true;
         }

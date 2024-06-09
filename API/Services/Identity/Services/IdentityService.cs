@@ -68,7 +68,7 @@ namespace Identity.Services
             var userAuthDTO = _mapper.Map<UserAuthDTO>(user);
 
 
-            var tokenResult = await _tokenService.CreateTokenForUser(user);
+            var tokenResult = await _tokenService.CreateToken_ForUser(user);
 
             if (tokenResult == null || !tokenResult.Status)
                 return _resultFact.Result<UserAuthDTO>(null, false, $"JWT token for User '{userToRegister.Name}' was NOT crerated !");
@@ -98,7 +98,7 @@ namespace Identity.Services
                 return _resultFact.Result<string>(null, false, $"User '{user.Name}' is NOT authorozed !");
 
 
-            var tokenResult = await _tokenService.CreateTokenForUser(userFromRepo);
+            var tokenResult = await _tokenService.CreateToken_ForUser(userFromRepo);
 
             if (tokenResult == null || !tokenResult.Status || string.IsNullOrWhiteSpace(tokenResult.Data))
                 return _resultFact.Result<string>(null, false, $"JWT token for User '{user.Name}' was NOT crerated !");
@@ -110,7 +110,7 @@ namespace Identity.Services
 
         public async Task<IServiceResult<string>> CreateTokenForService()
         {
-            return await _tokenService.CreateTokenForService();
+            return await _tokenService.CreateToken_ForService();
         }
 
 

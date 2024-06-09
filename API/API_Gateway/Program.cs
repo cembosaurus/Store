@@ -42,7 +42,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
-builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();

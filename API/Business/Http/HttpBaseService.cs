@@ -1,6 +1,5 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Interfaces;
-using Business.Identity.DTOs;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
@@ -55,7 +54,7 @@ namespace Business.Http
             _remoteServicesInfo_Provider = remoteServicesInfo_Provider;
             _resultFact = resultFact;
         }
-        // For 'HTTPManagementService', to prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
+        // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
         public HttpBaseService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();

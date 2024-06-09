@@ -32,7 +32,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddHostedService<Management_Worker>();
 
-builder.Services.AddSingleton<IRemoteServicesInfo_DB, RemoteServicesInfo_DB>();
+builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
 builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
 builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
 
@@ -46,22 +46,12 @@ builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
-// Appsettings:
-//builder.Services.Configure<List<ServiceURL_AS>>(builder.Configuration.GetSection("RemoteServices"));
 builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
-//builder.Services.AddHttpClient<IHttpManagementClient, HttpManagementClient>(client => {
-//    client.BaseAddress = new Uri(builder.Configuration.GetSection("RemoteServices_old:OrderingService:REST:BaseURL").Value);
-//});
-
-//builder.Services.AddHttpClient<IHttpIdentityClient, HttpIdentityClient>();
-
-//*********************************** TEST CLIENT: ***********************************
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
-//************************************************************************************
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -22,7 +22,7 @@ namespace Identity.Services.JWT
 
         public TokenService(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
         {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Auth:JWTKey").Value));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Config.Global:Auth:JWTKey").Value));
             _userManager = userManager;
             _resultFact = resultFact;
         }
@@ -30,7 +30,7 @@ namespace Identity.Services.JWT
 
 
 
-        public async Task<IServiceResult<string>> CreateTokenForUser(AppUser user)
+        public async Task<IServiceResult<string>> CreateToken_ForUser(AppUser user)
         {
             if (user == null)
                 return _resultFact.Result(string.Empty, false, $"App User model for authentication was not provided !");
@@ -48,7 +48,7 @@ namespace Identity.Services.JWT
         }
 
 
-        public async Task<IServiceResult<string>> CreateTokenForService()
+        public async Task<IServiceResult<string>> CreateToken_ForService()
         {
             var claims = new List<Claim>
             {

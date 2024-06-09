@@ -19,42 +19,27 @@ namespace Services.Identity.JWT
 
         public string Build()
         {
-            // ... create Claims ...
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()),
                 new Claim(ClaimTypes.Name, _user.UserName)
             };
 
-            //... getting my SECRET string from 'AppSettings.json'. _config is IConfiguration from 'Microsoft.Extensions.Configuration' ...
-            //var secret = _config.GetSection("Cembo_Settings:Token").Value;
-            //... OR string from constructor:
-            // ... encoding my string to byte array ...
             var mySecret = Encoding.UTF8.GetBytes(_secret);
-
-            // creating key for my JWT
             var key = new SymmetricSecurityKey(mySecret);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            // ... Server is signing credentials for user into token:
-            // ... generate Signing Credentials, encrypting my key using hashing algorythm ...
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            // ... Creating TOKEN:
-            // ... create Security Token Descriptor containing my Claims, Expire Date and Signing Credentials !!! ...
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
+                SigningCredentials = credentials
             };
 
-            // ... Generating TOKEN:
-            // ... generate JWT Token and pass Token Descriptor into it ...
             var tokenHandler = new JwtSecurityTokenHandler();
             var JWT_Token = tokenHandler.CreateToken(tokenDescriptor);
 
-            // ... return TOKEN as an Object to client ...
-            // ... user can verify received token at http://jwt.io ...
+            //... http://jwt.io ...
             return tokenHandler.WriteToken(JWT_Token);
 
         }

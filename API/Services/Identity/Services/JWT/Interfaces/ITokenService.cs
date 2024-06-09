@@ -5,7 +5,7 @@ namespace Identity.Services.JWT.Interfaces
 {
     public interface ITokenService
     {
-        Task<IServiceResult<string>> CreateTokenForService();
-        Task<IServiceResult<string>> CreateTokenForUser(AppUser user);
+        Task<IServiceResult<string>> CreateToken_ForService();
+        Task<IServiceResult<string>> CreateToken_ForUser(AppUser user);
     }
 }
