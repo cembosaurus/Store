@@ -47,6 +47,7 @@ namespace API_Gateway.Controllers.Business.Identity
 
 
 
+        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
         [AllowAnonymous]
         [HttpPost("service/authenticate")]
         public async Task<IActionResult> AuthenticateService(string apiKey)

@@ -7,7 +7,7 @@ using Business.Scheduler.Http.Services.Interfaces;
 using Inventory.Models;
 using Moq;
 using NUnit.Framework;
-using Ordering.OrderingBusinessLogic;
+using Ordering.Tools;
 using Services.Ordering.Models;
 
 

@@ -44,10 +44,11 @@ namespace Identity.Services.JWT
             var usersRoles = await _userManager.GetRolesAsync(user);
 
 
-            return await CreateToken(claims, usersRoles, $"Token for user '{user.UserName}' was NOT generated !");
+            return await GenerateToken(claims, usersRoles, $"Token for user '{user.UserName}' was NOT generated !");
         }
 
 
+        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
         public async Task<IServiceResult<string>> CreateToken_ForService()
         {
             var claims = new List<Claim>
@@ -61,13 +62,12 @@ namespace Identity.Services.JWT
             };
 
 
-            return await CreateToken(claims, serviceRoles, $"Token for API Service was NOT generated !");
+            return await GenerateToken(claims, serviceRoles, $"Token for API Service was NOT generated !");
         }
 
 
 
-
-        private async Task<IServiceResult<string>> CreateToken(List<Claim> claims, IList<string> roles, string failMessage)
+        private async Task<IServiceResult<string>> GenerateToken(List<Claim> claims, IList<string> roles, string failMessage)
         {
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 

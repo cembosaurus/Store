@@ -6,8 +6,8 @@ using Business.Payment.DTOs;
 using Business.Payment.Http.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
+using Ordering.Tools.Interfaces;
 using Services.Ordering.Models;
 
 
@@ -24,9 +24,9 @@ namespace Ordering.Services
         private readonly IHttpPaymentService _httpPaymentService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
-        private readonly IOrderBusinessLogic _orderingBusinessLogic;
+        private readonly IOrder _orderTools;
 
-        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrderBusinessLogic orderingBusinessLogic, IHttpPaymentService httpPaymentService)
+        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService)
         {
             _orderRepo = orderRepo;
             _cartRepo = cartRepo;
@@ -35,7 +35,7 @@ namespace Ordering.Services
             _httpPaymentService = httpPaymentService;
             _resultFact = resultFact;
             _mapper = mapper;
-            _orderingBusinessLogic = orderingBusinessLogic;
+            _orderTools = orderTools;
         }
 
 
@@ -176,7 +176,7 @@ namespace Ordering.Services
 
             order.Created = DateTime.Now;
 
-            var orderCodeResult = _orderingBusinessLogic.CreateOrderCode(cart.UserId);
+            var orderCodeResult = _orderTools.CreateOrderCode(cart.UserId);
 
             if (orderCodeResult == null || !orderCodeResult.Status)
                 message += Environment.NewLine + $"Failed to generate Order code !";

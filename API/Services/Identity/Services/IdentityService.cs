@@ -108,11 +108,11 @@ namespace Identity.Services
 
 
 
+        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
         public async Task<IServiceResult<string>> CreateTokenForService()
         {
             return await _tokenService.CreateToken_ForService();
         }
-
 
 
 

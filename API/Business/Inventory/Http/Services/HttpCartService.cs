@@ -16,8 +16,8 @@ namespace Business.Inventory.Http.Services
     public class HttpCartService : HttpBaseService, IHttpCartService
     {
 
-        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
+        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_Provider remoteServices_Provider)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";
             _remoteServicePathName = "Cart";
@@ -77,11 +77,14 @@ namespace Business.Inventory.Http.Services
         }
 
 
+        // request initiated by API services, NOT by users:
         public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
         {
             _method = HttpMethod.Delete;
             _requestQuery = $"/items/expired";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), _encoding, _mediaType);
+
+            _useApiKey = true;
 
             return await HTTP_Request_Handler<IEnumerable<CartItemsLockReadDTO>>();
         }

@@ -6,11 +6,13 @@ using Business.Http.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
+using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
 using Business.Management.Data;
 using Business.Management.Data.Interfaces;
 using Business.Management.Http.Services;
@@ -31,12 +33,14 @@ using Microsoft.IdentityModel.Tokens;
 using Ordering.Data;
 using Ordering.Data.Repositories;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.OrderingBusinessLogic;
-using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services;
 using Ordering.Services.Interfaces;
+using Ordering.Tools;
+using Ordering.Tools.Interfaces;
 using System.Reflection;
 using System.Text;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,11 +52,12 @@ builder.Services.AddControllers(opt =>
 });
 
 builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
-builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
+builder.Services.AddScoped<IAppsettings_Repo, Appsettings_Repo>();
+builder.Services.AddScoped<IRemoteServices_Provider, RemoteServices_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddTransient<IAppsettings_Provider, Appsettings_Provider>();
 builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.Configure<Config_Global_Data>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;
@@ -63,16 +68,21 @@ builder.Services.AddFluentValidation(conf => {
 
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });         // Allow optional argument in controller's action
 
-builder.Services.AddDbContext<OrderingContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("OrderingConnStr")));
+builder.Services.AddDbContext<OrderingContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Congif.Local:ConnectionStrings:OrderingConnStr").Value, opt => opt.EnableRetryOnFailure()));
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IArchiveService, ArchiveService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<IHttpItemService, HttpItemService>();
+builder.Services.AddScoped<IHttpCatalogueItemService, HttpCatalogueItemService>();
+builder.Services.AddScoped<IHttpItemPriceService, HttpItemPriceService>();
 builder.Services.AddScoped<IHttpAddressService, HttpAddressService>();
 builder.Services.AddScoped<IHttpPaymentService, HttpPaymentService>();
 builder.Services.AddScoped<IHttpSchedulerService, HttpSchedulerService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
@@ -81,8 +91,8 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartItemsRepository, CartItemsRepository>();
 builder.Services.AddScoped<IArchiveRepository , ArchiveRepository>();
 
-builder.Services.AddScoped<ICartBusinessLogic, OrderingTools>();
-builder.Services.AddScoped<IOrderBusinessLogic, OrderingTools>();    //............. not sure if hat's necessary, maybe one instance can be used with all interfaces in code ....
+builder.Services.AddScoped<ICart, OrderingTools>();
+builder.Services.AddScoped<IOrder, OrderingTools>();
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
@@ -91,7 +101,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -142,10 +152,10 @@ var app = builder.Build();
 
 app.UseMiddleware<Metrics_MW>();
 
-// Custom Exception Handler:
+app.UseMiddleware<ServiceId_MW>();
+
 app.UseMiddleware<ErrorHandler_MW>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

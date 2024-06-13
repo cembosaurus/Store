@@ -2,9 +2,11 @@
 using Business.Scheduler.DTOs;
 using Services.Ordering.Models;
 
-namespace Ordering.OrderingBusinessLogic.Interfaces
+
+
+namespace Ordering.Tools.Interfaces
 {
-    public interface ICartBusinessLogic
+    public interface ICart
     {
         Task<IServiceResult<IEnumerable<CartItem>>> AddItemsToCart(Cart cart, IEnumerable<CartItem> source);
         Task<IServiceResult<IEnumerable<CartItem>>> RemoveItemsFromCart(Cart cart, IEnumerable<CartItem> source);

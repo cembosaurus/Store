@@ -10,14 +10,14 @@ using Microsoft.IdentityModel.Tokens;
 namespace Business.Management.Appsettings
 {
     //________ Singleton________
-    public class AppsettingsService : IAppsettingsService
+    public class Appsettings_Provider : IAppsettings_Provider
     {
 
-        private IOptionsMonitor<Config_Global_Model_AS> _config_global;
+        private IOptionsMonitor<Config_Global_Data> _config_global;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
-        public AppsettingsService(IOptionsMonitor<Config_Global_Model_AS> config_global, IServiceScopeFactory serviceFactory)
+        public Appsettings_Provider(IOptionsMonitor<Config_Global_Data> config_global, IServiceScopeFactory serviceFactory)
         {
             _config_global = config_global;
             _serviceFactory = serviceFactory;
@@ -26,7 +26,7 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesModels()
+        public IServiceResult<ICollection<Service_Model_AS>> GetAllRemoteServicesModels()
         {
            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())

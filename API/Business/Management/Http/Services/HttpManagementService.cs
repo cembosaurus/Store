@@ -12,18 +12,16 @@ namespace Business.Management.Http.Services
 {
     public class HttpManagementService : HttpBaseService, IHttpManagementService
     {
+
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IServiceResultFactory _resultFact;
 
 
-
-        public HttpManagementService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpManagementService(IHostingEnvironment env, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
             : base(env, appsettingsService, httpAppClient, resultFact)
         {
             _remoteServiceName = "ManagementService";
             _remoteServicePathName = "RemoteService";
             _httpAppClient = httpAppClient;
-            _resultFact = resultFact;           
         }
 
 
@@ -40,6 +38,8 @@ namespace Business.Management.Http.Services
         {
             _method = HttpMethod.Get;
             _requestQuery = $"{"url/all"}";
+
+            _useApiKey = true;
 
             return await HTTP_Request_Handler<IEnumerable<Service_Model_AS>>();
         }

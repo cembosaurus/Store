@@ -10,15 +10,15 @@ namespace Business.Management.Data
     public class Appsettings_DB : IAppsettings_DB
     {
 
-        private Config_Global_Model_AS _globalConfig;
+        private Config_Global_Data _config_global_DATA;
 
 
         public Appsettings_DB()
         {
-            _globalConfig = new Config_Global_Model_AS();
-            _globalConfig.RemoteServices = new List<Service_Model_AS>();
-            _globalConfig.Auth = new Auth_Model_AS();
-            _globalConfig.RabbitMQ = new RabbitMQ_Model_AS();
+            _config_global_DATA = new Config_Global_Data();
+            _config_global_DATA.RemoteServices = new List<Service_Model_AS>();
+            _config_global_DATA.Auth = new Auth_Model_AS();
+            _config_global_DATA.RabbitMQ = new RabbitMQ_Model_AS();
         }
 
 
@@ -26,22 +26,22 @@ namespace Business.Management.Data
 
         public ICollection<Service_Model_AS> RemoteServices
         {
-            get => _globalConfig.RemoteServices;
-            set => _globalConfig.RemoteServices = value;
+            get => _config_global_DATA.RemoteServices;
+            set => _config_global_DATA.RemoteServices = value;
         }
 
 
         public Auth_Model_AS Auth
         {
-            get => _globalConfig.Auth;
-            set => _globalConfig.Auth = value;
+            get => _config_global_DATA.Auth;
+            set => _config_global_DATA.Auth = value;
         }
 
 
         public RabbitMQ_Model_AS RabbitMQ
         {
-            get => _globalConfig.RabbitMQ;
-            set => _globalConfig.RabbitMQ = value;
+            get => _config_global_DATA.RabbitMQ;
+            set => _config_global_DATA.RabbitMQ = value;
         }
 
     }

@@ -16,8 +16,8 @@ namespace Business.Payment.Http.Services
     public class HttpPaymentService : HttpBaseService, IHttpPaymentService
     {
 
-        public HttpPaymentService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
+        public HttpPaymentService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_Provider remoteServices_Provider)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "PaymentService";
             _remoteServicePathName = "Payment";

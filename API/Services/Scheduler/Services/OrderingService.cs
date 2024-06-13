@@ -7,11 +7,12 @@ using Scheduler.Data.Repositories.Interfaces;
 using Scheduler.Models;
 using Scheduler.Services.Interfaces;
 
+
+
 namespace Scheduler.Services
 {
     public class OrderingService : IArchiveService, ICartItemsService, ICartService, IOrderService
     {
-        private readonly IIdentityService _identityService;
         private readonly ICartItemLockRepository _cartItemLockRepo;
         private readonly IHttpInventoryService _httpInventoryService;
         private readonly IHttpCartService _httpCartService;
@@ -20,15 +21,14 @@ namespace Scheduler.Services
         private readonly int _lockedForDays;
 
         public OrderingService(IConfiguration config, IServiceResultFactory resultFact, IHttpInventoryService httpInventoryService, IHttpCartService httpCartService, ICartItemLockRepository cartItemLockRepo, 
-            IMapper mapper, IIdentityService identityService)
+            IMapper mapper)
         {
-            _identityService = identityService;
             _cartItemLockRepo = cartItemLockRepo;
             _httpInventoryService = httpInventoryService;
             _httpCartService = httpCartService;
             _resultFact = resultFact;
             _mapper = mapper;
-            int.TryParse(config.GetSection("ItemSettings:ItemLockedForDays").Value, out _lockedForDays);
+            int.TryParse(config.GetSection("Congif.Local:ItemSettings:ItemLockedForDays").Value, out _lockedForDays);
         }
 
 
@@ -186,18 +186,12 @@ namespace Scheduler.Services
         public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
         {
             if (cartItemLocks == null || !cartItemLocks.Any())
-                return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, "Cart item unlock data models to remove were NOT provided !");
-
+                return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, "Cart-item-unlock data models were NOT provided !");
 
             var message = "";
 
-            Console.WriteLine("--> DELETING cart item locks ....");
 
-
-            var authenticate = await _identityService.AuthenticateService();
-
-            if(!authenticate.Status)
-                return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, authenticate.Message);
+            // HTTP Request --> DELETE expired item locks from Cart API service:
 
             var removeCartItemResult = await _httpCartService.RemoveExpiredItemsFromCart(cartItemLocks);
 

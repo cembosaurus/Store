@@ -3,9 +3,9 @@ using Business.Management.Appsettings.Models;
 
 namespace Business.Management.Appsettings.Interfaces
 {
-    public interface IAppsettingsService
+    public interface IAppsettings_Provider
     {
-        IServiceResult<IEnumerable<Service_Model_AS>> GetAllRemoteServicesModels();
+        IServiceResult<ICollection<Service_Model_AS>> GetAllRemoteServicesModels();
         IServiceResult<string> GetApiKey();
         IServiceResult<Service_Model_AS> GetRemoteServiceModel(string name);
     }

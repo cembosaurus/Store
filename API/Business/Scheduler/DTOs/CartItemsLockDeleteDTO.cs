@@ -4,8 +4,8 @@ namespace Business.Scheduler.DTOs
 {
     public class CartItemsLockDeleteDTO
     {
-        public IEnumerable<int> ItemsIds { get; set; }
         public Guid CartId { get; set; }
+        public IEnumerable<int> ItemsIds { get; set; }
     }
 
 

@@ -1,6 +1,6 @@
 ﻿namespace Business.Management.Appsettings.Models
 {
-    public class Config_Global_Model_AS
+    public class Config_Global_Data
     {
         public ICollection<Service_Model_AS> RemoteServices { get; set; }
         public Auth_Model_AS Auth { get; set; }

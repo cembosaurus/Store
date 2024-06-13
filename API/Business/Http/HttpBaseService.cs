@@ -23,12 +23,14 @@ namespace Business.Http
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IRemoteServicesInfo_Provider _remoteServicesInfo_Provider;
-        private IAppsettingsService _appsettingsService;
+        private readonly IRemoteServices_Provider _remoteServices_Provider;
+        private IAppsettings_Provider _appsettings_Provider;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
-        private readonly IServiceResultFactory _resultFact;
 
+        protected readonly IServiceResultFactory _resultFact;
+
+        protected bool _useApiKey;
         protected Service_Model_AS _service_model;
         protected HttpRequestMessage _requestMessage;
         protected string _remoteServiceName;
@@ -45,20 +47,20 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IRemoteServicesInfo_Provider remoteServicesInfo_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettings_Provider, IHttpAppClient httpAppClient, IRemoteServices_Provider remoteServices_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
-            _appsettingsService = appsettingsService;
+            _appsettings_Provider = appsettings_Provider;
             _httpAppClient = httpAppClient;
-            _remoteServicesInfo_Provider = remoteServicesInfo_Provider;
+            _remoteServices_Provider = remoteServices_Provider;
             _resultFact = resultFact;
         }
         // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
-        public HttpBaseService(IHostingEnvironment env, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
-            _appsettingsService = appsettingsService;
+            _appsettings_Provider = appsettingsService;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
         }
@@ -74,6 +76,8 @@ namespace Business.Http
                 return _resultFact.Result(default(T), false, $"Request for remote service '{_remoteServiceName}' was NOT initialized ! Reason: {initResponse.Message}");
 
             var sendResponse = await Send();
+
+            _useApiKey = false;
 
             if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
                 return _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
@@ -142,7 +146,7 @@ namespace Business.Http
             if(string.IsNullOrWhiteSpace(_remoteServiceName))
                 return _resultFact.Result(false, false, $"Remote Service name was NOT provided !");
 
-            var modelResult = _appsettingsService.GetRemoteServiceModel(_remoteServiceName);
+            var modelResult = _appsettings_Provider.GetRemoteServiceModel(_remoteServiceName);
             if (!modelResult.Status)
             {
                 var result = await ReLoadServicesModels();
@@ -150,7 +154,7 @@ namespace Business.Http
                 if(!result.Status)
                     return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
 
-                modelResult = _remoteServicesInfo_Provider.GetServiceByName(_remoteServiceName);
+                modelResult = _remoteServices_Provider.GetServiceByName(_remoteServiceName);
                 if (!modelResult.Status)
                     return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
             }
@@ -166,13 +170,15 @@ namespace Business.Http
                 return _resultFact.Result(false, false, $"Request URL for Remote Service '{_remoteServiceName}' could not be constructed ! Missing data in Appsettings !");
 
 
-            //___ API Key: ----------------------------------------------- API KEY in every rewquest ?????????????????????????????????????????????????????????????????????????????????????????????????????????????
+            //___ API Key:
 
-            var apiKeyResult = _appsettingsService.GetApiKey();
-            if (!apiKeyResult.Status)
-                return _resultFact.Result(apiKeyResult.Status, false, $"{apiKeyResult.Message}");
+            if(_useApiKey)
+            { 
+                var apiKeyResult = AddApiKeyToHeader();
 
-            _requestHeaders.Add("ApiKey", apiKeyResult.Data);
+                if (!apiKeyResult.Status)
+                    return apiKeyResult;
+            }
 
 
             //___ HTTP Message:
@@ -203,9 +209,20 @@ namespace Business.Http
         }
 
 
+        protected IServiceResult<bool> AddApiKeyToHeader()
+        {
+            var apiKeyResult = _appsettings_Provider.GetApiKey();
+
+            if(apiKeyResult.Status)
+                _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
+
+            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request to {_remoteServiceName}/{_remoteServicePathName}: {apiKeyResult.Message}");
+        }
+
+
         private async Task<IServiceResult<IEnumerable<Service_Model_AS>>> ReLoadServicesModels()
         { 
-            return await _remoteServicesInfo_Provider.ReLoad();
+            return await _remoteServices_Provider.ReLoad();
         }
 
     }

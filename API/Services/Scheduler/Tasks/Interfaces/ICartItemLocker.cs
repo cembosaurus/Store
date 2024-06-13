@@ -1,9 +1,11 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
+using Quartz;
 
 namespace Scheduler.Tasks.Interfaces
 {
     public interface ICartItemLocker
     {
-        Task<IServiceResult<bool>> ExecuteManualy();
+        Task Execute(IJobExecutionContext context);
+        Task<IServiceResult<bool>> RemoveExpiredLocks();
     }
 }

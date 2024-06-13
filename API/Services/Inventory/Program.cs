@@ -17,6 +17,8 @@ using Services.Inventory.Data;
 using Services.Inventory.Data.Repositories.Interfaces;
 using System.Text;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IExId, ExId>();
@@ -108,7 +110,6 @@ app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
 
-// Custom Exception Handler:
 app.UseMiddleware<ErrorHandler_MW>();
 
 // Configure the HTTP request pipeline.

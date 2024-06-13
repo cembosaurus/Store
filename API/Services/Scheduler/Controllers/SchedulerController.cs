@@ -1,7 +1,10 @@
-﻿using Business.Scheduler.DTOs;
+﻿using Business.Filters.Identity;
+using Business.Scheduler.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Scheduler.Services.Interfaces;
+
+
 
 namespace Scheduler.Controllers
 {
@@ -34,7 +37,8 @@ namespace Scheduler.Controllers
 
 
 
-        [Authorize(Policy = "Everyone")]
+        [ApiKeyAuth]
+        [AllowAnonymous]
         [HttpPost("cartitem/lock")]
         public async Task<IActionResult> LockCartItem(CartItemsLockCreateDTO cartItemsLock)
         {
@@ -45,7 +49,8 @@ namespace Scheduler.Controllers
 
 
 
-        [Authorize(Policy = "Everyone")]
+        [ApiKeyAuth]
+        [AllowAnonymous]
         [HttpDelete("cartitem/lock")]
         public async Task<IActionResult> UnLockCartItem(CartItemsLockDeleteDTO cartItemUnLock)
         {

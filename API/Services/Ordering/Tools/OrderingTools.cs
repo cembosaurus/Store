@@ -2,15 +2,15 @@
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Scheduler.DTOs;
 using Business.Scheduler.Http.Services.Interfaces;
-using Ordering.OrderingBusinessLogic.Interfaces;
+using Ordering.Tools.Interfaces;
 using Services.Ordering.Models;
 using System.Text;
 
 
 
-namespace Ordering.OrderingBusinessLogic
+namespace Ordering.Tools
 {
-    public class OrderingTools : ICartBusinessLogic, IOrderBusinessLogic
+    public class OrderingTools : ICart, IOrder
     {
         private readonly IHttpItemPriceService _httpItemPriceService;
         private readonly IHttpCatalogueItemService _httpCatalogueItemService;

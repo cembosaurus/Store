@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Business.Filters.Identity;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.CQRS.Commands.Cart;
@@ -275,7 +276,9 @@ namespace Ordering.Controllers
 
 
 
-        [Authorize(Policy = "Everyone")]            // internal services (f.e: SchedulerService), not for users
+        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
+        [ApiKeyAuth]
+        [AllowAnonymous]            
         [HttpDelete("items/expired")]
         public async Task<IActionResult> DeleteExpiredCartItems(DeleteExpiredCartItems_C command)
         {

@@ -4,8 +4,8 @@ using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
+using Ordering.Tools.Interfaces;
 using Services.Ordering.Models;
 
 
@@ -21,9 +21,9 @@ namespace Ordering.Services
         private readonly ICartItemService _cartItemsService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
-        private readonly ICartBusinessLogic _cartBusinessLogic;
+        private readonly ICart _cartTools;
 
-        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpItemService httpItemService, IHttpItemPriceService httpItemPriceService, ICartItemService cartItemsService)
+        public CartService(ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICart cartTools, IHttpItemService httpItemService, IHttpItemPriceService httpItemPriceService, ICartItemService cartItemsService)
         {
             _cartRepo = cartRepo;
             _httpItemService = httpItemService;
@@ -31,7 +31,7 @@ namespace Ordering.Services
             _cartItemsService = cartItemsService;
             _resultFact = resultFact;
             _mapper = mapper;
-            _cartBusinessLogic = cartBusinessLogic;
+            _cartTools = cartTools;
         }
 
 
@@ -195,7 +195,7 @@ namespace Ordering.Services
 
             foreach (var ci in cart.CartItems)
             {
-                var updateStockAmountResult = await _cartBusinessLogic.AddAmountToStock(ci.ItemId, ci.Amount);
+                var updateStockAmountResult = await _cartTools.AddAmountToStock(ci.ItemId, ci.Amount);
 
                 if (!updateStockAmountResult.Status)
                     message += Environment.NewLine + $"Failed to restore amount '{ci.Amount}' into stock for item '{ci.ItemId}' ! Reason: '{updateStockAmountResult.Message}'";

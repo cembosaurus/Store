@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Business.Scheduler.DTOs;
 using Ordering.Data.Repositories.Interfaces;
-using Ordering.OrderingBusinessLogic.Interfaces;
 using Ordering.Services.Interfaces;
+using Ordering.Tools.Interfaces;
 using Services.Ordering.Models;
+
 
 
 namespace Ordering.Services
@@ -15,18 +15,16 @@ namespace Ordering.Services
     public class CartItemService : ICartItemService
     {
         private readonly IHttpCatalogueItemService _httpCatalogueItemService;
-        private readonly IHttpInventoryService _httpInventoryService;
-        private readonly ICartBusinessLogic _cartBusinessLogic;
+        private readonly ICart _cartTools;
         private readonly ICartItemsRepository _cartItemRepo;
         private readonly ICartRepository _cartRepo;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
 
-        public CartItemService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICartBusinessLogic cartBusinessLogic, IHttpCatalogueItemService httpCatalogueItemService, IHttpInventoryService httpInventoryService)
+        public CartItemService(ICartItemsRepository cartItemRepo, ICartRepository cartRepo, IServiceResultFactory resultFact, IMapper mapper, ICart cartTools, IHttpCatalogueItemService httpCatalogueItemService)
         {
             _httpCatalogueItemService = httpCatalogueItemService;
-            _httpInventoryService = httpInventoryService;
-            _cartBusinessLogic = cartBusinessLogic;
+            _cartTools = cartTools;
             _cartItemRepo = cartItemRepo;
             _cartRepo = cartRepo;
             _resultFact = resultFact;
@@ -38,10 +36,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetAllCardItems()
         {
-            Console.WriteLine($"--> GETTING cart items ......");
-
             var message = "";
-
 
             var cartItems = await _cartItemRepo.GetAllCardItems();
 
@@ -55,10 +50,7 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<IEnumerable<CartItemReadDTO>>> GetCartItems(int userId)
         {
-            Console.WriteLine($"--> GETTING cart items for user '{userId}' ......");
-
             var message = "";
-
 
             var cartItems = await _cartItemRepo.GetCartItemsByUserId(userId);
 
@@ -80,11 +72,10 @@ namespace Ordering.Services
             if (cart == null)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart '{userId}' NOT found !");
 
-
             var message = "";
 
-            Console.WriteLine($"--> ADDING cart items ......");
 
+            // ADD cart items:
 
             var ids = itemsToAdd.Select(i => i.ItemId);
 
@@ -108,44 +99,41 @@ namespace Ordering.Services
 
             var cartItems = _mapper.Map<IEnumerable<CartItem>>(itemsToAdd);
 
-            var addItemsToCartResult = await _cartBusinessLogic.AddItemsToCart(cart, cartItems);
+            var addItemsToCartResult = await _cartTools.AddItemsToCart(cart, cartItems);
 
             if (!addItemsToCartResult.Status || _cartItemRepo.SaveChanges() < 1)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, addItemsToCartResult.Status, addItemsToCartResult.Message);
 
 
-            Console.WriteLine($"--> REMOVING items from stock ......");
-
+            // REMOVE items from stock:
 
             foreach (var ci in cartItems)
             {
-                var addToStockResult = await _cartBusinessLogic.RemoveAmountFromStock(ci.ItemId, ci.Amount);
+                var addToStockResult = await _cartTools.RemoveAmountFromStock(ci.ItemId, ci.Amount);
 
                 if (!addToStockResult.Status)
                     message += Environment.NewLine + $"Amount '{ci.Amount}' for item '{ci.ItemId}' was NOT removed from stock ! Reason: {addToStockResult.Message}";
             }
 
 
-            Console.WriteLine($"--> UPDATING cart total ......");
+            // UPDATE cart total:
 
-
-            var updateCartTotal = await _cartBusinessLogic.UpdateCartTotal(cart);
+            var updateCartTotal = await _cartTools.UpdateCartTotal(cart);
 
             if (!updateCartTotal.Status || _cartItemRepo.SaveChanges() < 1)
                 message += Environment.NewLine + $"Total for cart '{cart.UserId}' was NOT updated ! Reason: {updateCartTotal.Message}";
 
 
-            Console.WriteLine($"--> LOCKING cart items ......");
-
+            // LOCK cart items:
 
             // Items are locked by Item ID, Cart ID and DateTime.
             // Locking process doesn't need amount to identify how many items are locked on cart,
             // amount of locked items is already provided by items on cart:
 
-            var cartItemLockResult = await _cartBusinessLogic.CartItemsLock(cart.CartId, matchingIds);
+            var cartItemLockResult = await _cartTools.CartItemsLock(cart.CartId, matchingIds);
 
             if (!cartItemLockResult.Status)
-                message += Environment.NewLine + $"Cart items were NOT locked ! Reason: '{cartItemLockResult.Message}'";
+                message += Environment.NewLine + $"Items were added to cart but NOT locked ! Reason: '{cartItemLockResult.Message}'";
 
             return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(addItemsToCartResult.Data), addItemsToCartResult.Status, addItemsToCartResult.Message + message);
         }
@@ -164,8 +152,8 @@ namespace Ordering.Services
 
             var message = string.Empty;
 
-            Console.WriteLine($"--> REMOVING cart items from list ......");
 
+            // REMOVE cart items from list:
 
             var ids = itemsToRemove.Select(i => i.ItemId);
 
@@ -188,7 +176,7 @@ namespace Ordering.Services
 
             var cartItems = _mapper.Map<IEnumerable<CartItem>>(itemsToRemove);
 
-            var removedCartItemsResult = await _cartBusinessLogic.RemoveItemsFromCart(cart, _mapper.Map<IEnumerable<CartItem>>(itemsToRemove));
+            var removedCartItemsResult = await _cartTools.RemoveItemsFromCart(cart, _mapper.Map<IEnumerable<CartItem>>(itemsToRemove));
 
             if (!removedCartItemsResult.Status || _cartRepo.SaveChanges() < 1)
                 return _resultFact.Result(_mapper.Map<IEnumerable<CartItemReadDTO>>(removedCartItemsResult.Data), false, removedCartItemsResult.Message);
@@ -197,28 +185,26 @@ namespace Ordering.Services
 
             foreach (var ci in removedCartItemsResult.Data)
             {
-                var addToStockResult = await _cartBusinessLogic.AddAmountToStock(ci.ItemId, ci.Amount);
+                var addToStockResult = await _cartTools.AddAmountToStock(ci.ItemId, ci.Amount);
 
                 if (!addToStockResult.Status)
                     message += Environment.NewLine + $"Amount for item '{ci.ItemId}' was NOT restored into stock ! Reason: {addToStockResult.Message}";
             }
 
 
-            Console.WriteLine($"--> UPDATING cart 'Total' ......");
+            // UPDATE cart total:
 
-
-            var updateCartTotalResult = await _cartBusinessLogic.UpdateCartTotal(cart);
+            var updateCartTotalResult = await _cartTools.UpdateCartTotal(cart);
 
             if (!updateCartTotalResult.Status || _cartItemRepo.SaveChanges() < 1)
                 message += Environment.NewLine + $"Total in cart '{cart.UserId}' was NOT updated ! Reason: {updateCartTotalResult.Message}";
 
 
-            Console.WriteLine($"--> REMOVING cart items from scheduler tasks (lock) ......");
-
+            // REMOVE cart items (locks) from scheduler tasks:
 
             var cartItemToUnlockIds = removedCartItemsResult.Data.Select(rci => rci.ItemId).ToList();
 
-            var cartItemLockRemoveResult = await _cartBusinessLogic.CartItemsUnLock(cart.CartId, cartItemToUnlockIds);
+            var cartItemLockRemoveResult = await _cartTools.CartItemsUnLock(cart.CartId, cartItemToUnlockIds);
 
             if (!cartItemLockRemoveResult.Status)
                 message += Environment.NewLine + cartItemLockRemoveResult.Message;
@@ -235,20 +221,18 @@ namespace Ordering.Services
             if (cart == null)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart '{userId}' NOT found !");
             if (cart.CartItems == null || !cart.CartItems.Any())
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart '{userId}' doesn't have items !");
-
+                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart '{userId}' doesn't contain items !");
 
 
             var message = string.Empty;
 
-            Console.WriteLine($"--> REMOVING cart items from cart '{cart.CartId}' for user '{cart.UserId}' ......");
 
-
+            // REMOVE items:
 
             var itemsToDelete = cart.CartItems.Where(ci => itemIds.Contains(ci.ItemId)).ToList();
 
             if(!itemsToDelete.Any())
-                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"NO matching items found to delete from cart '{cart.CartId}' for user '{cart.UserId}'");
+                return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"NO matching items to delete found in cart '{cart.CartId}' for user '{cart.UserId}'");
 
             await _cartItemRepo.DeleteCartItems(itemsToDelete);
 
@@ -259,23 +243,22 @@ namespace Ordering.Services
             if (saveResult < 1)
                 return _resultFact.Result<IEnumerable<CartItemReadDTO>>(null, false, $"Cart items were NOT removed !");
             else if (saveResult < itemIds.Count())
-                message += Environment.NewLine + $" - {itemIds.Count() - saveResult} of the cart items were NOT removed from cart '{cart.CartId}' ! Items: '{string.Join(",", mismatchingIds)}'";
+                message += Environment.NewLine + $" - {itemIds.Count() - saveResult} items were NOT removed from cart '{cart.CartId}' ! Items: '{string.Join(",", mismatchingIds)}'";
 
 
-            Console.WriteLine($"--> UPDATING cart total ......");
+            // UPDATE cart total:
 
-
-            var updateCartTotalResult = await _cartBusinessLogic.UpdateCartTotal(cart);
+            var updateCartTotalResult = await _cartTools.UpdateCartTotal(cart);
 
             if (!updateCartTotalResult.Status || _cartItemRepo.SaveChanges() < 1)
                 message += Environment.NewLine + $"Total in cart '{cart.UserId}' was NOT updated ! Reason: {updateCartTotalResult.Message}";
 
 
+            // UPDATE item amount in stock:
+
             foreach (var ci in itemsToDelete)
             {
-                Console.WriteLine($"--> ADDING amount for item '{ci.ItemId}' into stock ......");
-
-                var addAmountToStockResult = await _cartBusinessLogic.AddAmountToStock(ci.ItemId, ci.Amount);
+                var addAmountToStockResult = await _cartTools.AddAmountToStock(ci.ItemId, ci.Amount);
 
                 if (!addAmountToStockResult.Status)
                     message += Environment.NewLine + $"Amount for item '{ci.ItemId}' was NOT restored in stock ! Reson: '{addAmountToStockResult.Message}'";
@@ -286,44 +269,42 @@ namespace Ordering.Services
 
 
 
-        public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> DeleteExpiredItems(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
+        public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> DeleteExpiredItems(IEnumerable<CartItemsLockDeleteDTO> carts)
         {
             var message = "";
 
-            Console.WriteLine($"--> DELETEING expired items from carts ....");
-
-
-            foreach (var cil in cartItemLocks)
+            foreach (var cart in carts)
             {
-                if (cil.CartId == Guid.Empty)
+                if (cart.CartId == Guid.Empty)
                 {
-                    message += Environment.NewLine + $"Missing cart id ! Items NOT removed: '{string.Join(",", cil.ItemsIds)}'";
+                    message += Environment.NewLine + $"Missing cart id ! Items NOT removed: '{string.Join(",", cart.ItemsIds)}'";
 
                     continue;
                 }
 
-                var cartExistsResult = await _cartRepo.ExistsByCartId(cil.CartId);
+                var cartExistsResult = await _cartRepo.ExistsByCartId(cart.CartId);
 
                 if(!cartExistsResult)
                 {
-                    message += Environment.NewLine + $"Cart: '{cil.CartId}' does NOt exist !";
+                    // possible duplicate cart ids. Same ID will be added to message each time:
+                    message += Environment.NewLine + $"Cart: '{cart.CartId}' does NOT exist !";
 
                     continue;
                 }
 
-                if (cil.ItemsIds == null || !cil.ItemsIds.Any())
+                if (cart.ItemsIds == null || !cart.ItemsIds.Any())
                 {
-                    message += Environment.NewLine + $"List of expired items for Cart: '{cil.CartId}' is empty !";
+                    message += Environment.NewLine + $"List of expired items for Cart: '{cart.CartId}' is empty !";
 
                     continue;
                 }
 
-                var userId = await _cartRepo.GetUserIdByCartId(cil.CartId);
+                var userId = await _cartRepo.GetUserIdByCartId(cart.CartId);
 
                 if(userId < 1)
-                    return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, $"User for Cart: '{cil.CartId}' was NOT found !");
+                    return _resultFact.Result<IEnumerable<CartItemsLockReadDTO>>(null, false, $"User related to Cart: '{cart.CartId}' was NOT found !");
 
-                var cartItemsDeleteResult = await DeleteItemsFromCart(userId, cil.ItemsIds);
+                var cartItemsDeleteResult = await DeleteItemsFromCart(userId, cart.ItemsIds);
 
                 message += Environment.NewLine + cartItemsDeleteResult.Message;
 

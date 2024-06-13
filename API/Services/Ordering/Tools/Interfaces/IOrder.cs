@@ -1,9 +1,10 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
-using Services.Ordering.Models;
 
-namespace Ordering.OrderingBusinessLogic.Interfaces
+
+
+namespace Ordering.Tools.Interfaces
 {
-    public interface IOrderBusinessLogic
+    public interface IOrder
     {
         IServiceResult<string> CreateOrderCode(int cartId);
         IServiceResult<string> DecodeOrderCode(string orderId);

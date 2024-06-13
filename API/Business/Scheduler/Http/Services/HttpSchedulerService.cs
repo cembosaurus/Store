@@ -15,8 +15,8 @@ namespace Business.Scheduler.Http.Services
     public class HttpSchedulerService : HttpBaseService, IHttpSchedulerService
     {
 
-        public HttpSchedulerService(IHostingEnvironment env, IExId exId, IAppsettingsService appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServicesInfo_Provider remoteServicesInfoService)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServicesInfoService, resultFact)
+        public HttpSchedulerService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_Provider remoteServices_Provider)
+            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "SchedulerService";
             _remoteServicePathName = "Scheduler";
@@ -32,6 +32,8 @@ namespace Business.Scheduler.Http.Services
             _requestQuery = $"/cartitem/lock";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToLock), _encoding, _mediaType);
 
+            _useApiKey = true;
+
             return await HTTP_Request_Handler<CartItemsLockReadDTO>();
         }
 
@@ -42,6 +44,8 @@ namespace Business.Scheduler.Http.Services
             _method = HttpMethod.Delete;
             _requestQuery = $"/cartitem/lock";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToUnLock), _encoding, _mediaType);
+
+            _useApiKey = true;
 
             return await HTTP_Request_Handler<CartItemsLockReadDTO>();
         }

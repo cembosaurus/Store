@@ -26,7 +26,7 @@ namespace Scheduler.Tasks
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await ProcessExpiredCartItemLocks();
+            await RemoveExpiredLocks();
 
             Console.WriteLine($"This job will be executed again at: {context.NextFireTimeUtc}");
 
@@ -34,13 +34,9 @@ namespace Scheduler.Tasks
         }
 
 
-        public async Task<IServiceResult<bool>> ExecuteManualy() => await ProcessExpiredCartItemLocks();
-
-
-        private async Task<IServiceResult<bool>> ProcessExpiredCartItemLocks()
+        public async Task<IServiceResult<bool>> RemoveExpiredLocks()
         {
-            Console.WriteLine($"--> REMOVING expired items from cart ....");
-
+            // GET items with expired locks from Scheduler DB:
 
             var cartItemLocksExpired = await _cartItemLockRepo.GetCartItemLocksExpired();
 
@@ -66,6 +62,8 @@ namespace Scheduler.Tasks
                 });
             }
 
+
+            // DELETE expired item locks from Cart API service:
 
             var removeResult = await _cartItemService.RemoveExpiredItemsFromCart(cartItemsToRemove);
 

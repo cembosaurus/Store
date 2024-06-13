@@ -54,10 +54,10 @@ builder.Services.AddFluentValidation(conf => {
 });
 
 builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
-builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
+builder.Services.AddScoped<IAppsettings_Repo, Appsettings_Repo>();
+builder.Services.AddScoped<IRemoteServices_Provider, RemoteServices_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddTransient<IAppsettings_Provider, Appsettings_Provider>();
 //builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddSingleton<IExId, ExId>();
 

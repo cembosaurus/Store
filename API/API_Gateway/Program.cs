@@ -41,19 +41,18 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IExId, ExId>();
 
-builder.Services.Configure<Config_Global_Model_AS>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_Data>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
-builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
+builder.Services.AddScoped<IAppsettings_Repo, Appsettings_Repo>();
+builder.Services.AddScoped<IRemoteServices_Provider, RemoteServices_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddTransient<IAppsettings_Provider, Appsettings_Provider>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IJWTTokenStore, JWTTokenStore>();
-builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -199,7 +198,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServicesInfo_Provider>();
+    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServices_Provider>();
 
     // load all remote services models from, Management service:
     try { 

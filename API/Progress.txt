@@ -49,7 +49,14 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
                             NOTE: Management service is called after wrong URL, but when it's called as a main request (on startup) it is called twice if it's not online :)
 
 
-                            To Do: isNullOrEmpty() replace with InNullOrWhityespace() in all cases !!!!!!!!!!!!!!!!!!!
+                            
+
+
+
+                            To Do: authorize apps with Api Key NOT with JWT
+
+                            To Do: INSPECT CartItemService --> DeleteExpiredItems()  return type. Return list of deleted items for cart id
+                                                
 
                                                 
 

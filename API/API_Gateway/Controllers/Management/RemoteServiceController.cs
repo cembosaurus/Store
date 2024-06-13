@@ -12,11 +12,11 @@ namespace API_Gateway.Controllers.Management
     [ApiController]
     public class RemoteServiceController : ControllerBase
     {
-        private IRemoteServicesInfo_Provider _remoteServicesInfoService;
+        private IRemoteServices_Provider _remoteServicesInfoService;
 
 
 
-        public RemoteServiceController(IRemoteServicesInfo_Provider remoteServicesInfoService)
+        public RemoteServiceController(IRemoteServices_Provider remoteServicesInfoService)
         {
             _remoteServicesInfoService = remoteServicesInfoService;
         }

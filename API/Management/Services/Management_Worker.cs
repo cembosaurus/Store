@@ -1,8 +1,4 @@
-﻿using Business.Identity.Http.Services.Interfaces;
-
-
-
-namespace Management.Services
+﻿namespace Management.Services
 {
     // Background Worker: manages many things including watching the appsettings.json for changes 
 
@@ -44,9 +40,9 @@ namespace Management.Services
 
             using (var scope = _serviceFactory.CreateScope())
             {
-                var service = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
+                ////////////////////////////////////var service = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
 
-                service.Authenticate();
+                ////////////////////////////////////service.Authenticate();
             }
 
 

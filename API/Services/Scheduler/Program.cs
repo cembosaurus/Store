@@ -47,10 +47,10 @@ builder.Services.AddControllers(opt =>
 });
 
 builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
-builder.Services.AddScoped<IRemoteServicesInfo_Repo, RemoteServicesInfo_Repo>();
-builder.Services.AddScoped<IRemoteServicesInfo_Provider, RemoteServicesInfo_Provider>();
+builder.Services.AddScoped<IAppsettings_Repo, Appsettings_Repo>();
+builder.Services.AddScoped<IRemoteServices_Provider, RemoteServices_Provider>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettingsService, AppsettingsService>();
+builder.Services.AddTransient<IAppsettings_Provider, Appsettings_Provider>();
 builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddFluentValidation(conf => {
@@ -64,7 +64,9 @@ builder.Services.AddFluentValidation(conf => {
 builder.Services.RegisterSchedulerTasks(builder.Configuration);
 
 builder.Services.AddTransient<IRunAtStartup, RunAtStartup>();
-builder.Services.AddDbContext<SchedulerDBContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("SchedulerConnStr")));
+
+builder.Services.AddDbContext<SchedulerDBContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Congif.Local:ConnectionStrings:SchedulerConnStr").Value, opt => opt.EnableRetryOnFailure()));
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
@@ -80,11 +82,8 @@ builder.Services.AddScoped<ICartItemsService>(sp => sp.GetService<OrderingServic
 builder.Services.AddScoped<ICartService>(sp => sp.GetService<OrderingService>());
 builder.Services.AddScoped<IOrderService>(sp => sp.GetService<OrderingService>());
 
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
-builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
@@ -93,7 +92,7 @@ builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -179,10 +178,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-
-// ApiKey Auth:
-app.UseMiddleware<ApiKeyAuth_MW>();
 
 
 using (var scope = app.Services.CreateScope())

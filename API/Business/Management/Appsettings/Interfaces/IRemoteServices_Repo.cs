@@ -1,10 +1,8 @@
 ﻿using Business.Management.Appsettings.Models;
 
-
-
 namespace Business.Management.Appsettings.Interfaces
 {
-    public interface IRemoteServicesInfo_Repo
+    public interface IRemoteServices_Repo
     {
         bool DeleteByBaseURL(string baseURL);
         bool DeleteByName(string name);

@@ -1,5 +1,4 @@
 ﻿using Business.Filters.Identity;
-using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +14,11 @@ namespace Management.Controllers
     public class RemoteServiceController : ControllerBase
     {
 
-        private readonly IAppsettingsService _appsettingsService;
+        private readonly IAppsettings_Provider _appsettingsService;
 
 
 
-        public RemoteServiceController(IAppsettingsService appsettingsService)
+        public RemoteServiceController(IAppsettings_Provider appsettingsService)
         {
             _appsettingsService = appsettingsService;
         }

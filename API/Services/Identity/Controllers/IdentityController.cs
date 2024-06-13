@@ -46,8 +46,7 @@ namespace Services.Identity.Controllers
         }
 
 
-        // Filter attr.:
-        // Services authentication - 'ApiKey' value from request header. Returns JWT
+        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
         [ApiKeyAuth]
         [HttpPost("service/authenticate")]
         public async Task<IActionResult> LoginWithApiKey()

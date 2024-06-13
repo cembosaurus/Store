@@ -1,46 +1,31 @@
 ﻿using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
-using Business.Management.Data.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
 
 
 namespace Business.Management.Appsettings
 {
-    public class RemoteServicesInfo_Repo : IRemoteServicesInfo_Repo
+    public class RemoteServices_Repo : IRemoteServices_Repo
     {
 
-        ICollection<Service_Model_AS> _remoteServices;
+        private ICollection<Service_Model_AS> _remoteServices;
 
 
-
-        public RemoteServicesInfo_Repo(IAppsettings_DB appsettings_DB)
+        public RemoteServices_Repo(ICollection<Service_Model_AS> remoteServices)
         {
-            _remoteServices = appsettings_DB.RemoteServices;
+            _remoteServices = remoteServices;
         }
-
-
-
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
-
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
-
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
-
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
-
-        //....................................................... make is Appsettings_Repo !!!!! ...........................................................
 
 
 
         public bool IsEmpty()
-        { 
+        {
             return _remoteServices.IsNullOrEmpty();
         }
 
         public ICollection<Service_Model_AS> GetAll()
-        { 
+        {
             return _remoteServices.ToList();
         }
 
@@ -73,10 +58,10 @@ namespace Business.Management.Appsettings
 
 
         public bool UpdateByName(string name, Service_Model_AS serviceURL)
-        { 
+        {
             var url = _remoteServices.FirstOrDefault(url => url.Name == name);
 
-            if (url != null) 
+            if (url != null)
             {
                 url = serviceURL;
 
@@ -102,7 +87,7 @@ namespace Business.Management.Appsettings
         }
 
 
-        public bool DeleteByName(string name) 
+        public bool DeleteByName(string name)
         {
             var url = _remoteServices.FirstOrDefault(url => url.Name == name);
 
@@ -135,13 +120,12 @@ namespace Business.Management.Appsettings
 
         public bool InitializeDB(ICollection<Service_Model_AS> data)
         {
-            if(data.IsNullOrEmpty())
+            if (data.IsNullOrEmpty())
                 return false;
 
             _remoteServices = data;
 
             return true;
         }
-
     }
 }
