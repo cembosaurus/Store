@@ -23,15 +23,15 @@ namespace Business.Http
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IRemoteServices_Provider _remoteServices_Provider;
-        private IAppsettings_Provider _appsettings_Provider;
+        private readonly IRemoteServices_PROVIDER _remoteServices_Provider;
+        private IAppsettings_PROVIDER _appsettings_Provider;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
 
         protected readonly IServiceResultFactory _resultFact;
 
         protected bool _useApiKey;
-        protected Service_Model_AS _service_model;
+        protected RemoteService_MODEL_AS _service_model;
         protected HttpRequestMessage _requestMessage;
         protected string _remoteServiceName;
         protected string _remoteServicePathName;
@@ -47,7 +47,7 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettings_Provider, IHttpAppClient httpAppClient, IRemoteServices_Provider remoteServices_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
@@ -57,10 +57,10 @@ namespace Business.Http
             _resultFact = resultFact;
         }
         // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
-        public HttpBaseService(IHostingEnvironment env, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
-            _appsettings_Provider = appsettingsService;
+            _appsettings_Provider = appsettings_Provider;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
         }
@@ -110,7 +110,7 @@ namespace Business.Http
                     // Catch ex 503: local URL definition is obsolete or wrong, request failed !
                     // Update Remote Service URL to avoid 503 exception and try request again:
 
-                    var servicesModelsResult = await ReLoadServicesModels();
+                    var servicesModelsResult = await ReLoadServices();
 
                     if (!servicesModelsResult.Status)
                         throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {servicesModelsResult.Message}");
@@ -146,10 +146,11 @@ namespace Business.Http
             if(string.IsNullOrWhiteSpace(_remoteServiceName))
                 return _resultFact.Result(false, false, $"Remote Service name was NOT provided !");
 
-            var modelResult = _appsettings_Provider.GetRemoteServiceModel(_remoteServiceName);
+            var modelResult = GetServiceModel();
+
             if (!modelResult.Status)
             {
-                var result = await ReLoadServicesModels();
+                var result = await ReLoadServices();
 
                 if(!result.Status)
                     return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
@@ -220,9 +221,15 @@ namespace Business.Http
         }
 
 
-        private async Task<IServiceResult<IEnumerable<Service_Model_AS>>> ReLoadServicesModels()
+        private async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoadServices()
         { 
             return await _remoteServices_Provider.ReLoad();
+        }
+
+
+        protected virtual IServiceResult<RemoteService_MODEL_AS> GetServiceModel()
+        {
+            return _remoteServices_Provider.GetServiceByName(_remoteServiceName);
         }
 
     }

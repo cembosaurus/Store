@@ -56,6 +56,8 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
                             To Do: authorize apps with Api Key NOT with JWT
 
                             To Do: INSPECT CartItemService --> DeleteExpiredItems()  return type. Return list of deleted items for cart id
+
+                            To Do: remote services DB is empty even during secodn call after updatew
                                                 
 
                                                 

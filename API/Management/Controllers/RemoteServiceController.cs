@@ -14,11 +14,11 @@ namespace Management.Controllers
     public class RemoteServiceController : ControllerBase
     {
 
-        private readonly IAppsettings_Provider _appsettingsService;
+        private readonly IAppsettings_PROVIDER _appsettingsService;
 
 
 
-        public RemoteServiceController(IAppsettings_Provider appsettingsService)
+        public RemoteServiceController(IAppsettings_PROVIDER appsettingsService)
         {
             _appsettingsService = appsettingsService;
         }

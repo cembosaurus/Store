@@ -1,6 +1,9 @@
-﻿namespace Business.Management.Appsettings.Interfaces
+﻿using Business.Management.Appsettings.Models;
+
+namespace Business.Management.Appsettings.Interfaces
 {
-    internal interface IRabbitMQ_Repo
+    public interface IRabbitMQ_REPO
     {
+        RabbitMQ_MODEL_AS Get { get; }
     }
 }

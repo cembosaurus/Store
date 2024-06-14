@@ -14,7 +14,6 @@ using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Data;
-using Business.Management.Data.Interfaces;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
@@ -51,13 +50,13 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddSingleton<IAppsettings_DB, Appsettings_DB>();
-builder.Services.AddScoped<IAppsettings_Repo, Appsettings_Repo>();
-builder.Services.AddScoped<IRemoteServices_Provider, RemoteServices_Provider>();
+builder.Services.AddSingleton<Config_Global_DB>();
+builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<IRemoteServices_PROVIDER, RemoteServices_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettings_Provider, Appsettings_Provider>();
+builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>();
-builder.Services.Configure<Config_Global_Data>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_MODEL_AS>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

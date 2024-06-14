@@ -10,14 +10,14 @@ using Microsoft.IdentityModel.Tokens;
 namespace Business.Management.Appsettings
 {
     //________ Singleton________
-    public class Appsettings_Provider : IAppsettings_Provider
+    public class Appsettings_PROVIDER : IAppsettings_PROVIDER
     {
 
-        private IOptionsMonitor<Config_Global_Data> _config_global;
+        private IOptionsMonitor<Config_Global_MODEL_AS> _config_global;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
-        public Appsettings_Provider(IOptionsMonitor<Config_Global_Data> config_global, IServiceScopeFactory serviceFactory)
+        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_MODEL_AS> config_global, IServiceScopeFactory serviceFactory)
         {
             _config_global = config_global;
             _serviceFactory = serviceFactory;
@@ -26,7 +26,7 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<ICollection<Service_Model_AS>> GetAllRemoteServicesModels()
+        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> GetAllRemoteServicesModels()
         {
            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
@@ -35,14 +35,14 @@ namespace Business.Management.Appsettings
 
                 var configResult = _config_global.CurrentValue.RemoteServices;
                 if(configResult.IsNullOrEmpty())
-                    return resultFact.Result(configResult, false, $"Global config data were NOT found in Appsettings !");
+                    return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, false, $"Global config data were NOT found in Appsettings !");
 
-                return resultFact.Result(configResult, true);
+                return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, true);
             }
         }
 
 
-        public IServiceResult<Service_Model_AS> GetRemoteServiceModel(string name)
+        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceModel(string name)
         {
             // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
@@ -52,13 +52,13 @@ namespace Business.Management.Appsettings
                 var configResult = _config_global.CurrentValue.RemoteServices;
 
                 if (configResult.IsNullOrEmpty())
-                    return resultFact.Result<Service_Model_AS>(null, false, $"Global config data were NOT found in Appsettings !");
+                    return resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Global config data were NOT found in Appsettings !");
 
                 var model = configResult.FirstOrDefault(url => url.Name == name);
 
                 if (model == null)
                 {
-                    return resultFact.Result(model, false, $"URL for service '{name}' NOT found in Appsettings !");
+                    return resultFact.Result(model, false, $"URL for service '{name}' was NOT found in Appsettings !");
                 }
                 
                 return resultFact.Result(model, true);

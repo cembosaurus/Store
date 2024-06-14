@@ -12,11 +12,11 @@ namespace API_Gateway.Controllers.Management
     [ApiController]
     public class RemoteServiceController : ControllerBase
     {
-        private IRemoteServices_Provider _remoteServicesInfoService;
+        private IRemoteServices_PROVIDER _remoteServicesInfoService;
 
 
 
-        public RemoteServiceController(IRemoteServices_Provider remoteServicesInfoService)
+        public RemoteServiceController(IRemoteServices_PROVIDER remoteServicesInfoService)
         {
             _remoteServicesInfoService = remoteServicesInfoService;
         }
@@ -27,7 +27,7 @@ namespace API_Gateway.Controllers.Management
 
         [Authorize(Policy = "Everyone")]
         [HttpPut()]
-        public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<Service_Model_AS> servicesURLs)
+        public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<RemoteService_MODEL_AS> servicesURLs)
         {
             var result = _remoteServicesInfoService.Update(servicesURLs);
 

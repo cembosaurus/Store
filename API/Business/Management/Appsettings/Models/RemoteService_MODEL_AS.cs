@@ -1,24 +1,24 @@
 ﻿using Business.Management.Enums;
 using Microsoft.IdentityModel.Tokens;
-using static Business.Management.Appsettings.Models.Service_Model_AS.ServiceType;
+using static Business.Management.Appsettings.Models.RemoteService_MODEL_AS.ServiceType;
 
 
 
 namespace Business.Management.Appsettings.Models
 {
-    public class Service_Model_AS
+    public class RemoteService_MODEL_AS
     {
 
 
         public string Name { get; set; } = "";
-        public ICollection<ServiceType> Type { get; set; } = new List<ServiceType>();
+        public List<ServiceType> Type { get; set; } = new List<ServiceType>();
 
 
 
         public class ServiceType
         {
 
-            private string _name = "";
+            private string _name = TypeOfService.Undefined.ToString();
 
 
             public string Name 

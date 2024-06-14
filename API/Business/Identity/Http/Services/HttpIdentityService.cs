@@ -5,7 +5,7 @@ using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
-using Business.Management.Data.Interfaces;
+using Business.Management.Data;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 
@@ -15,14 +15,11 @@ namespace Business.Identity.Http.Services
 {
     public class HttpIdentityService : HttpBaseService, IHttpIdentityService
     {
-        private IAppsettings_DB _test_DB;
 
-        public HttpIdentityService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettingsProvider, IHttpAppClient httpAppClient, IRemoteServices_Provider remoteServicesInfoService, IServiceResultFactory resultFact, IAppsettings_DB test_DB)
+        public HttpIdentityService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsProvider, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServicesInfoService, IServiceResultFactory resultFact)
             : base(env, exId, appsettingsProvider, httpAppClient, remoteServicesInfoService, resultFact)
         {
             _remoteServiceName = "IdentityService";
-
-            _test_DB = test_DB;
         }
 
 

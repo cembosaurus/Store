@@ -55,7 +55,7 @@ namespace Business.Filters.Identity
 
         private Tuple<bool, string> Initialize(ActionExecutingContext context)
         {
-            var appsettingsService = context.HttpContext.RequestServices.GetService<IAppsettings_Provider>();
+            var appsettingsService = context.HttpContext.RequestServices.GetService<IAppsettings_PROVIDER>();
 
             if (appsettingsService == null)
             {

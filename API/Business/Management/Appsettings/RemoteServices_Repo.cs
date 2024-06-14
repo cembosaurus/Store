@@ -1,20 +1,21 @@
 ﻿using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
+using Business.Management.Data;
 using Microsoft.IdentityModel.Tokens;
 
 
 
 namespace Business.Management.Appsettings
 {
-    public class RemoteServices_Repo : IRemoteServices_Repo
+    public class RemoteServices_REPO : IRemoteServices_REPO
     {
 
-        private ICollection<Service_Model_AS> _remoteServices;
+        private List<RemoteService_MODEL_AS> _remoteServices;
 
 
-        public RemoteServices_Repo(ICollection<Service_Model_AS> remoteServices)
+        public RemoteServices_REPO(Config_Global_DB config_global_DB)
         {
-            _remoteServices = remoteServices;
+            _remoteServices = config_global_DB.RemoteServices;
         }
 
 
@@ -24,40 +25,40 @@ namespace Business.Management.Appsettings
             return _remoteServices.IsNullOrEmpty();
         }
 
-        public ICollection<Service_Model_AS> GetAll()
+        public ICollection<RemoteService_MODEL_AS> GetAll()
         {
             return _remoteServices.ToList();
         }
 
-        public Service_Model_AS GetByName(string name)
+        public RemoteService_MODEL_AS GetByName(string name)
         {
             return _remoteServices.FirstOrDefault(url => url.Name == name);
         }
 
-        public Service_Model_AS GetByBaseURL(string baseURL)
+        public RemoteService_MODEL_AS GetByBaseURL(string baseURL)
         {
             return _remoteServices.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
         }
 
-        public ICollection<Service_Model_AS> GetByPathName(string pathName)
+        public ICollection<RemoteService_MODEL_AS> GetByPathName(string pathName)
         {
             return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName))).ToList();
         }
 
 
-        public ICollection<Service_Model_AS> GetByPathRoure(string pathRoute)
+        public ICollection<RemoteService_MODEL_AS> GetByPathRoure(string pathRoute)
         {
             return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute))).ToList();
         }
 
 
-        public ICollection<Service_Model_AS> GetByType(string type)
+        public ICollection<RemoteService_MODEL_AS> GetByType(string type)
         {
             return _remoteServices.Where(url => url.Type.Any(st => st.Name == type)).ToList();
         }
 
 
-        public bool UpdateByName(string name, Service_Model_AS serviceURL)
+        public bool UpdateByName(string name, RemoteService_MODEL_AS serviceURL)
         {
             var url = _remoteServices.FirstOrDefault(url => url.Name == name);
 
@@ -72,7 +73,7 @@ namespace Business.Management.Appsettings
         }
 
 
-        public bool UpdateByBaseURL(string baseURL, Service_Model_AS serviceURL)
+        public bool UpdateByBaseURL(string baseURL, RemoteService_MODEL_AS serviceURL)
         {
             var url = _remoteServices.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
 
@@ -118,12 +119,12 @@ namespace Business.Management.Appsettings
 
 
 
-        public bool InitializeDB(ICollection<Service_Model_AS> data)
+        public bool InitializeDB(ICollection<RemoteService_MODEL_AS> data)
         {
             if (data.IsNullOrEmpty())
                 return false;
 
-            _remoteServices = data;
+            _remoteServices.AddRange(data);
 
             return true;
         }

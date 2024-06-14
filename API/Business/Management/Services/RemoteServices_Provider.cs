@@ -10,19 +10,19 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Management.Services
 {
-    public class RemoteServices_Provider : IRemoteServices_Provider
+    public class RemoteServices_PROVIDER : IRemoteServices_PROVIDER
     {
         private readonly bool _isProdEnv;
-        private IRemoteServices_Repo _remoteServices_Repo;
+        private IRemoteServices_REPO _remoteServices_Repo;
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
 
 
 
-        public RemoteServices_Provider(IHostingEnvironment env, IServiceResultFactory resultFact, IAppsettings_Repo appsettings_repo, IHttpManagementService httpManagementService)
+        public RemoteServices_PROVIDER(IHostingEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
         {
             _isProdEnv = env.IsProduction();
-            _remoteServices_Repo = appsettings_repo.RemoteServices;
+            _remoteServices_Repo = config_global_Repo.RemoteServices;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
         }
@@ -38,30 +38,30 @@ namespace Business.Management.Services
         }
 
 
-        public IServiceResult<Service_Model_AS> GetServiceByName(string name) 
+        public IServiceResult<RemoteService_MODEL_AS> GetServiceByName(string name) 
         {
             if(string.IsNullOrWhiteSpace(name))
-                return _resultFact.Result<Service_Model_AS>(null, false, "Remote Service name was NOT provided !");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service name was NOT provided !");
             if(_remoteServices_Repo.IsEmpty())
-                return _resultFact.Result<Service_Model_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
 
             var serviceModel = _remoteServices_Repo.GetByName(name);
 
             if (serviceModel == null)
-                return _resultFact.Result<Service_Model_AS>(null, false, $"Service '{name}' was NOT found ! n\\ Possible solution: Get URL from Management service.");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Service '{name}' was NOT found ! n\\ Possible solution: Get URL from Management service.");
             if (string.IsNullOrWhiteSpace(serviceModel.GetBaseUrl(TypeOfService.REST, _isProdEnv)))
-                return _resultFact.Result<Service_Model_AS>(null, false, $"Service '{name}' was found but there is missing Base URL !");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Service '{name}' was found but there is missing Base URL !");
 
             return _resultFact.Result(serviceModel, true);
         }
 
 
-        public IServiceResult<Service_Model_AS> GetServiceByBaseURL(string baseURL)
+        public IServiceResult<RemoteService_MODEL_AS> GetServiceByBaseURL(string baseURL)
         {
             if (string.IsNullOrWhiteSpace(baseURL))
-                return _resultFact.Result<Service_Model_AS>(null, false, "Remote Service Base URL was NOT provided !");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service Base URL was NOT provided !");
             if (_remoteServices_Repo.GetAll().IsNullOrEmpty())
-                return _resultFact.Result<Service_Model_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
+                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Local URLs DB is empty ! n\\ Possible solution: Get URL from Management service.");
 
             var serviceModel = _remoteServices_Repo.GetByBaseURL(baseURL);
 
@@ -95,7 +95,7 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<string> GetServiceURL_WithPath(Service_Model_AS serviceUrl, string pathName)
+        public IServiceResult<string> GetServiceURL_WithPath(RemoteService_MODEL_AS serviceUrl, string pathName)
         {
             if (string.IsNullOrWhiteSpace(serviceUrl.Name))
                 return _resultFact.Result("", false, "Remote Service name is missing !");
@@ -118,12 +118,12 @@ namespace Business.Management.Services
 
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<Service_Model_AS>>> ReLoad()
+        public async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoad()
         {
             var result = await _httpManagementService.GetAllRemoteServices();
 
             if (!result.Status || result.Data.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Remote Services URLs was NOT received from Management service ! Reason: {result.Message}");
+                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Remote Services URLs was NOT received from Management service ! Reason: {result.Message}");
 
             Update(result.Data);
 
@@ -137,12 +137,12 @@ namespace Business.Management.Services
 
         // WARNING: in K8 only one replica (NOT all) of this service will be chosen for PUT request by load balancer!
         // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
-        public IServiceResult<IEnumerable<Service_Model_AS>> Update(IEnumerable<Service_Model_AS> servicesModels)
+        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> Update(IEnumerable<RemoteService_MODEL_AS> servicesModels)
         {
             Console.WriteLine($"--> UPDATING Services models ......");
 
             if (servicesModels.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<Service_Model_AS>>(null, false, $"Services models for Management service was NOT provided !");
+                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Services models for Management service was NOT provided !");
 
             var message = "Warning ! There were missing data in provided Services models:";
 

@@ -15,7 +15,7 @@ namespace Business.Inventory.Http.Services
     public class HttpItemPriceService : HttpBaseService, IHttpItemPriceService
     {
 
-        public HttpItemPriceService(IHostingEnvironment env, IExId exId, IAppsettings_Provider appsettingsService, IHttpAppClient httpAppClient, IRemoteServices_Provider remoteServices_Provider, IServiceResultFactory resultFact)
+        public HttpItemPriceService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "InventoryService";
