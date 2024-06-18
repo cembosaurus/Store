@@ -19,5 +19,12 @@ namespace Business.Management.Appsettings
 
         public RabbitMQ_MODEL_AS Get => _rabbitMQ;
 
+
+        // To Do:
+        //
+        // Update
+        // Create
+        // Delete
+
     }
 }

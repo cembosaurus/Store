@@ -276,11 +276,11 @@ namespace Ordering.Controllers
 
 
 
-        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
+        // request initiated by API services (Scheduler Service), NOT by users:
         [ApiKeyAuth]
         [AllowAnonymous]            
         [HttpDelete("items/expired")]
-        public async Task<IActionResult> DeleteExpiredCartItems(DeleteExpiredCartItems_C command)
+        public async Task<IActionResult> RemoveExpiredItemsFromCart(DeleteExpiredCartItems_C command)
         {
             var result = await _mediator.Send(command);
 

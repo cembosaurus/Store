@@ -17,10 +17,11 @@ namespace Business.Identity.Http.Services
     {
 
 
-        public HttpAddressService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+        public HttpAddressService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "IdentityService";
+            _remoteServicePathName = "Address";
         }
 
 
@@ -30,7 +31,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAllAddresses()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address/all";
+            _requestQuery = $"all";
 
             return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
@@ -39,7 +40,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<bool>> ExistsAddressByAddressId(int addressId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address/{addressId}/exists";
+            _requestQuery = $"{addressId}/exists";
 
             return await HTTP_Request_Handler<bool>();
         }
@@ -48,7 +49,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<AddressReadDTO>> GetAddressByAddressId(int addressId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address/{addressId}";
+            _requestQuery = $"{addressId}";
 
             return await HTTP_Request_Handler<AddressReadDTO>();
         }
@@ -57,7 +58,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAddressesByAddressIds(IEnumerable<int> addressesIds)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address";
+            _requestQuery = $"";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressesIds), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
@@ -67,7 +68,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> GetAddressesByUserId(int userId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address/user/{userId}";
+            _requestQuery = $"user/{userId}";
 
             return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
         }
@@ -76,7 +77,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<AddressReadDTO>>> SearchAddress(SearchAddressModel searchModel)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/address";
+            _requestQuery = $"";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(searchModel), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<IEnumerable<AddressReadDTO>>();
@@ -86,7 +87,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<AddressReadDTO>> UpdateAddress(int id, AddressUpdateDTO addressDto)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/address/{id}";
+            _requestQuery = $"{id}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<AddressReadDTO>();
@@ -96,7 +97,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<AddressReadDTO>> AddAddressToUser(int userId, AddressCreateDTO addressDto)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"/address/{userId}";
+            _requestQuery = $"{userId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(addressDto), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<AddressReadDTO>();
@@ -106,7 +107,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<AddressReadDTO>> DeleteAddress(int id)
         {
             _method = HttpMethod.Delete;
-            _requestQuery = $"/address/{id}";
+            _requestQuery = $"{id}";
 
             return await HTTP_Request_Handler<AddressReadDTO>();
         }

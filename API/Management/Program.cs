@@ -33,7 +33,7 @@ builder.Services.AddHostedService<Management_Worker>();
 
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IRemoteServices_PROVIDER, RemoteServices_PROVIDER>();
+builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
 
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddSingleton<FileSystemWatcher>();

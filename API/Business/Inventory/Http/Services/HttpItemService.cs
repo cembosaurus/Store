@@ -16,7 +16,7 @@ namespace Business.Inventory.Http.Services
     {
 
 
-        public HttpItemService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_PROVIDER remoteServices_Provider)
+        public HttpItemService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "InventoryService";
@@ -30,7 +30,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = default)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "/all")}";
+            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "all")}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<IEnumerable<ItemReadDTO>>();
@@ -41,7 +41,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<ItemReadDTO>> GetItemById(int itemId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/{itemId}";
+            _requestQuery = $"{itemId}";
 
             return await HTTP_Request_Handler<ItemReadDTO>();
         }

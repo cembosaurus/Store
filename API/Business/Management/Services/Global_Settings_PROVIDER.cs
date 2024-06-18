@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Management.Services
 {
-    public class RemoteServices_PROVIDER : IRemoteServices_PROVIDER
+    public class Global_Settings_PROVIDER : IGlobal_Settings_PROVIDER
     {
         private readonly bool _isProdEnv;
         private IRemoteServices_REPO _remoteServices_Repo;
@@ -19,7 +19,7 @@ namespace Business.Management.Services
 
 
 
-        public RemoteServices_PROVIDER(IHostingEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
+        public Global_Settings_PROVIDER(IHostingEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
         {
             _isProdEnv = env.IsProduction();
             _remoteServices_Repo = config_global_Repo.RemoteServices;
@@ -38,7 +38,7 @@ namespace Business.Management.Services
         }
 
 
-        public IServiceResult<RemoteService_MODEL_AS> GetServiceByName(string name) 
+        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceByName(string name) 
         {
             if(string.IsNullOrWhiteSpace(name))
                 return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service name was NOT provided !");
@@ -56,7 +56,7 @@ namespace Business.Management.Services
         }
 
 
-        public IServiceResult<RemoteService_MODEL_AS> GetServiceByBaseURL(string baseURL)
+        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceByBaseURL(string baseURL)
         {
             if (string.IsNullOrWhiteSpace(baseURL))
                 return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service Base URL was NOT provided !");
@@ -73,14 +73,14 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<string> GetServiceURL_WithPath(string serviceName, string pathName)
+        public IServiceResult<string> GetRemoteServiceURL_WithPath(string serviceName, string pathName)
         {
             if (string.IsNullOrWhiteSpace(serviceName))
                 return _resultFact.Result("", false, "Remote Service name was NOT provided !");
             if (string.IsNullOrWhiteSpace(pathName))
                 return _resultFact.Result("", false, $"Path for Remote Service '{serviceName}' was NOT provided !");
 
-            var modelResult = GetServiceByName(serviceName);
+            var modelResult = GetRemoteServiceByName(serviceName);
 
             if(!modelResult.Status)
                 return _resultFact.Result("", false, modelResult.Message);
@@ -95,7 +95,7 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<string> GetServiceURL_WithPath(RemoteService_MODEL_AS serviceUrl, string pathName)
+        public IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_MODEL_AS serviceUrl, string pathName)
         {
             if (string.IsNullOrWhiteSpace(serviceUrl.Name))
                 return _resultFact.Result("", false, "Remote Service name is missing !");
@@ -118,14 +118,14 @@ namespace Business.Management.Services
 
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoad()
+        public async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoadRemoteServices()
         {
             var result = await _httpManagementService.GetAllRemoteServices();
 
             if (!result.Status || result.Data.IsNullOrEmpty())
                 return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Remote Services URLs was NOT received from Management service ! Reason: {result.Message}");
 
-            Update(result.Data);
+            UpdateRemoteServices(result.Data);
 
             return result;
         }
@@ -137,7 +137,7 @@ namespace Business.Management.Services
 
         // WARNING: in K8 only one replica (NOT all) of this service will be chosen for PUT request by load balancer!
         // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
-        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> Update(IEnumerable<RemoteService_MODEL_AS> servicesModels)
+        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> UpdateRemoteServices(IEnumerable<RemoteService_MODEL_AS> servicesModels)
         {
             Console.WriteLine($"--> UPDATING Services models ......");
 

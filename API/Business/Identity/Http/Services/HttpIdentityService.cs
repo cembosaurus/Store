@@ -16,10 +16,11 @@ namespace Business.Identity.Http.Services
     public class HttpIdentityService : HttpBaseService, IHttpIdentityService
     {
 
-        public HttpIdentityService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsProvider, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServicesInfoService, IServiceResultFactory resultFact)
+        public HttpIdentityService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsProvider, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServicesInfoService, IServiceResultFactory resultFact)
             : base(env, exId, appsettingsProvider, httpAppClient, remoteServicesInfoService, resultFact)
         {
             _remoteServiceName = "IdentityService";
+            _remoteServicePathName = "Identity";
         }
 
 
@@ -29,7 +30,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<UserAuthDTO>> Register(UserToRegisterDTO user)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"identity/register";
+            _requestQuery = $"register";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<UserAuthDTO>();
@@ -40,7 +41,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<string>> Login_UserPassword(UserToLoginDTO user)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"identity/login";
+            _requestQuery = $"login";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(user), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<string>();
@@ -52,7 +53,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<string>> Login_ApiKey(string apiKey)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"identity/service/authenticate";
+            _requestQuery = $"service/authenticate";
             _requestHeaders.Add("x-api-key", apiKey);
 
             return await HTTP_Request_Handler<string>();

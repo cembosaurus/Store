@@ -15,10 +15,11 @@ namespace Business.Identity.Http.Services
     public class HttpUserService : HttpBaseService, IHttpUserService
     {
 
-        public HttpUserService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact) :
+        public HttpUserService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact) :
         base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "IdentityService";
+            _remoteServicePathName = "User";
         }
 
 
@@ -28,7 +29,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<string>>> EditUserRoles(int id, IEnumerable<string> roles)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/user/{id}/changeroles";
+            _requestQuery = $"{id}/changeroles";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(roles), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<IEnumerable<string>>();
@@ -39,7 +40,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<UserReadDTO>>> GetAllUsers()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user";
+            _requestQuery = $"";
 
 
             return await HTTP_Request_Handler<IEnumerable<UserReadDTO>>();
@@ -50,7 +51,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<IEnumerable<UserWithRolesReadDTO>>> GetAllUsersWithRoles()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/withroles";
+            _requestQuery = $"withroles";
 
 
             return await HTTP_Request_Handler<IEnumerable<UserWithRolesReadDTO>>();
@@ -61,7 +62,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<UserReadDTO>> GetCurrentUser()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/current";
+            _requestQuery = $"current";
 
 
             return await HTTP_Request_Handler<UserReadDTO>();
@@ -72,7 +73,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<UserReadDTO>> GetUserById(int id)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/{id}";
+            _requestQuery = $"{id}";
 
 
             return await HTTP_Request_Handler<UserReadDTO>();
@@ -83,7 +84,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<UserReadDTO>> GetUserByName(string name)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/name/{name}";
+            _requestQuery = $"name/{name}";
 
 
             return await HTTP_Request_Handler<UserReadDTO>();
@@ -94,7 +95,7 @@ namespace Business.Identity.Http.Services
         public async Task<IServiceResult<UserWithRolesReadDTO>> GetUserWithRoles(int id)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/{id}/withroles";
+            _requestQuery = $"{id}/withroles";
 
 
             return await HTTP_Request_Handler<UserWithRolesReadDTO>();

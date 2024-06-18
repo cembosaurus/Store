@@ -16,7 +16,7 @@ namespace Business.Ordering.Http.Services
     {
 
 
-        public HttpOrderService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_PROVIDER remoteServices_Provider)
+        public HttpOrderService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";
@@ -30,7 +30,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> CompleteOrder(int userId)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/{userId}/complete";
+            _requestQuery = $"{userId}/complete";
 
             return await HTTP_Request_Handler<OrderReadDTO>();
         }
@@ -40,7 +40,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> CreateOrder(int userId, OrderCreateDTO orderCreateDTO)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"/{userId}";
+            _requestQuery = $"{userId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderCreateDTO }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<OrderReadDTO>();
@@ -51,7 +51,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> DeleteOrder(int userId)
         {
             _method = HttpMethod.Delete;
-            _requestQuery = $"/{userId}";
+            _requestQuery = $"{userId}";
 
             return await HTTP_Request_Handler<OrderReadDTO>();
         }
@@ -61,7 +61,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/all";
+            _requestQuery = $"all";
 
             return await HTTP_Request_Handler<IEnumerable<OrderReadDTO>>();
         }
@@ -71,7 +71,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByCartId(Guid cartId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/cart";
+            _requestQuery = $"cart";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<OrderReadDTO>();
@@ -82,7 +82,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string orderCode)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/ordercode";
+            _requestQuery = $"ordercode";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderCode }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<OrderReadDTO>();
@@ -93,7 +93,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByUserId(int userId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/user/{userId}";
+            _requestQuery = $"user/{userId}";
 
             return await HTTP_Request_Handler<OrderReadDTO>();
         }
@@ -103,7 +103,7 @@ namespace Business.Ordering.Http.Services
         public async Task<IServiceResult<OrderReadDTO>> UpdateOrder(int userId, OrderUpdateDTO orderUpdateDTO)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/{userId}";
+            _requestQuery = $"{userId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { orderUpdateDTO }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<OrderReadDTO>();

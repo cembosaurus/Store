@@ -128,7 +128,7 @@ namespace Ordering.Services
 
             // Items are locked by Item ID, Cart ID and DateTime.
             // Locking process doesn't need amount to identify how many items are locked on cart,
-            // amount of locked items is already provided by items on cart:
+            // amount of locked items is already provided by amount of items on cart:
 
             var cartItemLockResult = await _cartTools.CartItemsLock(cart.CartId, matchingIds);
 

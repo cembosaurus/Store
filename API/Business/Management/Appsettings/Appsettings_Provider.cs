@@ -86,5 +86,46 @@ namespace Business.Management.Appsettings
         }
 
 
+
+        public IServiceResult<string> GetJWTKey()
+        {
+            // create scope of IServiceResultFactory inside this singleton:
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
+
+                var JWTKey = _config_global.CurrentValue.Auth.JWTKey;
+
+                if (string.IsNullOrWhiteSpace(JWTKey))
+                {
+                    return resultFact.Result("", false, $"JWT-Key was NOT found in Appsettings !");
+                }
+
+                return resultFact.Result(JWTKey, true);
+            }
+        }
+
+
+
+        public IServiceResult<RabbitMQ_MODEL_AS> GetRabbitMQ()
+        {
+            // create scope of IServiceResultFactory inside this singleton:
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
+
+                var host = _config_global.CurrentValue.RabbitMQ.Host;
+                var port = _config_global.CurrentValue.RabbitMQ.Port;
+
+                if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(port))
+                {
+                    return resultFact.Result<RabbitMQ_MODEL_AS>(null, false, $"Missing or incomplete RabbitMQ config data were found in Appsettings ! Host: '{host}', Port: '{port}'");
+                }
+
+                return resultFact.Result(new RabbitMQ_MODEL_AS { Host = host, Port = port}, true);
+            }
+        }
+
+
     }
 }

@@ -12,11 +12,11 @@ namespace API_Gateway.Controllers.Management
     [ApiController]
     public class RemoteServiceController : ControllerBase
     {
-        private IRemoteServices_PROVIDER _remoteServicesInfoService;
+        private IGlobal_Settings_PROVIDER _remoteServicesInfoService;
 
 
 
-        public RemoteServiceController(IRemoteServices_PROVIDER remoteServicesInfoService)
+        public RemoteServiceController(IGlobal_Settings_PROVIDER remoteServicesInfoService)
         {
             _remoteServicesInfoService = remoteServicesInfoService;
         }
@@ -29,7 +29,7 @@ namespace API_Gateway.Controllers.Management
         [HttpPut()]
         public ActionResult UpdateAllServicesURL([FromBody] IEnumerable<RemoteService_MODEL_AS> servicesURLs)
         {
-            var result = _remoteServicesInfoService.Update(servicesURLs);
+            var result = _remoteServicesInfoService.UpdateRemoteServices(servicesURLs);
 
             return result.Status ? Ok(result) : BadRequest(result);
         }

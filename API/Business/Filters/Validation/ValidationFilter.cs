@@ -6,6 +6,7 @@ namespace Business.Filters.Validation
     public class ValidationFilter : ActionFilterAttribute
     {
 
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (!context.ModelState.IsValid)
@@ -13,6 +14,8 @@ namespace Business.Filters.Validation
                 context.Result = new BadRequestObjectResult(context.ModelState);
             }
         }
+
+
         public void OnActionExecuted(ActionExecutedContext context) { }
     }
 }

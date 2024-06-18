@@ -7,6 +7,8 @@ namespace Business.Management.Appsettings.Interfaces
     {
         IServiceResult<IEnumerable<RemoteService_MODEL_AS>> GetAllRemoteServicesModels();
         IServiceResult<string> GetApiKey();
+        IServiceResult<string> GetJWTKey();
+        IServiceResult<RabbitMQ_MODEL_AS> GetRabbitMQ();
         IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceModel(string name);
     }
 }

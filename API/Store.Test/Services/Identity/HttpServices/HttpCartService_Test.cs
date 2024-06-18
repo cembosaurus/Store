@@ -34,7 +34,7 @@ namespace Store.Test.Services.Identity.HttpServices
         private IHostingEnvironment env;
         private IExId exId;
         private IAppsettings_PROVIDER appsettingsService;
-        private IRemoteServices_PROVIDER remoteServices_Provider;
+        private IGlobal_Settings_PROVIDER remoteServices_Provider;
 
 
         [SetUp]

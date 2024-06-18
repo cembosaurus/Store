@@ -43,7 +43,7 @@ builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.Configure<Config_Global_MODEL_AS>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IRemoteServices_PROVIDER, RemoteServices_PROVIDER>();
+builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 
@@ -197,11 +197,11 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IRemoteServices_PROVIDER>();
+    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IGlobal_Settings_PROVIDER>();
 
     // load all remote services models from, Management service:
     try { 
-        var result = await remoteServicesInfoService.ReLoad();
+        var result = await remoteServicesInfoService.ReLoadRemoteServices();
         Console.WriteLine($"--> Loading remote services info models from Management service: {(result.Status ? "Success !" : $"Failed: {result.Message}")}");
     }
     catch (HttpRequestException ex) {

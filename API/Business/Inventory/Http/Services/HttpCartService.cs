@@ -16,7 +16,7 @@ namespace Business.Inventory.Http.Services
     public class HttpCartService : HttpBaseService, IHttpCartService
     {
 
-        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_PROVIDER remoteServices_Provider)
+        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";
@@ -37,7 +37,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<CartReadDTO>> DeleteCart(int id)
         {
             _method = HttpMethod.Delete;
-            _requestQuery = $"/{id}";
+            _requestQuery = $"{id}";
 
             return await HTTP_Request_Handler<CartReadDTO>();
         }
@@ -45,7 +45,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<bool>> ExistsCartByCartId(Guid cartId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/exists";
+            _requestQuery = $"exists";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartId }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<bool>();
@@ -54,7 +54,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<IEnumerable<CartReadDTO>>> GetCards()
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/all";
+            _requestQuery = $"all";
 
             return await HTTP_Request_Handler<IEnumerable<CartReadDTO>>();
         }
@@ -62,7 +62,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<CartReadDTO>> GetCartByUserId(int userId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/{userId}";
+            _requestQuery = $"{userId}";
 
             return await HTTP_Request_Handler<CartReadDTO>();
         }
@@ -70,18 +70,18 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<CartReadDTO>> UpdateCart(int userId, CartUpdateDTO cartUpdateDTO)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/{userId}";
+            _requestQuery = $"{userId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartUpdateDTO }), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<CartReadDTO>();
         }
 
 
-        // request initiated by API services, NOT by users:
+        // request initiated by API services (Scheduler Service), NOT by users:
         public async Task<IServiceResult<IEnumerable<CartItemsLockReadDTO>>> RemoveExpiredItemsFromCart(IEnumerable<CartItemsLockDeleteDTO> cartItemLocks)
         {
             _method = HttpMethod.Delete;
-            _requestQuery = $"/items/expired";
+            _requestQuery = $"items/expired";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(new { cartItemLocks }), _encoding, _mediaType);
 
             _useApiKey = true;

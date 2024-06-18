@@ -23,7 +23,7 @@ namespace Business.Http
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IRemoteServices_PROVIDER _remoteServices_Provider;
+        private readonly IGlobal_Settings_PROVIDER _global_settings_Provider;
         private IAppsettings_PROVIDER _appsettings_Provider;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
@@ -47,13 +47,13 @@ namespace Business.Http
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER global_settings_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
             _appsettings_Provider = appsettings_Provider;
             _httpAppClient = httpAppClient;
-            _remoteServices_Provider = remoteServices_Provider;
+            _global_settings_Provider = global_settings_Provider;
             _resultFact = resultFact;
         }
         // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
@@ -68,16 +68,26 @@ namespace Business.Http
 
 
 
+
         protected async Task<IServiceResult<T>> HTTP_Request_Handler<T>()
         {
-            var initResponse = await InitializeRequest();
+            // create HTTP request:
+
+            var initResponse = await CreateRequest();
 
             if (!initResponse.Status)
-                return _resultFact.Result(default(T), false, $"Request for remote service '{_remoteServiceName}' was NOT initialized ! Reason: {initResponse.Message}");
+                return _resultFact.Result(default(T), false, $"HTTP request for remote service '{_remoteServiceName}' was NOT created ! Reason: {initResponse.Message}");
+
+
+            // send HTTP reequest:
 
             var sendResponse = await Send();
 
+
             _useApiKey = false;
+
+
+            // handle HTTP response:
 
             if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
                 return _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
@@ -91,71 +101,23 @@ namespace Business.Http
 
 
 
-        // VIRTUAL - unlike all HTTP Services, HttpManagementService (uses its own overridden Send()) doesn't need 503 ex checkup because
-        // if Management API service is not reached then there is no logic in trying to update Management API service's URL from this Management API service
-        protected async virtual Task<HttpResponseMessage> Send()
+        protected async Task<IServiceResult<bool>> CreateRequest()
         {
-            _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
+            // get caller's (THIS) service model:
 
-            if (!string.IsNullOrWhiteSpace(_requestURL))
-            {
-                try
-                {
-                    InitializeHttpRequestMessage();
-
-                    return await _httpAppClient.Send(_requestMessage);
-                }
-                catch (Exception ex) when (_exId.Http_503(ex))
-                {
-                    // Catch ex 503: local URL definition is obsolete or wrong, request failed !
-                    // Update Remote Service URL to avoid 503 exception and try request again:
-
-                    var servicesModelsResult = await ReLoadServices();
-
-                    if (!servicesModelsResult.Status)
-                        throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL, and attempt to get correct URL from 'Management' Service FAILED ! \\n Message: {servicesModelsResult.Message}");
-
-
-                    _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
-
-                    if (string.IsNullOrWhiteSpace(_requestURL))
-                        throw new HttpRequestException("Could NOT get Remote Service URL ! Request URL was NOT constructed !");
-
-                    try
-                    {
-                        // Rebuild the http request message, to prevent "Request already sent" error:
-                        InitializeHttpRequestMessage();
-
-                        return await _httpAppClient.Send(_requestMessage);
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-                }
-            }
-
-            return _requestMessage.CreateErrorResponse(HttpStatusCode.BadRequest, "Request URL was NOT constructed !");
-        }
-
-
-        protected async Task<IServiceResult<bool>> InitializeRequest()
-        {
-            //___ THIS Service Model:
-
-            if(string.IsNullOrWhiteSpace(_remoteServiceName))
-                return _resultFact.Result(false, false, $"Remote Service name was NOT provided !");
+            if (string.IsNullOrWhiteSpace(_remoteServiceName))
+                return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
 
             var modelResult = GetServiceModel();
 
             if (!modelResult.Status)
             {
-                var result = await ReLoadServices();
+                var result = await _global_settings_Provider.ReLoadRemoteServices();
 
-                if(!result.Status)
+                if (!result.Status)
                     return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
 
-                modelResult = _remoteServices_Provider.GetServiceByName(_remoteServiceName);
+                modelResult = _global_settings_Provider.GetRemoteServiceByName(_remoteServiceName);
                 if (!modelResult.Status)
                     return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
             }
@@ -163,18 +125,18 @@ namespace Business.Http
             _service_model = modelResult.Data;
 
 
-            //___ Request URL:
+            // build HTTP request URL:
 
             _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
             if (string.IsNullOrWhiteSpace(_requestURL))
-                return _resultFact.Result(false, false, $"Request URL for Remote Service '{_remoteServiceName}' could not be constructed ! Missing data in Appsettings !");
+                return _resultFact.Result(false, false, $"Request URL for Remote Service '{_remoteServiceName}' could not be constructed ! Missing URL data in Appsettings or Global Settings !");
 
 
-            //___ API Key:
+            // add API Key to HTTP request header:
 
-            if(_useApiKey)
-            { 
+            if (_useApiKey)
+            {
                 var apiKeyResult = AddApiKeyToHeader();
 
                 if (!apiKeyResult.Status)
@@ -182,13 +144,72 @@ namespace Business.Http
             }
 
 
-            //___ HTTP Message:
+            // initialize HTTP request message:
 
             InitializeHttpRequestMessage();
 
 
+            // build request URL:
+
+            _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
+
+            if(string.IsNullOrWhiteSpace(_requestURL))
+                return _resultFact.Result(false, false, "Failed to get request URL from remote service model !");
+
+
             return _resultFact.Result(true, true);
         }
+
+
+
+
+        // VIRTUAL - unlike all HTTP Services, HttpManagementService (uses its own overridden Send()) doesn't need 503 ex handling because
+        // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL from Management API service:
+        protected async virtual Task<HttpResponseMessage> Send()
+        {
+            // first attempt:
+            try
+            {
+                InitializeHttpRequestMessage();
+            
+                return await _httpAppClient.Send(_requestMessage);
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {
+                // Catch ex 503: if HTTP Request URL provided by global settings is not up-to-date or wrong, request will fail ! ...
+                // Send the HTTP request to Management API service to update global settings by new data. ...
+                // Create new request URL. ...
+                // Try HTTP request again:
+
+            
+                var servicesModelsResult = await _global_settings_Provider.ReLoadRemoteServices();
+            
+                if (!servicesModelsResult.Status)
+                    throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
+            
+            
+                _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
+            
+                if (string.IsNullOrWhiteSpace(_requestURL))
+                    throw new HttpRequestException("Failed to get request URL from remote service model !");
+
+            
+                // second attempt:
+                try
+                {
+                    // Rebuild the http request message, to prevent "Request already sent" error:
+                    InitializeHttpRequestMessage();
+            
+                    return await _httpAppClient.Send(_requestMessage);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+
+        }
+
 
 
         protected void InitializeHttpRequestMessage()
@@ -210,6 +231,7 @@ namespace Business.Http
         }
 
 
+
         protected IServiceResult<bool> AddApiKeyToHeader()
         {
             var apiKeyResult = _appsettings_Provider.GetApiKey();
@@ -217,19 +239,14 @@ namespace Business.Http
             if(apiKeyResult.Status)
                 _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
 
-            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request to {_remoteServiceName}/{_remoteServicePathName}: {apiKeyResult.Message}");
+            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request '{_remoteServiceName}/{_remoteServicePathName}': {apiKeyResult.Message}");
         }
 
-
-        private async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoadServices()
-        { 
-            return await _remoteServices_Provider.ReLoad();
-        }
 
 
         protected virtual IServiceResult<RemoteService_MODEL_AS> GetServiceModel()
         {
-            return _remoteServices_Provider.GetServiceByName(_remoteServiceName);
+            return _global_settings_Provider.GetRemoteServiceByName(_remoteServiceName);
         }
 
     }

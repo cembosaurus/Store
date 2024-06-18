@@ -15,7 +15,7 @@ namespace Business.Scheduler.Http.Services
     public class HttpSchedulerService : HttpBaseService, IHttpSchedulerService
     {
 
-        public HttpSchedulerService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IRemoteServices_PROVIDER remoteServices_Provider)
+        public HttpSchedulerService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "SchedulerService";
@@ -29,7 +29,7 @@ namespace Business.Scheduler.Http.Services
         public async Task<IServiceResult<CartItemsLockReadDTO>> CartItemsLock(CartItemsLockCreateDTO cartItemsToLock)
         {
             _method = HttpMethod.Post;
-            _requestQuery = $"/cartitem/lock";
+            _requestQuery = $"cartitem/lock";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToLock), _encoding, _mediaType);
 
             _useApiKey = true;
@@ -42,7 +42,7 @@ namespace Business.Scheduler.Http.Services
         public async Task<IServiceResult<CartItemsLockReadDTO>> CartItemsUnLock(CartItemsLockDeleteDTO cartItemsToUnLock)
         {
             _method = HttpMethod.Delete;
-            _requestQuery = $"/cartitem/lock";
+            _requestQuery = $"cartitem/lock";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(cartItemsToUnLock), _encoding, _mediaType);
 
             _useApiKey = true;

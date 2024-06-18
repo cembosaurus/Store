@@ -19,5 +19,13 @@ namespace Business.Management.Appsettings
         public Auth_MODEL_AS Get => _auth;
 
 
+
+        // To Do:
+        //
+        // Update
+        // Create
+        // Delete
+
+
     }
 }

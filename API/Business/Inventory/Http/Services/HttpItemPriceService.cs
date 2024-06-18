@@ -15,7 +15,7 @@ namespace Business.Inventory.Http.Services
     public class HttpItemPriceService : HttpBaseService, IHttpItemPriceService
     {
 
-        public HttpItemPriceService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IRemoteServices_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+        public HttpItemPriceService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "InventoryService";
@@ -29,7 +29,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<IEnumerable<ItemPriceReadDTO>>> GetItemPrices(IEnumerable<int> itemIds = default)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "/all")}";
+            _requestQuery = $"{(itemIds != null && itemIds.Any() ? "" : "all")}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemIds), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<IEnumerable<ItemPriceReadDTO>>();
@@ -39,7 +39,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<ItemPriceReadDTO>> GetItemPriceById(int itemId)
         {
             _method = HttpMethod.Get;
-            _requestQuery = $"/{itemId}";
+            _requestQuery = $"{itemId}";
 
             return await HTTP_Request_Handler<ItemPriceReadDTO>();
         }
@@ -48,7 +48,7 @@ namespace Business.Inventory.Http.Services
         public async Task<IServiceResult<ItemPriceReadDTO>> UpdateItemPrice(int itemId, ItemPriceUpdateDTO itemPriceUpdateDTO)
         {
             _method = HttpMethod.Put;
-            _requestQuery = $"/{itemId}";
+            _requestQuery = $"{itemId}";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(itemPriceUpdateDTO), _encoding, _mediaType);
 
             return await HTTP_Request_Handler<ItemPriceReadDTO>();
