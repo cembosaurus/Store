@@ -1,8 +1,7 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
-using Business.Http;
-using Business.Http.Interfaces;
+using Business.Http.Clients;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
@@ -82,6 +81,7 @@ builder.Services.AddScoped<ICartService>(sp => sp.GetService<OrderingService>())
 builder.Services.AddScoped<IOrderService>(sp => sp.GetService<OrderingService>());
 
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
+builder.Services.AddScoped<IHttpCatalogueItemService, HttpCatalogueItemService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();

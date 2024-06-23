@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StaticContent.Services.Interfaces;
 
-namespace StaticContent.Controllers
+
+
+namespace StaticContent.Controllers.Business
 {
 
     //[Authorize]

@@ -3,7 +3,7 @@ using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Services.Inventory.Controllers
+namespace Inventory.Controllers.Business
 {
 
     [Authorize]

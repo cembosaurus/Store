@@ -6,7 +6,7 @@ using Scheduler.Services.Interfaces;
 
 
 
-namespace Scheduler.Controllers
+namespace Scheduler.Controllers.Business
 {
 
     [Authorize]

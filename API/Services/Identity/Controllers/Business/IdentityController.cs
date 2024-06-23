@@ -4,7 +4,7 @@ using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Services.Identity.Controllers
+namespace Identity.Controllers.Business
 {
 
     [Route("[controller]")]
@@ -46,14 +46,5 @@ namespace Services.Identity.Controllers
         }
 
 
-        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
-        [ApiKeyAuth]
-        [HttpPost("service/authenticate")]
-        public async Task<IActionResult> LoginWithApiKey()
-        {
-            var result = await _identityService.CreateTokenForService();
-
-            return Ok(result);
-        }
     }
 }

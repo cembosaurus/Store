@@ -3,7 +3,9 @@ using Business.Payment.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PaymentService.Controllers
+
+
+namespace Payment.Controllers.Business
 {
 
     [Authorize]

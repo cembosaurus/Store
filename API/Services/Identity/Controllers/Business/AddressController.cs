@@ -4,7 +4,7 @@ using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Identity.Controllers
+namespace Identity.Controllers.Business
 {
 
     [Authorize]

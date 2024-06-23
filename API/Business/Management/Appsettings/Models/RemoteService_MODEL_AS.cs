@@ -12,6 +12,7 @@ namespace Business.Management.Appsettings.Models
 
         public string Name { get; set; } = "";
         public List<ServiceType> Type { get; set; } = new List<ServiceType>();
+        public bool IsHTTPClient { get; set; }
 
 
 

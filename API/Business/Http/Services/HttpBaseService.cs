@@ -1,5 +1,5 @@
 ﻿using Business.Exceptions.Interfaces;
-using Business.Http.Interfaces;
+using Business.Http.Clients;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
@@ -16,7 +16,7 @@ using System.Text;
 
 
 
-namespace Business.Http
+namespace Business.Http.Services
 {
     public class HttpBaseService
     {
@@ -153,7 +153,7 @@ namespace Business.Http
 
             _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
-            if(string.IsNullOrWhiteSpace(_requestURL))
+            if (string.IsNullOrWhiteSpace(_requestURL))
                 return _resultFact.Result(false, false, "Failed to get request URL from remote service model !");
 
 
@@ -171,7 +171,7 @@ namespace Business.Http
             try
             {
                 InitializeHttpRequestMessage();
-            
+
                 return await _httpAppClient.Send(_requestMessage);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
@@ -181,25 +181,25 @@ namespace Business.Http
                 // Create new request URL. ...
                 // Try HTTP request again:
 
-            
+
                 var servicesModelsResult = await _global_settings_Provider.ReLoadRemoteServices();
-            
+
                 if (!servicesModelsResult.Status)
                     throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
-            
-            
+
+
                 _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
-            
+
                 if (string.IsNullOrWhiteSpace(_requestURL))
                     throw new HttpRequestException("Failed to get request URL from remote service model !");
 
-            
+
                 // second attempt:
                 try
                 {
                     // Rebuild the http request message, to prevent "Request already sent" error:
                     InitializeHttpRequestMessage();
-            
+
                     return await _httpAppClient.Send(_requestMessage);
                 }
                 catch
@@ -236,7 +236,7 @@ namespace Business.Http
         {
             var apiKeyResult = _appsettings_Provider.GetApiKey();
 
-            if(apiKeyResult.Status)
+            if (apiKeyResult.Status)
                 _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
 
             return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request '{_remoteServiceName}/{_remoteServicePathName}': {apiKeyResult.Message}");

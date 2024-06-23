@@ -4,7 +4,7 @@ using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Services.Inventory.Controllers
+namespace Inventory.Controllers.Business
 {
 
     [Authorize]
@@ -61,7 +61,7 @@ namespace Services.Inventory.Controllers
         [HttpPost]
         public async Task<ActionResult> AddItem(ItemCreateDTO itemCreateDTO)
         {
-           var result = await _itemService.AddItem(itemCreateDTO);
+            var result = await _itemService.AddItem(itemCreateDTO);
 
             return result.Status ? Ok(result) : BadRequest(result);
         }

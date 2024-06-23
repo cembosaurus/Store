@@ -5,7 +5,9 @@ using Ordering.CQRS.Commands.Order;
 using Ordering.CQRS.Queries.Order;
 using System.Security.Claims;
 
-namespace Services.Ordering.Controllers
+
+
+namespace Ordering.Controllers.Business
 {
 
     [Authorize]
@@ -70,7 +72,7 @@ namespace Services.Ordering.Controllers
             return result.Status ? Ok(result) : BadRequest(result);
         }
 
-        
+
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("ordercode")]
         public async Task<IActionResult> GetOrderByOrderCode([FromBody] GetOrderByOrderCode_Q query)
@@ -86,7 +88,7 @@ namespace Services.Ordering.Controllers
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody]CreateOrder_C command)
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrder_C command)
         {
             command.UserId = _principalId;
 
@@ -113,7 +115,7 @@ namespace Services.Ordering.Controllers
 
         [Authorize(Policy = "Everyone")]        // Customer
         [HttpPut]
-        public async Task<IActionResult> UpdateOrder([FromBody]UpdateOrder_C command)
+        public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrder_C command)
         {
             command.UserId = _principalId;
 
@@ -141,7 +143,7 @@ namespace Services.Ordering.Controllers
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpPut("complete")]
-        public async Task<IActionResult> CompleteOrder([FromRoute]CompleteOrder_C command)
+        public async Task<IActionResult> CompleteOrder([FromRoute] CompleteOrder_C command)
         {
             command.UserId = _principalId;
 

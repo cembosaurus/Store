@@ -1,4 +1,11 @@
-﻿namespace Management.Services
+﻿using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
+using Microsoft.IdentityModel.Tokens;
+
+namespace Management.Services
 {
     // Background Worker: manages many things including watching the appsettings.json for changes 
 
@@ -24,6 +31,13 @@
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
             Console.WriteLine("--> Management Service: Background worker is running ...");
+
+            // send requests on startup .....................
+
+
+            //var result = SendAppsettingsToAllServices();
+            var result = HandleAppsettingsUpdate();
+
         }
 
 
@@ -34,23 +48,77 @@
 
 
 
-            // To Do: send Authorized ! PUT requests to all Remote Services with new URLs (but it wouldn't work properly in case of multiple replicas in K8)
+            // To Do: PUT requests to all Remote Services with new URLs (but it wouldn't reach all services in case of multiple replicas in K8)
 
-            // create scope of IServiceResultFactory inside this singleton:
 
-            using (var scope = _serviceFactory.CreateScope())
-            {
-                ////////////////////////////////////var service = scope.ServiceProvider.GetService<IHttpApiKeyAuthService>();
-
-                ////////////////////////////////////service.Authenticate();
-            }
+            var result = HandleAppsettingsUpdate();
 
 
             _switch = !_switch;
         }
 
 
-        // ................................................................ To Do: also appsettings production:
+
+        private IServiceResult<IEnumerable<RemoteService_MODEL_AS>> HandleAppsettingsUpdate()
+        {
+            IServiceResult<IEnumerable<RemoteService_MODEL_AS>> result;
+            var prependMessage = "Management Service:  EVENT -> On Appsettings Update/Change: \n";
+
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var _appsettings_Provider = scope.ServiceProvider.GetService<IAppsettings_PROVIDER>();
+                var _globalsettings_Provider = scope.ServiceProvider.GetService<IGlobal_Settings_PROVIDER>();
+
+
+                var appsettingsResult = _appsettings_Provider.GetGlobalConfig();
+
+                appsettingsResult
+                    .PrependMessage(" - READ Remote Service models from Global Appsettings. Result: \n")
+                    .PrependMessage(prependMessage);
+
+                if (!appsettingsResult.Status)
+                    return appsettingsResult;
+
+
+                var _globalsettingsResult = _globalsettings_Provider.UpdateRemoteServiceModels(appsettingsResult.Data);
+
+                _globalsettingsResult
+                    .PrependMessage(" - UPDATE Remote Service models in Global Settings. Result: \n")
+                    .PrependMessage(prependMessage);
+
+                if (!_globalsettingsResult.Status)
+                    return _globalsettingsResult;
+
+
+                result = _globalsettings_Provider.GetRemoteServices_WithHTTPClient();
+
+                result
+                    .PrependMessage(" - READ updated Remote Service models from Global Settings. Result: \n")
+                    .PrependMessage(prependMessage);
+
+                if (!result.Status)
+                    return result;
+            }
+
+
+
+
+            foreach (var model in result.Data)
+            { 
+            
+                    /////// ================================ To Do: send update to all services ====================
+            }
+
+
+
+
+            return result;
+        }
+
+
+
+
+
         private void Initialize()
         {
             _watcher.Path = Directory.GetCurrentDirectory();

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Services.Identity.Controllers
+namespace Identity.Controllers.Business
 {
     [Authorize]
     [Route("[controller]")]
@@ -83,7 +83,7 @@ namespace Services.Identity.Controllers
 
         [Authorize(Policy = "Everyone")]
         [HttpPut("{id}/changeroles")]
-        public async Task<IActionResult> EditUserRoles(int id, [FromBody]string[] roles)
+        public async Task<IActionResult> EditUserRoles(int id, [FromBody] string[] roles)
         {
             var result = await _userService.EditUserRoles(id, roles);
 

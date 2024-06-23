@@ -282,6 +282,7 @@ namespace Ordering.Services
                     continue;
                 }
 
+
                 var cartExistsResult = await _cartRepo.ExistsByCartId(cart.CartId);
 
                 if(!cartExistsResult)
@@ -292,12 +293,14 @@ namespace Ordering.Services
                     continue;
                 }
 
+
                 if (cart.ItemsIds == null || !cart.ItemsIds.Any())
                 {
                     message += Environment.NewLine + $"List of expired items for Cart: '{cart.CartId}' is empty !";
 
                     continue;
                 }
+
 
                 var userId = await _cartRepo.GetUserIdByCartId(cart.CartId);
 

@@ -32,35 +32,44 @@ namespace Business.Management.Appsettings
 
         public RemoteService_MODEL_AS GetByName(string name)
         {
-            return _remoteServices.FirstOrDefault(url => url.Name == name);
+            return _remoteServices.FirstOrDefault(s => s.Name == name);
         }
 
         public RemoteService_MODEL_AS GetByBaseURL(string baseURL)
         {
-            return _remoteServices.FirstOrDefault(url => url.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
+            return _remoteServices.FirstOrDefault(s => s.Type.Any(t => t.BaseURL.Dev == baseURL || t.BaseURL.Prod == baseURL));
         }
 
         public ICollection<RemoteService_MODEL_AS> GetByPathName(string pathName)
         {
-            return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Name == pathName))).ToList();
+            return _remoteServices.Where(s => s.Type.Any(t => t.Paths.Any(p => p.Name == pathName))).ToList();
         }
 
 
         public ICollection<RemoteService_MODEL_AS> GetByPathRoure(string pathRoute)
         {
-            return _remoteServices.Where(url => url.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute))).ToList();
+            return _remoteServices.Where(s => s.Type.Any(t => t.Paths.Any(p => p.Route == pathRoute))).ToList();
         }
 
 
         public ICollection<RemoteService_MODEL_AS> GetByType(string type)
         {
-            return _remoteServices.Where(url => url.Type.Any(st => st.Name == type)).ToList();
+            return _remoteServices.Where(s => s.Type.Any(st => st.Name == type)).ToList();
         }
+
+
+        public ICollection<RemoteService_MODEL_AS> GetHttpClients()
+        {
+            return _remoteServices.Where(s => s.IsHTTPClient).ToList();
+        }
+
+
+
 
 
         public bool UpdateByName(string name, RemoteService_MODEL_AS serviceURL)
         {
-            var url = _remoteServices.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServices.FirstOrDefault(s => s.Name == name);
 
             if (url != null)
             {
@@ -75,7 +84,7 @@ namespace Business.Management.Appsettings
 
         public bool UpdateByBaseURL(string baseURL, RemoteService_MODEL_AS serviceURL)
         {
-            var url = _remoteServices.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServices.FirstOrDefault(s => s.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
@@ -88,9 +97,11 @@ namespace Business.Management.Appsettings
         }
 
 
+
+
         public bool DeleteByName(string name)
         {
-            var url = _remoteServices.FirstOrDefault(url => url.Name == name);
+            var url = _remoteServices.FirstOrDefault(s => s.Name == name);
 
             if (url != null)
             {
@@ -105,7 +116,7 @@ namespace Business.Management.Appsettings
 
         public bool DeleteByBaseURL(string baseURL)
         {
-            var url = _remoteServices.FirstOrDefault(url => url.Type.Any(st => st.BaseURL.Dev == baseURL));
+            var url = _remoteServices.FirstOrDefault(s => s.Type.Any(st => st.BaseURL.Dev == baseURL));
 
             if (url != null)
             {
@@ -119,10 +130,14 @@ namespace Business.Management.Appsettings
 
 
 
+
+
         public bool InitializeDB(ICollection<RemoteService_MODEL_AS> data)
         {
             if (data.IsNullOrEmpty())
                 return false;
+
+            _remoteServices.Clear();
 
             _remoteServices.AddRange(data);
 

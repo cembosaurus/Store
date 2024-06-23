@@ -1,7 +1,11 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace Business.Libraries.ServiceResult
 {
+
+
+
     public class ServiceResult<T> : ServiceResult, IServiceResult<T>
     {
 
@@ -17,6 +21,9 @@ namespace Business.Libraries.ServiceResult
         public T? Data => _data;
 
     }
+
+
+
 
 
     public class ServiceResult : IServiceResult
@@ -38,5 +45,22 @@ namespace Business.Libraries.ServiceResult
 
         public string Message => _message;
 
+        public ServiceResult PrependMessage(string msg = "")
+        {
+            _message = msg + _message;
+
+            return this;
+        }
+        public ServiceResult AppendMessage(string msg = "")
+        {
+            _message += msg;
+
+            return this;
+        }
+
+
     }
+
+
+
 }

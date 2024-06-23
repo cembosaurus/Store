@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.CQRS.Commands.Archive;
 using Ordering.CQRS.Queries.Archive;
 
-namespace Services.Ordering.Controllers
+
+
+namespace Ordering.Controllers.Business
 {
 
     //[Authorize]

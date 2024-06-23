@@ -7,7 +7,7 @@ namespace Business.Middlewares
     {
         private RequestDelegate _next;
         private readonly Guid _serviceId = Guid.NewGuid();
-        // project's physical filename as it's stated in f.e: docker file or file system, for acurate identification
+        // physical file-name of project as it's stated in f.e: docker file or file system, for acurate identification
         private readonly string _serviceName = Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
 
         public ServiceId_MW(RequestDelegate next)
@@ -17,12 +17,12 @@ namespace Business.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            // manual - data in body (Service Id, Name, ... etc):
+            // manual - GET response with data in body (Service Id, Name, ... etc):
             if (context.Request.Path == "/svcid")
             {
                 await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(new ServiceIdReadDTO { Id = _serviceId, Name = _serviceName }));          
             }
-            // auto - data in header (Service Id only):
+            // auto - GET response with data in header (Service Id only):
             else
             {
                 context.Response.OnStarting(() =>

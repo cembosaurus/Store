@@ -14,21 +14,21 @@ namespace Scheduler.Services
     public class OrderingService : IArchiveService, ICartItemsService, ICartService, IOrderService
     {
         private readonly ICartItemLockRepository _cartItemLockRepo;
-        private readonly IHttpInventoryService _httpInventoryService;
+        private readonly IHttpCatalogueItemService _httpCatalogueItemService;
         private readonly IHttpCartService _httpCartService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
         private readonly int _lockedForDays;
 
-        public OrderingService(IConfiguration config, IServiceResultFactory resultFact, IHttpInventoryService httpInventoryService, IHttpCartService httpCartService, ICartItemLockRepository cartItemLockRepo, 
+        public OrderingService(IConfiguration config, IServiceResultFactory resultFact, IHttpCatalogueItemService httpCatalogueItemService, IHttpCartService httpCartService, ICartItemLockRepository cartItemLockRepo, 
             IMapper mapper)
         {
             _cartItemLockRepo = cartItemLockRepo;
-            _httpInventoryService = httpInventoryService;
+            _httpCatalogueItemService = httpCatalogueItemService;
             _httpCartService = httpCartService;
             _resultFact = resultFact;
             _mapper = mapper;
-            int.TryParse(config.GetSection("Congif.Local:ItemSettings:ItemLockedForDays").Value, out _lockedForDays);
+            int.TryParse(config.GetSection("Congif.Local:ItemsLock:ItemLockedForDays").Value, out _lockedForDays);
         }
 
 
@@ -74,7 +74,7 @@ namespace Scheduler.Services
 
             foreach (var i in cartItemsToLockDTO.ItemsIds)
             {
-                var itemExists = await _httpInventoryService.ExistsCatalogueItemById(i);
+                var itemExists = await _httpCatalogueItemService.ExistsCatalogueItemById(i);
 
                 if (!itemExists.Status)
                 {

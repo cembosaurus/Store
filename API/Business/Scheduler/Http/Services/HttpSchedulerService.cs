@@ -1,6 +1,6 @@
 ﻿using Business.Exceptions.Interfaces;
-using Business.Http;
-using Business.Http.Interfaces;
+using Business.Http.Clients;
+using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;

@@ -34,8 +34,9 @@ namespace Business.Management.Appsettings
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
                 var configResult = _config_global.CurrentValue.RemoteServices;
+
                 if(configResult.IsNullOrEmpty())
-                    return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, false, $"Global config data were NOT found in Appsettings !");
+                    return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, false, $"Remote Service models were NOT found in Global Appsettings !");
 
                 return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, true);
             }
@@ -64,6 +65,7 @@ namespace Business.Management.Appsettings
                 return resultFact.Result(model, true);
             }
         }
+
 
 
 
@@ -123,6 +125,26 @@ namespace Business.Management.Appsettings
                 }
 
                 return resultFact.Result(new RabbitMQ_MODEL_AS { Host = host, Port = port}, true);
+            }
+        }
+
+
+
+        public IServiceResult<Config_Global_MODEL_AS> GetGlobalConfig()
+        {
+            // create scope of IServiceResultFactory inside this singleton:
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
+
+                var globalConfig = _config_global.CurrentValue;
+
+                if (globalConfig == null)
+                {
+                    return resultFact.Result(globalConfig, false, $"Global Config data were NOT found in Appsettings !");
+                }
+
+                return resultFact.Result(globalConfig, true);
             }
         }
 

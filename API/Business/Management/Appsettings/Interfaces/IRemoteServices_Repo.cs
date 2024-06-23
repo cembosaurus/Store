@@ -12,6 +12,7 @@ namespace Business.Management.Appsettings.Interfaces
         ICollection<RemoteService_MODEL_AS> GetByPathName(string pathName);
         ICollection<RemoteService_MODEL_AS> GetByPathRoure(string pathRoute);
         ICollection<RemoteService_MODEL_AS> GetByType(string type);
+        ICollection<RemoteService_MODEL_AS> GetHttpClients();
         bool InitializeDB(ICollection<RemoteService_MODEL_AS> data);
         bool IsEmpty();
         bool UpdateByBaseURL(string baseURL, RemoteService_MODEL_AS serviceURL);

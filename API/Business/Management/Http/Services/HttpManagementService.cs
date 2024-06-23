@@ -1,7 +1,6 @@
-﻿using Business.Http;
-using Business.Http.Interfaces;
+﻿using Business.Http.Clients;
+using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Http.Services.Interfaces;

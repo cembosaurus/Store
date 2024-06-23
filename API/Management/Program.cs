@@ -1,7 +1,6 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
-using Business.Http;
-using Business.Http.Interfaces;
+using Business.Http.Clients;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
