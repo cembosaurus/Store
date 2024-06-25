@@ -7,14 +7,14 @@ using Business.Management.Services.Interfaces;
 
 namespace Business.Http.Services
 {
-    public class HttpGlobalSettingsBroadcast : IHttpGlobalSettingsBroadcast
+    public class HttpGlobalConfigBroadcast : IHttpGlobalConfigBroadcast
     {
 
         private IGlobal_Settings_PROVIDER _globalSettings_Provider;
 
 
 
-        public HttpGlobalSettingsBroadcast(IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER globalSettings_Provider)
+        public HttpGlobalConfigBroadcast(IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER globalSettings_Provider)
         {
             _globalSettings_Provider = globalSettings_Provider;
         }
@@ -23,7 +23,7 @@ namespace Business.Http.Services
 
 
 
-        public async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> UpdateRemoteServices()
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> BroadcastUpdate(Config_Global_AS_MODEL globalConfig)
         {
             return null;
         }

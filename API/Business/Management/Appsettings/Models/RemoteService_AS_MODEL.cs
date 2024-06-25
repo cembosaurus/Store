@@ -1,18 +1,19 @@
 ﻿using Business.Management.Enums;
 using Microsoft.IdentityModel.Tokens;
-using static Business.Management.Appsettings.Models.RemoteService_MODEL_AS.ServiceType;
+using System.IO;
+using System;
+using static Business.Management.Appsettings.Models.RemoteService_AS_MODEL.ServiceType;
 
 
 
 namespace Business.Management.Appsettings.Models
 {
-    public class RemoteService_MODEL_AS
+    public class RemoteService_AS_MODEL
     {
 
 
         public string Name { get; set; } = "";
         public List<ServiceType> Type { get; set; } = new List<ServiceType>();
-        public bool IsHTTPClient { get; set; }
 
 
 
@@ -64,38 +65,43 @@ namespace Business.Management.Appsettings.Models
 
 
 
-        public string GetBaseUrl(TypeOfService type, bool isProdEnv)
+        public string GetBaseUrl(TypeOfService typeName, bool isProdEnv)
         {
-            var url = Type.FirstOrDefault(t => t.Name == type.ToString()).BaseURL;
+            var url = Type.FirstOrDefault(t => t.Name == typeName.ToString())?.BaseURL;
 
-            return isProdEnv ? url.Prod : url.Dev;
+            return url == null ? 
+                "" : 
+                isProdEnv ? url.Prod : url.Dev;
         }
 
 
-        public string GetPathByName(TypeOfService type, string name)
+        public string GetPathByName(TypeOfService typeName, string name)
         {
-            return Type.FirstOrDefault(t => t.Name == type.ToString()).Paths.FirstOrDefault(p => p.Name == name).Route;
+            var path = Type.FirstOrDefault(t => t.Name == typeName.ToString())?.Paths.FirstOrDefault(p => p.Name == name)?.Route;
+
+            return path ?? "";
         }
 
 
-        public ICollection<URLPath> GetPaths(TypeOfService type)
+        public ICollection<URLPath> GetPaths(TypeOfService typeName)
         { 
-            return Type.Where(t => t.Name == type.ToString()).SelectMany(s => s.Paths).ToList();
+            var paths = Type.Where(t => t.Name == typeName.ToString())?.SelectMany(s => s.Paths)?.ToList();
+
+            return paths ?? new List<URLPath>();
         }
 
 
-        public string GetUrlWithPath(TypeOfService type, string pathName, bool isProdEnv)
+        public string GetUrlWithPath(TypeOfService typeName, string pathName, bool isProdEnv)
         {
-            if(string.IsNullOrWhiteSpace(pathName) || GetPaths(type).IsNullOrEmpty())
-                return GetBaseUrl(type, isProdEnv);
-
-            var url = GetBaseUrl(type, isProdEnv);
-            var path = GetPathByName(TypeOfService.REST, pathName);
-
-            if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(pathName) && GetPaths(typeName).IsNullOrEmpty())
                 return "";
 
-            return url += "/" + path;
+                var url = GetBaseUrl(typeName, isProdEnv);
+                var path = GetPathByName(TypeOfService.REST, pathName);
+
+            return string.IsNullOrWhiteSpace(url) && string.IsNullOrWhiteSpace(path) 
+                ? "" 
+                : url += "/" + path;
         }
 
     }

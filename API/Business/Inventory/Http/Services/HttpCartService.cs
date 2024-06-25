@@ -16,7 +16,7 @@ namespace Business.Inventory.Http.Services
     public class HttpCartService : HttpBaseService, IHttpCartService
     {
 
-        public HttpCartService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
+        public HttpCartService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";

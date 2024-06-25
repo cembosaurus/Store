@@ -13,11 +13,11 @@ namespace Business.Management.Appsettings
     public class Appsettings_PROVIDER : IAppsettings_PROVIDER
     {
 
-        private IOptionsMonitor<Config_Global_MODEL_AS> _config_global;
+        private IOptionsMonitor<Config_Global_AS_MODEL> _config_global;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
-        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_MODEL_AS> config_global, IServiceScopeFactory serviceFactory)
+        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_AS_MODEL> config_global, IServiceScopeFactory serviceFactory)
         {
             _config_global = config_global;
             _serviceFactory = serviceFactory;
@@ -26,7 +26,7 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> GetAllRemoteServicesModels()
+        public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetAllRemoteServicesModels()
         {
            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
@@ -36,14 +36,14 @@ namespace Business.Management.Appsettings
                 var configResult = _config_global.CurrentValue.RemoteServices;
 
                 if(configResult.IsNullOrEmpty())
-                    return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, false, $"Remote Service models were NOT found in Global Appsettings !");
+                    return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(configResult, false, $"Remote Service models were NOT found in Global Appsettings !");
 
-                return resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(configResult, true);
+                return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(configResult, true);
             }
         }
 
 
-        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceModel(string name)
+        public IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceModel(string name)
         {
             // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
@@ -53,7 +53,7 @@ namespace Business.Management.Appsettings
                 var configResult = _config_global.CurrentValue.RemoteServices;
 
                 if (configResult.IsNullOrEmpty())
-                    return resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Global config data were NOT found in Appsettings !");
+                    return resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Global config data were NOT found in Appsettings !");
 
                 var model = configResult.FirstOrDefault(url => url.Name == name);
 
@@ -109,7 +109,7 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<RabbitMQ_MODEL_AS> GetRabbitMQ()
+        public IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ()
         {
             // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
@@ -121,16 +121,16 @@ namespace Business.Management.Appsettings
 
                 if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(port))
                 {
-                    return resultFact.Result<RabbitMQ_MODEL_AS>(null, false, $"Missing or incomplete RabbitMQ config data were found in Appsettings ! Host: '{host}', Port: '{port}'");
+                    return resultFact.Result<RabbitMQ_AS_MODEL>(null, false, $"Missing or incomplete RabbitMQ config data were found in Appsettings ! Host: '{host}', Port: '{port}'");
                 }
 
-                return resultFact.Result(new RabbitMQ_MODEL_AS { Host = host, Port = port}, true);
+                return resultFact.Result(new RabbitMQ_AS_MODEL { Host = host, Port = port}, true);
             }
         }
 
 
 
-        public IServiceResult<Config_Global_MODEL_AS> GetGlobalConfig()
+        public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
         {
             // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())

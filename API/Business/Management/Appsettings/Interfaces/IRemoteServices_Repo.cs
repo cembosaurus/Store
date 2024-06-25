@@ -6,16 +6,15 @@ namespace Business.Management.Appsettings.Interfaces
     {
         bool DeleteByBaseURL(string baseURL);
         bool DeleteByName(string name);
-        ICollection<RemoteService_MODEL_AS> GetAll();
-        RemoteService_MODEL_AS GetByBaseURL(string baseURL);
-        RemoteService_MODEL_AS GetByName(string name);
-        ICollection<RemoteService_MODEL_AS> GetByPathName(string pathName);
-        ICollection<RemoteService_MODEL_AS> GetByPathRoure(string pathRoute);
-        ICollection<RemoteService_MODEL_AS> GetByType(string type);
-        ICollection<RemoteService_MODEL_AS> GetHttpClients();
-        bool InitializeDB(ICollection<RemoteService_MODEL_AS> data);
+        ICollection<RemoteService_AS_MODEL> GetAll();
+        RemoteService_AS_MODEL GetByBaseURL(string baseURL);
+        RemoteService_AS_MODEL GetByName(string name);
+        ICollection<RemoteService_AS_MODEL> GetByPathName(string pathName);
+        ICollection<RemoteService_AS_MODEL> GetByPathRoure(string pathRoute);
+        ICollection<RemoteService_AS_MODEL> GetByType(string type);
+        bool Initialize(ICollection<RemoteService_AS_MODEL> data);
         bool IsEmpty();
-        bool UpdateByBaseURL(string baseURL, RemoteService_MODEL_AS serviceURL);
-        bool UpdateByName(string name, RemoteService_MODEL_AS serviceURL);
+        bool UpdateByBaseURL(string baseURL, RemoteService_AS_MODEL serviceURL);
+        bool UpdateByName(string name, RemoteService_AS_MODEL serviceURL);
     }
 }

@@ -1,11 +1,14 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+
+
 
 
 namespace Business.Management.Services
@@ -13,16 +16,16 @@ namespace Business.Management.Services
     public class Global_Settings_PROVIDER : IGlobal_Settings_PROVIDER
     {
         private readonly bool _isProdEnv;
-        private IRemoteServices_REPO _remoteServices_Repo;
+        private Config_Global_REPO _config_global_Repo;
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
 
 
 
-        public Global_Settings_PROVIDER(IHostingEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
+        public Global_Settings_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, Config_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
         {
             _isProdEnv = env.IsProduction();
-            _remoteServices_Repo = config_global_Repo.RemoteServices;
+            _config_global_Repo = config_global_Repo;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
         }
@@ -32,38 +35,38 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<bool> IsEmpty()
+        public IServiceResult<bool> IsEmpty_RemoteServiceModels()
         {
-            return _resultFact.Result(_remoteServices_Repo.IsEmpty(), true);
+            return _resultFact.Result(_config_global_Repo.RemoteServices.IsEmpty(), true);
         }
 
 
-        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceByName(string name) 
+        public IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceByName(string name) 
         {
             if(string.IsNullOrWhiteSpace(name))
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service name was NOT provided !");
-            if(_remoteServices_Repo.IsEmpty())
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service.");
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, "Remote Service name was NOT provided !");
+            if(_config_global_Repo.RemoteServices.IsEmpty())
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service.");
 
-            var serviceModel = _remoteServices_Repo.GetByName(name);
+            var serviceModel = _config_global_Repo.RemoteServices.GetByName(name);
 
             if (serviceModel == null)
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Service '{name}' was NOT found ! n\\ Possible solution: Reload models from Management service.");
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Service '{name}' was NOT found ! n\\ Possible solution: Reload models from Management service.");
             if (string.IsNullOrWhiteSpace(serviceModel.GetBaseUrl(TypeOfService.REST, _isProdEnv)))
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Service '{name}' was found but there is missing Base URL !");
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Service '{name}' was found but there is missing Base URL !");
 
             return _resultFact.Result(serviceModel, true);
         }
 
 
-        public IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceByBaseURL(string baseURL)
+        public IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceByBaseURL(string baseURL)
         {
             if (string.IsNullOrWhiteSpace(baseURL))
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, "Remote Service Base URL was NOT provided !");
-            if (_remoteServices_Repo.IsEmpty())
-                return _resultFact.Result<RemoteService_MODEL_AS>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service.");
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, "Remote Service Base URL was NOT provided !");
+            if (_config_global_Repo.RemoteServices.IsEmpty())
+                return _resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service.");
 
-            var serviceModel = _remoteServices_Repo.GetByBaseURL(baseURL);
+            var serviceModel = _config_global_Repo.RemoteServices.GetByBaseURL(baseURL);
 
             if (serviceModel == null)
                 return _resultFact.Result(serviceModel, false, $"Service model with Base URL '{baseURL}' was NOT found !");
@@ -95,7 +98,7 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_MODEL_AS serviceUrl, string pathName)
+        public IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_AS_MODEL serviceUrl, string pathName)
         {
             if (string.IsNullOrWhiteSpace(serviceUrl.Name))
                 return _resultFact.Result("", false, "Remote Service name is missing !");
@@ -117,33 +120,17 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> GetRemoteServices_WithHTTPClient()
+        public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetRemoteServices_WithGlobalConfig()
         {
-            if (_remoteServices_Repo.IsEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service Appsettings.");
+            if (_config_global_Repo.RemoteServices.IsEmpty())
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Remote Services repo is empty ! n\\ Possible solution: Reload models from Management service Appsettings.");
 
-            var serviceModels = _remoteServices_Repo.GetHttpClients();
+            var serviceModels = _config_global_Repo.RemoteServices.GetByPathName("GlobalConfig");
 
             if (serviceModels.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Service models with HTTP Clients were NOT found ! n\\ Possible solution: Reload models from Management service Appsettings.");
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Service models with HTTP Clients were NOT found ! n\\ Possible solution: Reload models from Management service Appsettings.");
 
-            return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(serviceModels, true);
-        }
-
-
-
-
-        public IServiceResult<bool> IsRemoteServiceHttpClient(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return _resultFact.Result(false, false, "Remote Service name was NOT provided !");
-
-            var result = GetRemoteServiceByName(name);
-
-            if (!result.Status)
-                return _resultFact.Result(result.Status, result.Status, result.Message);
-
-            return _resultFact.Result(result.Data.IsHTTPClient, result.Status);
+            return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(serviceModels, true);
         }
 
 
@@ -152,20 +139,41 @@ namespace Business.Management.Services
 
 
 
-
+        // HTTP
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<RemoteService_MODEL_AS>>> ReLoadRemoteServices()
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> ReLoad()
+        {
+            var result = await _httpManagementService.GetGlobalConfig();
+
+            if (!result.Status || result.Data == null)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config was NOT received from Management service ! Reason: {result.Message}");
+
+            result = Update(result.Data);
+
+            return result;
+        }
+
+
+
+        // HTTP
+        // For ALL services !
+        // UPDATE Remote Services models by GET response from Management service:
+        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServices()
         {
             var result = await _httpManagementService.GetAllRemoteServices();
 
             if (!result.Status || result.Data.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Remote Services models were NOT received from Management service ! Reason: {result.Message}");
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Remote Services models were NOT received from Management service ! Reason: {result.Message}");
 
-            result =  UpdateRemoteServiceModels(result.Data);
+            result = UpdateRemoteServiceModels(result.Data);
 
             return result;
         }
+
+
+
+
 
 
 
@@ -174,12 +182,29 @@ namespace Business.Management.Services
 
         // WARNING: in K8 only one replica (NOT all) of this service will be chosen for PUT request by load balancer!
         // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
-        public IServiceResult<IEnumerable<RemoteService_MODEL_AS>> UpdateRemoteServiceModels(IEnumerable<RemoteService_MODEL_AS> servicesModels)
+        public IServiceResult<Config_Global_AS_MODEL> Update(Config_Global_AS_MODEL config)
         {
-            Console.WriteLine($"--> UPDATING Services models ......");
+            if (config == null)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config data for Management service was NOT provided !");
 
+
+            _config_global_Repo.Initialize(config);
+
+            return _resultFact.Result(config, true);
+        }
+
+
+
+
+        // For MANAGEMENT service !
+        // UPDATE Remote Services models by incoming PUT request from Management API service:
+
+        // WARNING: in K8 only one replica (NOT all) of this service will be chosen for PUT request by load balancer!
+        // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
+        public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> UpdateRemoteServiceModels(IEnumerable<RemoteService_AS_MODEL> servicesModels)
+        {
             if (servicesModels.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_MODEL_AS>>(null, false, $"Services models for Management service were NOT provided !");
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Services models for Management service were NOT provided !");
 
             var message = "WARNING ! There were missing data in provided Services models: ";
 
@@ -197,7 +222,7 @@ namespace Business.Management.Services
                 }
             }
 
-            _remoteServices_Repo.InitializeDB(servicesModels.ToList());
+            _config_global_Repo.RemoteServices.Initialize(servicesModels.ToList());
 
             return _resultFact.Result(servicesModels, true);
         }

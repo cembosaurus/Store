@@ -56,7 +56,7 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
 
 
 
-                            To Do: GLOBAL SETTINGS provider -- RELOAD all global settings notr just remote services -- for later use in management-worker !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            To Do: GLOBAL SETTINGS provider -- RELOAD all global settings notr just remote services -- for later use in management-worker, AND global settings REPO -> Update() to update whole GC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 

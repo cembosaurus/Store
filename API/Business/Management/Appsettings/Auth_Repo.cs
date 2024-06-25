@@ -1,6 +1,6 @@
-﻿using Business.Management.Appsettings.Interfaces;
+﻿using AutoMapper;
+using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
-using Business.Management.Data;
 
 
 
@@ -8,15 +8,25 @@ namespace Business.Management.Appsettings
 {
     public class Auth_REPO : IAuth_REPO
     {
-        private Auth_MODEL_AS _auth;
 
-        public Auth_REPO(Config_Global_DB config_global_DB)
+        private Auth_AS_MODEL _auth;
+        private IMapper _mapper;
+
+
+
+        public Auth_REPO(Auth_AS_MODEL auth, IMapper mapper)
         {
-            _auth = config_global_DB.Auth;
+            _auth = auth;
+            _mapper = mapper;
         }
 
 
-        public Auth_MODEL_AS Get => _auth;
+
+
+        public Auth_AS_MODEL Get => _auth;
+
+        public void Initi8alize(Auth_AS_MODEL auth) => _auth = _mapper.Map<Auth_AS_MODEL>(auth);
+        
 
 
 

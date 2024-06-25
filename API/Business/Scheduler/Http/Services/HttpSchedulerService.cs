@@ -15,7 +15,7 @@ namespace Business.Scheduler.Http.Services
     public class HttpSchedulerService : HttpBaseService, IHttpSchedulerService
     {
 
-        public HttpSchedulerService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
+        public HttpSchedulerService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
             : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "SchedulerService";

@@ -5,11 +5,11 @@ namespace Business.Management.Appsettings.Interfaces
 {
     public interface IAppsettings_PROVIDER
     {
-        IServiceResult<Config_Global_MODEL_AS> GetGlobalConfig();
-        IServiceResult<IEnumerable<RemoteService_MODEL_AS>> GetAllRemoteServicesModels();
+        IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetAllRemoteServicesModels();
         IServiceResult<string> GetApiKey();
+        IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig();
         IServiceResult<string> GetJWTKey();
-        IServiceResult<RabbitMQ_MODEL_AS> GetRabbitMQ();
-        IServiceResult<RemoteService_MODEL_AS> GetRemoteServiceModel(string name);
+        IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ();
+        IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceModel(string name);
     }
 }

@@ -12,6 +12,6 @@ namespace Business.Http.Controllers.Interfaces
         [ApiKeyAuth]
         [AllowAnonymous]
         [HttpPut("remoteservices/models")]
-        ActionResult UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_MODEL_AS> models);
+        ActionResult UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_AS_MODEL> models);
     }
 }

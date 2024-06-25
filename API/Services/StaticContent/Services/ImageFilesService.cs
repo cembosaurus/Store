@@ -15,7 +15,7 @@ namespace StaticContent.Services
             _conf = conf;
 
             // Images will be moved into DB:
-            _imagePath = _conf.GetSection("Images").Value;
+            _imagePath = _conf.GetSection("Congif.Local:Images").Value;
         }
 
 

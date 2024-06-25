@@ -1,6 +1,8 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
+using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
@@ -30,20 +32,21 @@ builder.Services.AddControllers();
 
 builder.Services.AddHostedService<Management_Worker>();
 
-builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
-
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddSingleton<FileSystemWatcher>();
 builder.Services.AddSingleton<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 
+builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
+builder.Services.AddSingleton<Config_Global_DB>();
+builder.Services.AddScoped<Config_Global_REPO>();
+builder.Services.AddScoped<IHttpGlobalConfigBroadcast, HttpGlobalConfigBroadcast>();
+
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.Configure<Config_Global_MODEL_AS>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();

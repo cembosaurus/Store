@@ -11,14 +11,14 @@ namespace Management.Controllers
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class RemoteServiceController : ControllerBase
+    public class GlobalConfigController : ControllerBase
     {
 
         private readonly IAppsettings_PROVIDER _appsettings_Provider;
 
 
 
-        public RemoteServiceController(IAppsettings_PROVIDER appsettings_Provider)
+        public GlobalConfigController(IAppsettings_PROVIDER appsettings_Provider)
         {
             _appsettings_Provider = appsettings_Provider;
         }
@@ -29,8 +29,20 @@ namespace Management.Controllers
 
         [ApiKeyAuth]
         [AllowAnonymous]
-        [HttpGet("url/all")]
-        public ActionResult GetAllServicesURL()
+        [HttpGet()]
+        public ActionResult GetGlobalConfig()
+        {
+            var result = _appsettings_Provider.GetGlobalConfig();
+
+            return result.Status ? Ok(result) : BadRequest(result);
+        }
+
+
+
+        [ApiKeyAuth]
+        [AllowAnonymous]
+        [HttpGet("services")]
+        public ActionResult GetAllServiceModels()
         {
             var result = _appsettings_Provider.GetAllRemoteServicesModels();
 

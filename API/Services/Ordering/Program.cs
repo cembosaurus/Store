@@ -50,12 +50,12 @@ builder.Services.AddControllers(opt =>
 });
 
 builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<Config_Global_REPO>();
 builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>();
-builder.Services.Configure<Config_Global_MODEL_AS>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

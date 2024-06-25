@@ -3,15 +3,17 @@ using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ordering.Controllers.Management
+
+
+namespace Identity.Controllers.Management
 {
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public partial class GlobalSettingsController : GlobalSettingsBaseController
+    public partial class GlobalConfigController : GlobalConfigBaseController
     {
 
-        public GlobalSettingsController(IGlobal_Settings_PROVIDER globalSettings_Provider)
+        public GlobalConfigController(IGlobal_Settings_PROVIDER globalSettings_Provider)
             : base(globalSettings_Provider)
         {
         }

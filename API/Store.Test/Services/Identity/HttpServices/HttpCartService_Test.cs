@@ -31,7 +31,7 @@ namespace Store.Test.Services.Identity.HttpServices
         private Mock<IHttpAppClient> _httpAppClient;
         private HttpContent _content;
 
-        private IHostingEnvironment env;
+        private IWebHostEnvironment env;
         private IExId exId;
         private IAppsettings_PROVIDER appsettingsService;
         private IGlobal_Settings_PROVIDER remoteServices_Provider;

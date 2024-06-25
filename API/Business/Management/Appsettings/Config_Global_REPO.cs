@@ -1,45 +1,38 @@
-﻿using Business.Management.Appsettings.Interfaces;
+﻿using AutoMapper;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
 using Business.Management.Data;
 
 
 
 namespace Business.Management.Appsettings
 {
-    public class Config_Global_REPO : IConfig_Global_REPO
-    {
-
-        private IRemoteServices_REPO _remoteServices;
-        private IAuth_REPO _auth;
-        private IRabbitMQ_REPO _rabbitMQ;
-
+    public class Config_Global_REPO
+    {        
+        
+        private Config_Global_AS_MODEL _globalConfig;
+        private IMapper _mapper;
 
 
-        public Config_Global_REPO(Config_Global_DB config_global_DB)
+        public Config_Global_REPO(Config_Global_DB config_global_DB, IMapper mapper)
         {
-            _remoteServices = new RemoteServices_REPO(config_global_DB);
-            _auth = new Auth_REPO(config_global_DB);
-            _rabbitMQ = new RabbitMQ_REPO(config_global_DB);
+            _globalConfig = config_global_DB.Data;
+            RemoteServices = new RemoteServices_REPO(config_global_DB.Data.RemoteServices, mapper);
+            Auth = new Auth_REPO(config_global_DB.Data.Auth, mapper);
+            RabbitMQ = new RabbitMQ_REPO(config_global_DB.Data.RabbitMQ, mapper);
+            _mapper = mapper;
         }
 
 
 
-        public IRemoteServices_REPO RemoteServices
-        {
-            get { return _remoteServices; }
-            set { _remoteServices = value; }
-        }
 
-        public IAuth_REPO Auth
-        {
-            get { return _auth; }
-            set { _auth = value; }
-        }
+        public IRemoteServices_REPO RemoteServices;
 
-        public IRabbitMQ_REPO RabbitMQ
-        {
-            get { return _rabbitMQ; }
-            set { _rabbitMQ = value; }
-        }
+        public IAuth_REPO Auth;
+
+        public IRabbitMQ_REPO RabbitMQ;
+
+        public void Initialize(Config_Global_AS_MODEL globalConfig) => _globalConfig = _mapper.Map<Config_Global_AS_MODEL>(globalConfig);
 
 
     }

@@ -8,9 +8,9 @@ using Business.Management.Enums;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -31,7 +31,7 @@ namespace Business.Http.Services
         protected readonly IServiceResultFactory _resultFact;
 
         protected bool _useApiKey;
-        protected RemoteService_MODEL_AS _service_model;
+        protected RemoteService_AS_MODEL _service_model;
         protected HttpRequestMessage _requestMessage;
         protected string _remoteServiceName;
         protected string _remoteServicePathName;
@@ -47,7 +47,7 @@ namespace Business.Http.Services
 
 
 
-        public HttpBaseService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER global_settings_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER global_settings_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
@@ -57,7 +57,7 @@ namespace Business.Http.Services
             _resultFact = resultFact;
         }
         // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
-        public HttpBaseService(IHostingEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpBaseService(IWebHostEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _appsettings_Provider = appsettings_Provider;
@@ -244,7 +244,7 @@ namespace Business.Http.Services
 
 
 
-        protected virtual IServiceResult<RemoteService_MODEL_AS> GetServiceModel()
+        protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel()
         {
             return _global_settings_Provider.GetRemoteServiceByName(_remoteServiceName);
         }

@@ -15,7 +15,7 @@ namespace Business.Identity.Http.Services
     public class HttpUserService : HttpBaseService, IHttpUserService
     {
 
-        public HttpUserService(IHostingEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact) :
+        public HttpUserService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact) :
         base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "IdentityService";
