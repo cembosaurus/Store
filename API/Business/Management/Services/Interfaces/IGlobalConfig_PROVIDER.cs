@@ -3,8 +3,12 @@ using Business.Management.Appsettings.Models;
 
 namespace Business.Management.Services.Interfaces
 {
-    public interface IGlobal_Settings_PROVIDER
+    public interface IGlobalConfig_PROVIDER
     {
+        IServiceResult<string> GetApiKey();
+        IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig();
+        IServiceResult<string> GetJWTKey();
+        IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ();
         IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceByBaseURL(string baseURL);
         IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceByName(string name);
         IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetRemoteServices_WithGlobalConfig();

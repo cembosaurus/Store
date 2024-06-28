@@ -56,12 +56,13 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
 
 
 
-                            To Do: GLOBAL SETTINGS provider -- RELOAD all global settings notr just remote services -- for later use in management-worker, AND global settings REPO -> Update() to update whole GC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            To Do: ALL HTTP services --> make only one HTTP method. All parameters (get/post/del, query string, content ...) inserted by callers (services)
+
+                            To Do: ----------------------------> WHAT if Management API service sends new Global Config UPDATE with NEW/UPDATED Management API service URL to all services ????????????????????????????????????????????????????????????????? Implement UPDATE/Rewrite functionality to correct data in Appsettings !!!
 
 
 
 
-                            To Do: CHANGE appsetings distribution in rabbitMQ services as well
                             To Do: ManagementService - > functionality for managinfg the remote services (ID's, etc)
 
                                                 

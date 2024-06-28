@@ -37,10 +37,10 @@ builder.Services.AddSingleton<FileSystemWatcher>();
 builder.Services.AddSingleton<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 
-builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
+builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<Config_Global_REPO>();
-builder.Services.AddScoped<IHttpGlobalConfigBroadcast, HttpGlobalConfigBroadcast>();
+builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<IHttpGlobalConfigService, HttpGlobalConfigService>();
 
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();

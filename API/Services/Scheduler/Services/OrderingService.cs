@@ -28,7 +28,7 @@ namespace Scheduler.Services
             _httpCartService = httpCartService;
             _resultFact = resultFact;
             _mapper = mapper;
-            int.TryParse(config.GetSection("Congif.Local:ItemsLock:ItemLockedForDays").Value, out _lockedForDays);
+            int.TryParse(config.GetSection("Config.Local:ItemsLock:ItemLockedForDays").Value, out _lockedForDays);
         }
 
 

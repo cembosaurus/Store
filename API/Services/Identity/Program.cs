@@ -54,15 +54,15 @@ builder.Services.AddFluentValidation(conf => {
 });
 
 builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<Config_Global_REPO>();
-builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
+builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 //builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddSingleton<IExId, ExId>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Congif.Local:ConnectionStrings:IdentityConnStr").Value));
+builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:IdentityConnStr").Value));
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

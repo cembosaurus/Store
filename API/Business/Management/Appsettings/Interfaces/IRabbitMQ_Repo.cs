@@ -1,11 +1,14 @@
 ﻿using Business.Management.Appsettings.Models;
+using static Business.Management.Appsettings.Models.RabbitMQ_AS_MODEL;
 
 namespace Business.Management.Appsettings.Interfaces
 {
     public interface IRabbitMQ_REPO
     {
-        RabbitMQ_AS_MODEL Get { get; }
+        RabbitMQ_AS_MODEL Data { get; }
 
-        void Initi8alize(RabbitMQ_AS_MODEL rabbitMQ);
+        Env Client(bool isProdEnv);
+        Env Server(bool isProdEnv);
+        void Initialize(RabbitMQ_AS_MODEL rabbitMQ);
     }
 }

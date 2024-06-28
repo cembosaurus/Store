@@ -14,6 +14,7 @@ namespace Business.Management.Data
             Data = new Config_Global_AS_MODEL();
         }
 
+
         public Config_Global_AS_MODEL Data;
 
     }

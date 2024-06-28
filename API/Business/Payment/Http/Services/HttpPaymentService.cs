@@ -2,7 +2,6 @@
 using Business.Http.Clients;
 using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Ordering.DTOs;
 using Business.Payment.DTOs;
@@ -16,8 +15,8 @@ namespace Business.Payment.Http.Services
     public class HttpPaymentService : HttpBaseService, IHttpPaymentService
     {
 
-        public HttpPaymentService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpPaymentService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER remoteServices_Provider)
+            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "PaymentService";
             _remoteServicePathName = "Payment";

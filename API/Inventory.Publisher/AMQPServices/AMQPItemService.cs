@@ -20,7 +20,7 @@ namespace Inventory.Publisher.AMQPServices
         public AMQPItemService(IAMQClient amqpItemClient, IServiceResultFactory resultFact, IHttpContextAccessor accessor, IConfiguration config)
         {
             _amqpItemClient = amqpItemClient;
-            _amqpItemClient.RequestQueueName = config.GetSection("RabbitMQ:ItemRequestQueueName").Value;
+            _amqpItemClient.RequestQueueName = config.GetSection("RabbitMQ:Server:ItemRequestQueueName").Value;
             _resultFact = resultFact;
             _accessor = accessor;
         }

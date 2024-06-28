@@ -45,8 +45,8 @@ builder.Services.AddControllers(opt =>
 });
 
 builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<Config_Global_REPO>();
-builder.Services.AddScoped<IGlobal_Settings_PROVIDER, Global_Settings_PROVIDER>();
+builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>();
@@ -63,7 +63,7 @@ builder.Services.RegisterSchedulerTasks(builder.Configuration);
 
 builder.Services.AddTransient<IRunAtStartup, RunAtStartup>();
 
-builder.Services.AddDbContext<SchedulerDBContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Congif.Local:ConnectionStrings:SchedulerConnStr").Value, opt => opt.EnableRetryOnFailure()));
+builder.Services.AddDbContext<SchedulerDBContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:SchedulerConnStr").Value, opt => opt.EnableRetryOnFailure()));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();

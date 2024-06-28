@@ -18,7 +18,7 @@ namespace Business.Management.Http.Services
 
 
         public HttpManagementService(IWebHostEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
-            : base(env, appsettings_Provider, httpAppClient, resultFact)
+            : base(env, httpAppClient, resultFact)
         {
             _remoteServiceName = "ManagementService";
             _remoteServicePathName = "GlobalConfig";
@@ -35,10 +35,23 @@ namespace Business.Management.Http.Services
             return await _httpAppClient.Send(_requestMessage);
         }
 
+
         protected override IServiceResult<RemoteService_AS_MODEL> GetServiceModel()
         {
             return _appsettings_Provider.GetRemoteServiceModel(_remoteServiceName);
         }
+
+
+        protected override IServiceResult<bool> AddApiKeyToHeader()
+        {
+            var apiKeyResult = _appsettings_Provider.GetApiKey();
+
+            if (apiKeyResult.Status)
+                _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
+
+            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request '{_remoteServiceName}/{_remoteServicePathName}': {apiKeyResult.Message}");
+        }
+
 
 
 
@@ -64,6 +77,8 @@ namespace Business.Management.Http.Services
 
             return await HTTP_Request_Handler<IEnumerable<RemoteService_AS_MODEL>>();
         }
+
+
 
     }
 }

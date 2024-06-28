@@ -13,56 +13,52 @@ namespace Business.Management.Appsettings
     public class Appsettings_PROVIDER : IAppsettings_PROVIDER
     {
 
-        private IOptionsMonitor<Config_Global_AS_MODEL> _config_global;
+
+        private IOptionsMonitor<Config_Global_AS_MODEL> _appsettings_config_global;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
-        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_AS_MODEL> config_global, IServiceScopeFactory serviceFactory)
+
+        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_AS_MODEL> appsettings_config_global, IServiceScopeFactory serviceFactory)
         {
-            _config_global = config_global;
+            _appsettings_config_global = appsettings_config_global;
             _serviceFactory = serviceFactory;
         }
 
 
 
 
+
+
+
         public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetAllRemoteServicesModels()
         {
-           // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var configResult = _config_global.CurrentValue.RemoteServices;
+                var remoteServices = _appsettings_config_global.CurrentValue.RemoteServices;
 
-                if(configResult.IsNullOrEmpty())
-                    return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(configResult, false, $"Remote Service models were NOT found in Global Appsettings !");
-
-                return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(configResult, true);
+                return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(remoteServices, !remoteServices.IsNullOrEmpty(), remoteServices.IsNullOrEmpty() 
+                    ? $"Remote Service models were NOT found in Global Appsettings !" : "");
             }
         }
 
 
         public IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceModel(string name)
         {
-            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var configResult = _config_global.CurrentValue.RemoteServices;
+                var remoteServices = _appsettings_config_global.CurrentValue.RemoteServices;
 
-                if (configResult.IsNullOrEmpty())
+                if (remoteServices.IsNullOrEmpty())
                     return resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Global config data were NOT found in Appsettings !");
 
-                var model = configResult.FirstOrDefault(url => url.Name == name);
-
-                if (model == null)
-                {
-                    return resultFact.Result(model, false, $"URL for service '{name}' was NOT found in Appsettings !");
-                }
+                var model = remoteServices.FirstOrDefault(url => url.Name == name);
                 
-                return resultFact.Result(model, true);
+                return resultFact.Result(model, model != null, model == null ? $"URL for service '{name}' was NOT found in Appsettings !" : "");
             }
         }
 
@@ -71,19 +67,13 @@ namespace Business.Management.Appsettings
 
         public IServiceResult<string> GetApiKey()
         {
-            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var apiKey = _config_global.CurrentValue.Auth.ApiKey;
+                var apiKey = _appsettings_config_global.CurrentValue.Auth.ApiKey;
 
-                if (string.IsNullOrWhiteSpace(apiKey))
-                {
-                    return resultFact.Result("", false, $"API-Key was NOT found in Appsettings !");
-                }
-
-                return resultFact.Result(apiKey, true);
+                return resultFact.Result(apiKey, !string.IsNullOrWhiteSpace(apiKey), string.IsNullOrWhiteSpace(apiKey) ? "API-Key was NOT found in Appsettings !" : "");
             }
         }
 
@@ -91,19 +81,13 @@ namespace Business.Management.Appsettings
 
         public IServiceResult<string> GetJWTKey()
         {
-            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var JWTKey = _config_global.CurrentValue.Auth.JWTKey;
+                var JWTKey = _appsettings_config_global.CurrentValue.Auth.JWTKey;
 
-                if (string.IsNullOrWhiteSpace(JWTKey))
-                {
-                    return resultFact.Result("", false, $"JWT-Key was NOT found in Appsettings !");
-                }
-
-                return resultFact.Result(JWTKey, true);
+                return resultFact.Result(JWTKey, !string.IsNullOrWhiteSpace(JWTKey), string.IsNullOrWhiteSpace(JWTKey) ? $"JWT-Key was NOT found in Appsettings !" : "");
             }
         }
 
@@ -111,20 +95,13 @@ namespace Business.Management.Appsettings
 
         public IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ()
         {
-            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var host = _config_global.CurrentValue.RabbitMQ.Host;
-                var port = _config_global.CurrentValue.RabbitMQ.Port;
-
-                if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(port))
-                {
-                    return resultFact.Result<RabbitMQ_AS_MODEL>(null, false, $"Missing or incomplete RabbitMQ config data were found in Appsettings ! Host: '{host}', Port: '{port}'");
-                }
-
-                return resultFact.Result(new RabbitMQ_AS_MODEL { Host = host, Port = port}, true);
+                var rabbitMQ = _appsettings_config_global.CurrentValue.RabbitMQ;
+                
+                return resultFact.Result(rabbitMQ, rabbitMQ != null, rabbitMQ == null ? $"RabbitMQ data were NOT found in Appsettings !" : "");
             }
         }
 
@@ -132,19 +109,13 @@ namespace Business.Management.Appsettings
 
         public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
         {
-            // create scope of IServiceResultFactory inside this singleton:
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var globalConfig = _config_global.CurrentValue;
+                var globalConfig = _appsettings_config_global.CurrentValue;
 
-                if (globalConfig == null)
-                {
-                    return resultFact.Result(globalConfig, false, $"Global Config data were NOT found in Appsettings !");
-                }
-
-                return resultFact.Result(globalConfig, true);
+                return resultFact.Result(globalConfig, globalConfig != null, globalConfig == null ? $"Global Config data were NOT found in Appsettings !" : "");
             }
         }
 

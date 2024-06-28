@@ -11,7 +11,7 @@ namespace Ordering.Controllers.Management
     public partial class GlobalConfigController : GlobalConfigBaseController
     {
 
-        public GlobalConfigController(IGlobal_Settings_PROVIDER globalSettings_Provider)
+        public GlobalConfigController(IGlobalConfig_PROVIDER globalSettings_Provider)
             : base(globalSettings_Provider)
         {
         }

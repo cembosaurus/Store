@@ -12,11 +12,11 @@ namespace Business.Http.Controllers
     [ApiController]
     public partial class GlobalConfigBaseController : ControllerBase, IHttpBroadcastController
     {
-        private IGlobal_Settings_PROVIDER _globalSettings_Provider;
+        private IGlobalConfig_PROVIDER _globalSettings_Provider;
 
 
 
-        public GlobalConfigBaseController(IGlobal_Settings_PROVIDER globalSettings_Provider)
+        public GlobalConfigBaseController(IGlobalConfig_PROVIDER globalSettings_Provider)
         {
             _globalSettings_Provider = globalSettings_Provider;
         }

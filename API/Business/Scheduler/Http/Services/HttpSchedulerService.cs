@@ -2,7 +2,6 @@
 using Business.Http.Clients;
 using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Scheduler.DTOs;
 using Business.Scheduler.Http.Services.Interfaces;
@@ -15,8 +14,8 @@ namespace Business.Scheduler.Http.Services
     public class HttpSchedulerService : HttpBaseService, IHttpSchedulerService
     {
 
-        public HttpSchedulerService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpSchedulerService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER remoteServices_Provider)
+            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "SchedulerService";
             _remoteServicePathName = "Scheduler";

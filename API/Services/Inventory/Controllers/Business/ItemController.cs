@@ -15,11 +15,11 @@ namespace Inventory.Controllers.Business
 
         private readonly IItemService _itemService;
 
+
         public ItemController(IItemService itemService)
         {
             _itemService = itemService;
         }
-
 
 
 

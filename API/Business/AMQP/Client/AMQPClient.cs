@@ -42,10 +42,10 @@ namespace Business.AMQP.Client
             _accessor = accessor;
             _resultFact = resultFact;
 
-            _host = config.GetSection("RabbitMQ:Host").Value;
-            int.TryParse(config.GetSection("RabbitMQ:Port").Value, out _port);
-            int.TryParse(config.GetSection("RabbitMQ:ResultAwaitSeconds").Value, out _resultAwaitSeconds);
-            int.TryParse(config.GetSection("RabbitMQ:ResultPollingIntervalSeconds").Value, out _resultPollingIntervalSeconds);
+            _host = config.GetSection("RabbitMQ:Server:Host").Value;
+            int.TryParse(config.GetSection("RabbitMQ:Server:Port").Value, out _port);
+            int.TryParse(config.GetSection("RabbitMQ:Server:ResultAwaitSeconds").Value, out _resultAwaitSeconds);
+            int.TryParse(config.GetSection("RabbitMQ:Server:ResultPollingIntervalSeconds").Value, out _resultPollingIntervalSeconds);
             _connFact = new ConnectionFactory()
             {
                 HostName = _host,

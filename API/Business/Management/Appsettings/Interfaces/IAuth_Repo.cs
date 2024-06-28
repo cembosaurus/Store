@@ -4,8 +4,10 @@ namespace Business.Management.Appsettings.Interfaces
 {
     public interface IAuth_REPO
     {
-        Auth_AS_MODEL Get { get; }
+        string Apikey { get; }
+        Auth_AS_MODEL Data { get; }
+        string JWTKey { get; }
 
-        void Initi8alize(Auth_AS_MODEL auth);
+        void Initialize(Auth_AS_MODEL auth);
     }
 }

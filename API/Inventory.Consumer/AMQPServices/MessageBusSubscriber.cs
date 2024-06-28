@@ -6,6 +6,8 @@ using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
+
+
 namespace Inventory.Consumer.AMQPServices
 {
     public class MessageBusSubscriber : BackgroundService, IMessageBusSubscriber
@@ -30,11 +32,11 @@ namespace Inventory.Consumer.AMQPServices
             _resultFact = resultFact;
             _config = config;
 
-            _requestQueueName = _config.GetSection("RabbitMQ:ItemRequestQueueName").Value;
+            _requestQueueName = _config.GetSection("RabbitMQ:Server:ItemRequestQueueName").Value;
             _connFact = new ConnectionFactory()
             {
-                HostName = _config.GetSection("RabbitMQ:Host").Value,
-                Port = int.Parse(_config.GetSection("RabbitMQ:Port").Value)
+                HostName = _config.GetSection("RabbitMQ:Server:Host").Value,
+                Port = int.Parse(_config.GetSection("RabbitMQ:Server:Port").Value)
             };
 
             CreateConnection();

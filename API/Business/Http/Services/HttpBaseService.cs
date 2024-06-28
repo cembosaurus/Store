@@ -2,7 +2,6 @@
 using Business.Http.Clients;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
 using Business.Management.Services.Interfaces;
@@ -23,8 +22,7 @@ namespace Business.Http.Services
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IGlobal_Settings_PROVIDER _global_settings_Provider;
-        private IAppsettings_PROVIDER _appsettings_Provider;
+        private readonly IGlobalConfig_PROVIDER _globalConfig_Provider;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
 
@@ -33,10 +31,10 @@ namespace Business.Http.Services
         protected bool _useApiKey;
         protected RemoteService_AS_MODEL _service_model;
         protected HttpRequestMessage _requestMessage;
-        protected string _remoteServiceName;
-        protected string _remoteServicePathName;
-        protected string _requestURL;
-        protected string _requestQuery;
+        protected string _remoteServiceName = "";
+        protected string _remoteServicePathName = "";
+        protected string _requestURL = "";
+        protected string _requestQuery = "";
         protected HttpMethod _method;
         protected HttpContent _content;
         protected Dictionary<string, string> _requestHeaders = new Dictionary<string, string>();
@@ -46,21 +44,19 @@ namespace Business.Http.Services
 
 
 
-
-        public HttpBaseService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER global_settings_Provider, IServiceResultFactory resultFact)
+        // any Http service:
+        public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
-            _appsettings_Provider = appsettings_Provider;
             _httpAppClient = httpAppClient;
-            _global_settings_Provider = global_settings_Provider;
+            _globalConfig_Provider = globalConfig_Provider;
             _resultFact = resultFact;
         }
-        // For 'HTTPManagementService', to maintain business logic and prevent circulatory DI: HTTPManagementService <--> RemoteServicesInfoService:
-        public HttpBaseService(IWebHostEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> Global_Settings_PROVIDER:
+        public HttpBaseService(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
-            _appsettings_Provider = appsettings_Provider;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
         }
@@ -103,7 +99,7 @@ namespace Business.Http.Services
 
         protected async Task<IServiceResult<bool>> CreateRequest()
         {
-            // get caller's (THIS) service model:
+            // GET TARGET's (THIS) service MODEL:
 
             if (string.IsNullOrWhiteSpace(_remoteServiceName))
                 return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
@@ -112,12 +108,12 @@ namespace Business.Http.Services
 
             if (!modelResult.Status)
             {
-                var result = await _global_settings_Provider.ReLoadRemoteServices();
+                var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
 
-                if (!result.Status)
+                if (!modelsListResult.Status)
                     return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
 
-                modelResult = _global_settings_Provider.GetRemoteServiceByName(_remoteServiceName);
+                modelResult = _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
                 if (!modelResult.Status)
                     return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
             }
@@ -167,7 +163,7 @@ namespace Business.Http.Services
         // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL from Management API service:
         protected async virtual Task<HttpResponseMessage> Send()
         {
-            // first attempt:
+            // FIRST attempt:
             try
             {
                 InitializeHttpRequestMessage();
@@ -182,7 +178,7 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await _global_settings_Provider.ReLoadRemoteServices();
+                var servicesModelsResult = await _globalConfig_Provider.ReLoadRemoteServices();
 
                 if (!servicesModelsResult.Status)
                     throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
@@ -194,7 +190,7 @@ namespace Business.Http.Services
                     throw new HttpRequestException("Failed to get request URL from remote service model !");
 
 
-                // second attempt:
+                // SECOND attempt:
                 try
                 {
                     // Rebuild the http request message, to prevent "Request already sent" error:
@@ -232,9 +228,9 @@ namespace Business.Http.Services
 
 
 
-        protected IServiceResult<bool> AddApiKeyToHeader()
+        protected virtual IServiceResult<bool> AddApiKeyToHeader()
         {
-            var apiKeyResult = _appsettings_Provider.GetApiKey();
+            var apiKeyResult = _globalConfig_Provider.GetApiKey();
 
             if (apiKeyResult.Status)
                 _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
@@ -246,7 +242,7 @@ namespace Business.Http.Services
 
         protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel()
         {
-            return _global_settings_Provider.GetRemoteServiceByName(_remoteServiceName);
+            return _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
         }
 
     }

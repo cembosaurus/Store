@@ -1,5 +1,5 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
 using Business.Management.Http.Services.Interfaces;
@@ -13,16 +13,16 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Management.Services
 {
-    public class Global_Settings_PROVIDER : IGlobal_Settings_PROVIDER
+    public class GlobalConfig_PROVIDER : IGlobalConfig_PROVIDER
     {
         private readonly bool _isProdEnv;
-        private Config_Global_REPO _config_global_Repo;
+        private IConfig_Global_REPO _config_global_Repo;
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
 
 
 
-        public Global_Settings_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, Config_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
+        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
         {
             _isProdEnv = env.IsProduction();
             _config_global_Repo = config_global_Repo;
@@ -33,7 +33,18 @@ namespace Business.Management.Services
 
 
 
+        // ------------------------------------------------------------------------------------ READ: ------------------------------------------------------------------------------
 
+        // Global Config:
+
+        public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
+        {
+            return _resultFact.Result(_config_global_Repo.GlobalConfig, true);
+        }
+
+
+
+        // Remote Services:
 
         public IServiceResult<bool> IsEmpty_RemoteServiceModels()
         {
@@ -137,7 +148,48 @@ namespace Business.Management.Services
 
 
 
+        // Auth:
 
+        public IServiceResult<string> GetApiKey()
+        {
+            var apiKey = _config_global_Repo.Auth.Apikey;
+
+            return _resultFact.Result(apiKey, !string.IsNullOrWhiteSpace(apiKey), string.IsNullOrWhiteSpace(apiKey) 
+                ? $"Api-Key not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+        }
+
+
+
+
+        public IServiceResult<string> GetJWTKey()
+        {
+            var JWTKey = _config_global_Repo.Auth.JWTKey;
+
+            return _resultFact.Result(JWTKey, !string.IsNullOrWhiteSpace(JWTKey), string.IsNullOrWhiteSpace(JWTKey)
+                ? $"JWT-Key not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+        }
+
+
+
+
+
+        // RabbiotMQ:
+
+        public IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ()
+        {
+            var rabbitMQ = _config_global_Repo.RabbitMQ.Data;
+
+            return _resultFact.Result(rabbitMQ, rabbitMQ != null, rabbitMQ == null
+                ? $"RabbitMQ data were not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+        }
+
+
+
+
+
+
+
+        // ------------------------------------------------------------------------------------ WRITE: ------------------------------------------------------------------------------
 
         // HTTP
         // For ALL services !

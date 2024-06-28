@@ -1,31 +1,34 @@
 ﻿using AutoMapper;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
-
-
+using Business.Management.Data;
 
 namespace Business.Management.Appsettings
 {
     public class Auth_REPO : IAuth_REPO
     {
 
-        private Auth_AS_MODEL _auth;
+        private Config_Global_DB _db;
         private IMapper _mapper;
 
 
 
-        public Auth_REPO(Auth_AS_MODEL auth, IMapper mapper)
+        public Auth_REPO(Config_Global_DB db, IMapper mapper)
         {
-            _auth = auth;
+            _db = db;
             _mapper = mapper;
         }
 
 
 
 
-        public Auth_AS_MODEL Get => _auth;
+        public Auth_AS_MODEL Data => _db.Data.Auth;
 
-        public void Initi8alize(Auth_AS_MODEL auth) => _auth = _mapper.Map<Auth_AS_MODEL>(auth);
+        public string Apikey => _db.Data.Auth.ApiKey;
+
+        public string JWTKey => _db.Data.Auth.JWTKey;
+
+        public void Initialize(Auth_AS_MODEL auth) => _db.Data.Auth = _mapper.Map<Auth_AS_MODEL>(auth);
         
 
 

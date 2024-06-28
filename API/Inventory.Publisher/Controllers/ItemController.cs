@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Publisher.Controllers
 {
+
     [Authorize]
     [Route("[controller]")]
     [ApiController]

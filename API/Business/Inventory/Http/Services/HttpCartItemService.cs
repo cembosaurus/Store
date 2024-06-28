@@ -3,7 +3,6 @@ using Business.Http.Clients;
 using Business.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Ordering.DTOs;
 using Microsoft.AspNetCore.Hosting;
@@ -15,8 +14,8 @@ namespace Business.Inventory.Http.Services
     public class HttpCartItemService : HttpBaseService, IHttpCartItemService
     {
 
-        public HttpCartItemService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobal_Settings_PROVIDER remoteServices_Provider)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpCartItemService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER remoteServices_Provider)
+            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";
             _remoteServicePathName = "Cart";

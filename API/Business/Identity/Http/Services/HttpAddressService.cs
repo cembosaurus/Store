@@ -5,7 +5,6 @@ using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Identity.Models;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 
@@ -17,8 +16,8 @@ namespace Business.Identity.Http.Services
     {
 
 
-        public HttpAddressService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettingsService, IHttpAppClient httpAppClient, IGlobal_Settings_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(env, exId, appsettingsService, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpAddressService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "IdentityService";
             _remoteServicePathName = "Address";

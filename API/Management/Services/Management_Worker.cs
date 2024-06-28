@@ -1,36 +1,36 @@
 ﻿using AutoMapper;
 using Business.Http.Services.Interfaces;
+using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
-using Business.Management.Enums;
-using Microsoft.IdentityModel.Tokens;
+using Business.Management.Appsettings.Models;
+using Business.Management.Data;
 
 
 
 namespace Management.Services
 {
-    // Background Worker: manages many things including watching the appsettings.json for changes 
+    // Background Worker: events (appsettings changes, ...) 
 
     public class Management_Worker : BackgroundService
     {
-        private readonly bool _isProdEnv;
         private readonly IServiceScopeFactory _serviceFactory;
         private FileSystemWatcher _watcher;
+        private Config_Global_DB _globalConfig_DB;
         private bool _switch = true; // MS bug - firing event twice. Prevent it by using the switch.
                                      // Not ideal solution as two independet events could be fired in sequence so second one will be ignored.
                                      // But this event is fired rarely f.e: after Appsettings is updated
 
-
-        public Management_Worker(IWebHostEnvironment env, FileSystemWatcher watcher, IServiceScopeFactory serviceFactory)
+        public Management_Worker(FileSystemWatcher watcher, Config_Global_DB globalConfig_DB, IServiceScopeFactory serviceFactory)
         {
-            _isProdEnv = env.IsProduction();
             _serviceFactory = serviceFactory;
             _watcher = watcher;
+            _globalConfig_DB = globalConfig_DB;
 
             Initialize();
         }
 
 
-
+        //.................................................................................................. To Do: decopule it, DI appsettings part, .... etc
 
 
         // On StartUp:
@@ -46,7 +46,7 @@ namespace Management.Services
         public void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
         {
             if (_switch)
-                Console.WriteLine($"--> Appsettings : \n{args.ChangeType}\n{args.Name}\n{args.FullPath}");
+                Console.WriteLine($"--> Appsettings UPDATE: \n{args.ChangeType}\n{args.Name}\n{args.FullPath}");
 
             HandleAppsettingsUpdate();
 
@@ -61,20 +61,19 @@ namespace Management.Services
         private async void HandleAppsettingsUpdate()
         {
             using (var scope = _serviceFactory.CreateScope())
-            {
+            {           
                 var appsettings_Provider = scope.ServiceProvider.GetService<IAppsettings_PROVIDER>();
-                var httpGlobalConfigBroadcast = scope.ServiceProvider.GetService<IHttpGlobalConfigBroadcast>();
-                var _mapper = scope.ServiceProvider.GetService<IMapper>();
+                var congigGlobal_Repo = scope.ServiceProvider.GetService<IConfig_Global_REPO>();
+                var httpAllServices = scope.ServiceProvider.GetService<IHttpGlobalConfigService>();
 
                 var appsettingsResult = appsettings_Provider.GetGlobalConfig();
 
                 if (appsettingsResult.Status)
                 {
+                    congigGlobal_Repo.Initialize(appsettingsResult.Data);
 
-                    var result = appsettingsResult.Data?.RemoteServices.Where(m => m.GetPathByName(TypeOfService.REST, "GlobalConfig").IsNullOrEmpty() == false).Select(s => s.GetBaseUrl(TypeOfService.REST, _isProdEnv)).ToList();
-
-
-                    //var httpUpdateResult = await httpGlobalConfigBroadcast.BroadcastUpdate(appsettingsResult.Data);
+                    var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices();     
+                    //.....
                 }
             }
 
