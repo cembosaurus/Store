@@ -6,16 +6,15 @@ using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
-
-
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Inventory.Http.Services
 {
     public class HttpItemPriceService : HttpBaseService, IHttpItemPriceService
     {
 
-        public HttpItemPriceService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpItemPriceService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "InventoryService";
             _remoteServicePathName = "ItemPrice";

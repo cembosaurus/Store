@@ -6,16 +6,15 @@ using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
-
-
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Identity.Http.Services
 {
     public class HttpIdentityService : HttpBaseService, IHttpIdentityService
     {
 
-        public HttpIdentityService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServicesInfoService, IServiceResultFactory resultFact)
-            : base(env, exId, httpAppClient, remoteServicesInfoService, resultFact)
+        public HttpIdentityService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "IdentityService";
             _remoteServicePathName = "Identity";

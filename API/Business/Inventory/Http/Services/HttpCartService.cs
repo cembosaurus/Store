@@ -7,16 +7,15 @@ using Business.Management.Services.Interfaces;
 using Business.Ordering.DTOs;
 using Business.Scheduler.DTOs;
 using Microsoft.AspNetCore.Hosting;
-
-
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Inventory.Http.Services
 {
     public class HttpCartService : HttpBaseService, IHttpCartService
     {
 
-        public HttpCartService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER remoteServices_Provider)
-            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpCartService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "OrderingService";
             _remoteServicePathName = "Cart";

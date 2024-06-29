@@ -45,8 +45,9 @@ namespace Business.Http.Services
 
 
         // any Http service:
-        public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact)
         {
+            _accessor = accessor;
             _isProdEnv = env.IsProduction();
             _exId = exId;
             _httpAppClient = httpAppClient;
@@ -214,7 +215,7 @@ namespace Business.Http.Services
             _requestMessage.Method = _method;
             _requestMessage.Content = _content;
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
-            if (!string.IsNullOrWhiteSpace(_token))
+            if (!string.IsNullOrWhiteSpace(_token) || !_useApiKey)
                 _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             if (!_requestHeaders.IsNullOrEmpty())
             {

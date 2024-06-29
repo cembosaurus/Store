@@ -7,16 +7,15 @@ using Business.Ordering.DTOs;
 using Business.Payment.DTOs;
 using Business.Payment.Http.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
-
-
+using Microsoft.AspNetCore.Http;
 
 namespace Business.Payment.Http.Services
 {
     public class HttpPaymentService : HttpBaseService, IHttpPaymentService
     {
 
-        public HttpPaymentService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER remoteServices_Provider)
-            : base(env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpPaymentService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
         {
             _remoteServiceName = "PaymentService";
             _remoteServicePathName = "Payment";

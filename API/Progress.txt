@@ -56,7 +56,7 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
 
 
 
-                            To Do: ALL HTTP services --> make only one HTTP method. All parameters (get/post/del, query string, content ...) inserted by callers (services)
+                            To Do: ALL HTTP services --> make only one HTTP method. All parameters (get/post/del, query string, content ...) inserted by callers (services) --> services and httpservices are identical
 
                             To Do: ----------------------------> WHAT if Management API service sends new Global Config UPDATE with NEW/UPDATED Management API service URL to all services ????????????????????????????????????????????????????????????????? Implement UPDATE/Rewrite functionality to correct data in Appsettings !!!
 
