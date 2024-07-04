@@ -71,9 +71,6 @@ namespace Business.Http.Services
                     if (model.Name == "ManagementService")
                         continue;
 
-                    //if (model.Name == "MetricsService") // not deployed yet....
-                    //    continue;
-
                     _remoteServiceName = model.Name;
 
                     try
