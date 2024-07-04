@@ -1,4 +1,4 @@
-﻿using Business.Http.Clients;
+﻿using Business.Http.Clients.Interfaces;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Models;
@@ -11,15 +11,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Business.Http.Services
 {
-    public class HttpGlobalConfigService : HttpBaseService, IHttpGlobalConfigService
+    // sends HTTP messages to ALL (specific) API services
+    // URL source: Global Config
+
+    public class HttpAllServices : HttpBaseService, IHttpAllServices
     {
 
         private readonly IHttpAppClient _httpAppClient;
-        private IGlobalConfig_PROVIDER _globalConfig_Provider;
 
 
 
-        public HttpGlobalConfigService(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER globalConfig_Provider)
+        public HttpAllServices(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER globalConfig_Provider)
             : base(env, httpAppClient, resultFact)
         {
             _httpAppClient = httpAppClient;
@@ -38,36 +40,40 @@ namespace Business.Http.Services
 
 
 
-        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> PostGlobalConfig(Config_Global_AS_MODEL globalConfig_Model)
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> PostGlobalConfig(Config_Global_AS_MODEL globalConfig_Model)
         {
             _method = HttpMethod.Put;
             _requestQuery = $"";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(globalConfig_Model), _encoding, _mediaType);
 
-            _useApiKey = true;
-
-            return await HTTP_Request_Handler<IEnumerable<RemoteService_AS_MODEL>>();
+            return await HTTP_Request_Handler<Config_Global_AS_MODEL>();
         }
 
 
 
 
-        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> PostGlobalConfigToMultipleServices()
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> PostGlobalConfigToMultipleServices()
         {
             _remoteServicePathName = "GlobalConfig";
 
             var globalConfig_Model = _globalConfig_Provider.GetGlobalConfig();
 
-            if (globalConfig_Model.Status)
-                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, "Global Config DB not found!");
+            if (!globalConfig_Model.Status)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, "Global Config DB not found!");
             if (globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, "Remote Services were not found in Global Config DB!");
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, "Remote Services were not found in Global Config DB!");
 
 
             foreach (var model in globalConfig_Model.Data.RemoteServices)
             {
                 if (!model.GetPathByName(TypeOfService.REST, _remoteServicePathName).IsNullOrEmpty())
                 {
+                    if (model.Name == "ManagementService")
+                        continue;
+
+                    //if (model.Name == "MetricsService") // not deployed yet....
+                    //    continue;
+
                     _remoteServiceName = model.Name;
 
                     try
@@ -76,7 +82,10 @@ namespace Business.Http.Services
                     }
                     catch (Exception ex)
                     {
-                        var e = ex.Message;
+                        Console.ForegroundColor = ConsoleColor.Red; 
+                        Console.Write("FAIL: ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"HTTP request to '{_remoteServiceName}' --> Message: {ex.Message}");
                     }
                 }
             }

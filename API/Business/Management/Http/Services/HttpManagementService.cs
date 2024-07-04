@@ -1,4 +1,4 @@
-﻿using Business.Http.Clients;
+﻿using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Business.Management.Http.Services
 {
+    // sends HTTP messages to Management API service.
+    // URL routes: source Appsettings
+
     public class HttpManagementService : HttpBaseService, IHttpManagementService
     {
 
@@ -62,8 +65,6 @@ namespace Business.Management.Http.Services
             _method = HttpMethod.Get;
             _requestQuery = $"";
 
-            _useApiKey = true;
-
             return await HTTP_Request_Handler<Config_Global_AS_MODEL>();
         }
 
@@ -72,8 +73,6 @@ namespace Business.Management.Http.Services
         {
             _method = HttpMethod.Get;
             _requestQuery = $"{"services"}";
-
-            _useApiKey = true;
 
             return await HTTP_Request_Handler<IEnumerable<RemoteService_AS_MODEL>>();
         }

@@ -2,9 +2,9 @@
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Identity.JWT;
+using Identity.JWT.Interfaces;
 using Identity.Models;
-using Identity.Services.JWT;
-using Identity.Services.JWT.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +28,7 @@ namespace Store.Test.Services.Identity.Services
 
         private IConfiguration _config;
         private IServiceResultFactory _resultFact;
-        private ITokenService _tokenService;
+        private IJWT_Provider _tokenService;
 
 
         [SetUp]
@@ -51,7 +51,7 @@ namespace Store.Test.Services.Identity.Services
 
             _resultFact = new ServiceResultFactory();
 
-            _tokenService = new TokenService(_config, new Mock<UserManager<AppUser>>().Object, _resultFact);
+            _tokenService = new JWT_Provider(_config, new Mock<UserManager<AppUser>>().Object, _resultFact);
         
         }
 

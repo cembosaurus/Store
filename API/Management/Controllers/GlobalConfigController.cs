@@ -1,6 +1,5 @@
 ﻿using Business.Filters.Identity;
 using Business.Management.Appsettings.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Management.Controllers
 {
 
-    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class GlobalConfigController : ControllerBase
@@ -28,7 +26,6 @@ namespace Management.Controllers
 
 
         [ApiKeyAuth]
-        [AllowAnonymous]
         [HttpGet()]
         public ActionResult GetGlobalConfig()
         {
@@ -40,7 +37,6 @@ namespace Management.Controllers
 
 
         [ApiKeyAuth]
-        [AllowAnonymous]
         [HttpGet("services")]
         public ActionResult GetAllServiceModels()
         {

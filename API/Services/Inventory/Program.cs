@@ -41,7 +41,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(ValidationFilter).Assembly);
 // Allow optional argument in controller's action
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });    
 
-builder.Services.AddDbContext<InventoryContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:InventoryConnStr").Value, opt => opt.EnableRetryOnFailure()));
+builder.Services.AddDbContext<InventoryContext>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IItemService, ItemService>();
@@ -63,7 +63,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });

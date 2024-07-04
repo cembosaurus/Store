@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });
@@ -93,10 +93,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 app.UseMiddleware<Metrics_MW>();
 
-// Custom Exception Handler:
+app.UseMiddleware<ServiceId_MW>();
+
 app.UseMiddleware<ErrorHandler_MW>();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

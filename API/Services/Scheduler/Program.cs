@@ -2,6 +2,7 @@ using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
 using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
@@ -11,6 +12,7 @@ using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
 using Business.Management.Data;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
@@ -50,6 +52,7 @@ builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;
@@ -63,7 +66,7 @@ builder.Services.RegisterSchedulerTasks(builder.Configuration);
 
 builder.Services.AddTransient<IRunAtStartup, RunAtStartup>();
 
-builder.Services.AddDbContext<SchedulerDBContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:SchedulerConnStr").Value, opt => opt.EnableRetryOnFailure()));
+builder.Services.AddDbContext<SchedulerDBContext>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -98,7 +101,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });
@@ -140,22 +143,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 app.UseMiddleware<Metrics_MW>();
 
-// Custom Exception Handler:
-app.UseMiddleware<ErrorHandler_MW>();
+app.UseMiddleware<ServiceId_MW>();
 
-
-//app.Use(async (context, next) => 
-//{
-//    Console.WriteLine($".... FIRST middleware BEFORE .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-//    await next.Invoke(context);
-//    Console.WriteLine($".... FIRST middleware AFTER .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-
-//});
-
-
-// Custom Exception Handler:
 app.UseMiddleware<ErrorHandler_MW>();
 
 

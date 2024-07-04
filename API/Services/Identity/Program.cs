@@ -2,6 +2,7 @@ using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
 using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
@@ -9,6 +10,7 @@ using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
 using Business.Management.Data;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
@@ -21,12 +23,13 @@ using FluentValidation.AspNetCore;
 using Identity.Data;
 using Identity.Data.Repositories;
 using Identity.Data.Repositories.Interfaces;
+using Identity.JWT;
+using Identity.JWT.Interfaces;
 using Identity.Models;
 using Identity.Services;
 using Identity.Services.Interfaces;
-using Identity.Services.JWT;
-using Identity.Services.JWT.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -60,9 +63,10 @@ builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 //builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<IdentityContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:IdentityConnStr").Value));
+builder.Services.AddDbContext<IdentityContext>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -72,7 +76,7 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IJWT_Provider, JWT_Provider>();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
@@ -81,12 +85,11 @@ builder.Services.AddIdentityCore<AppUser>(opt => {
     opt.Password.RequireNonAlphanumeric = false;    // Add more options to customize password complexity.
     opt.Password.RequireDigit = false;
     opt.Password.RequireUppercase = false;
-})
-    .AddRoles<AppRole>()
-    .AddRoleManager<RoleManager<AppRole>>()
-    .AddRoleValidator<RoleValidator<AppRole>>()
-    .AddSignInManager<SignInManager<AppUser>>()
-    .AddEntityFrameworkStores<IdentityContext>();
+}).AddRoles<AppRole>()
+  .AddRoleManager<RoleManager<AppRole>>()
+  .AddRoleValidator<RoleValidator<AppRole>>()
+  .AddSignInManager<SignInManager<AppUser>>()
+  .AddEntityFrameworkStores<IdentityContext>();
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -99,7 +102,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });
@@ -142,7 +145,8 @@ var app = builder.Build();
 
 app.UseMiddleware<Metrics_MW>();
 
-// Custom Exception Handler:
+app.UseMiddleware<ServiceId_MW>();
+
 app.UseMiddleware<ErrorHandler_MW>();
 
 // Configure the HTTP request pipeline.

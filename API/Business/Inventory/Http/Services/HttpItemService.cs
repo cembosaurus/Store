@@ -1,5 +1,5 @@
 ﻿using Business.Exceptions.Interfaces;
-using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
 using Business.Inventory.DTOs.Item;
 using Business.Inventory.Http.Services.Interfaces;

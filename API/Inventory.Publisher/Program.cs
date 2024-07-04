@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });

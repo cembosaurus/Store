@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 
 
-namespace Business.Http.Controllers.Interfaces
+namespace Business.Management.Controllers.Interfaces
 {
     public interface IHttpBroadcastController
     {

@@ -3,9 +3,9 @@ using Business.Identity.DTOs;
 using Business.Identity.Enums;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
+using Identity.JWT.Interfaces;
 using Identity.Models;
 using Identity.Services.Interfaces;
-using Identity.Services.JWT.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Identity.Models;
@@ -26,9 +26,9 @@ namespace Identity.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly ITokenService _tokenService;
+        private readonly IJWT_Provider _tokenService;
 
-        public IdentityService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IServiceResultFactory resultFact, IMapper mapper, 
+        public IdentityService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, SignInManager<AppUser> signInManager, IJWT_Provider tokenService, IServiceResultFactory resultFact, IMapper mapper, 
             IHttpCartService httpCartService, IHttpContextAccessor accessor)
         {
             _userManager = userManager;

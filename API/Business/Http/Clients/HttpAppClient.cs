@@ -1,4 +1,6 @@
-﻿namespace Business.Http.Clients
+﻿using Business.Http.Clients.Interfaces;
+
+namespace Business.Http.Clients
 {
     public class HttpAppClient : IHttpAppClient
     {
@@ -18,7 +20,9 @@
 
         public async Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage)
         {
-            return await _httpClient.SendAsync(requestMessage);
+            var result = await _httpClient.SendAsync(requestMessage);
+
+            return result;
         }
     }
 }

@@ -14,14 +14,14 @@ namespace Business.Management.Appsettings
     {
 
 
-        private IOptionsMonitor<Config_Global_AS_MODEL> _appsettings_config_global;
+        private IOptionsMonitor<Config_Global_AS_MODEL> _appsettings_monitor;
         private readonly IServiceScopeFactory _serviceFactory;
 
 
 
-        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_AS_MODEL> appsettings_config_global, IServiceScopeFactory serviceFactory)
+        public Appsettings_PROVIDER(IOptionsMonitor<Config_Global_AS_MODEL> appsettings_monitor, IServiceScopeFactory serviceFactory)
         {
-            _appsettings_config_global = appsettings_config_global;
+            _appsettings_monitor = appsettings_monitor;
             _serviceFactory = serviceFactory;
         }
 
@@ -30,6 +30,8 @@ namespace Business.Management.Appsettings
 
 
 
+        // ------------------------------------------------------------------------------------ READ: ------------------------------------------------------------------------------
+
 
         public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetAllRemoteServicesModels()
         {
@@ -37,7 +39,7 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var remoteServices = _appsettings_config_global.CurrentValue.RemoteServices;
+                var remoteServices = _appsettings_monitor.CurrentValue.RemoteServices;
 
                 return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(remoteServices, !remoteServices.IsNullOrEmpty(), remoteServices.IsNullOrEmpty() 
                     ? $"Remote Service models were NOT found in Global Appsettings !" : "");
@@ -51,12 +53,12 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var remoteServices = _appsettings_config_global.CurrentValue.RemoteServices;
+                var remoteServices = _appsettings_monitor.CurrentValue.RemoteServices;
 
                 if (remoteServices.IsNullOrEmpty())
                     return resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Global config data were NOT found in Appsettings !");
 
-                var model = remoteServices.FirstOrDefault(url => url.Name == name);
+                var model = remoteServices.FirstOrDefault(s => s.Name == name);
                 
                 return resultFact.Result(model, model != null, model == null ? $"URL for service '{name}' was NOT found in Appsettings !" : "");
             }
@@ -71,7 +73,7 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var apiKey = _appsettings_config_global.CurrentValue.Auth.ApiKey;
+                var apiKey = _appsettings_monitor.CurrentValue.Auth.ApiKey;
 
                 return resultFact.Result(apiKey, !string.IsNullOrWhiteSpace(apiKey), string.IsNullOrWhiteSpace(apiKey) ? "API-Key was NOT found in Appsettings !" : "");
             }
@@ -85,7 +87,7 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var JWTKey = _appsettings_config_global.CurrentValue.Auth.JWTKey;
+                var JWTKey = _appsettings_monitor.CurrentValue.Auth.JWTKey;
 
                 return resultFact.Result(JWTKey, !string.IsNullOrWhiteSpace(JWTKey), string.IsNullOrWhiteSpace(JWTKey) ? $"JWT-Key was NOT found in Appsettings !" : "");
             }
@@ -99,7 +101,7 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var rabbitMQ = _appsettings_config_global.CurrentValue.RabbitMQ;
+                var rabbitMQ = _appsettings_monitor.CurrentValue.RabbitMQ;
                 
                 return resultFact.Result(rabbitMQ, rabbitMQ != null, rabbitMQ == null ? $"RabbitMQ data were NOT found in Appsettings !" : "");
             }
@@ -113,7 +115,7 @@ namespace Business.Management.Appsettings
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var globalConfig = _appsettings_config_global.CurrentValue;
+                var globalConfig = _appsettings_monitor.CurrentValue;
 
                 return resultFact.Result(globalConfig, globalConfig != null, globalConfig == null ? $"Global Config data were NOT found in Appsettings !" : "");
             }

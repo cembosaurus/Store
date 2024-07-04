@@ -1,5 +1,5 @@
 ﻿using Business.Exceptions.Interfaces;
-using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Models;
@@ -22,11 +22,11 @@ namespace Business.Http.Services
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IGlobalConfig_PROVIDER _globalConfig_Provider;
         private readonly IExId _exId;
         private readonly bool _isProdEnv;
 
         protected readonly IServiceResultFactory _resultFact;
+        protected IGlobalConfig_PROVIDER _globalConfig_Provider;
 
         protected bool _useApiKey;
         protected RemoteService_AS_MODEL _service_model;
@@ -44,7 +44,7 @@ namespace Business.Http.Services
 
 
 
-        // any Http service:
+        // any Http service (except 'HTTPManagementService'):
         public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact)
         {
             _accessor = accessor;
@@ -54,7 +54,7 @@ namespace Business.Http.Services
             _globalConfig_Provider = globalConfig_Provider;
             _resultFact = resultFact;
         }
-        // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> Global_Settings_PROVIDER:
+        // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER:
         public HttpBaseService(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
@@ -81,15 +81,16 @@ namespace Business.Http.Services
             var sendResponse = await Send();
 
 
-            _useApiKey = false;
-
-
             // handle HTTP response:
 
             if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
                 return _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
 
-            var content = sendResponse.Content.ReadAsStringAsync().Result ?? "";
+            var content = sendResponse.Content.ReadAsStringAsync().Result;
+
+
+            var TEST = _remoteServiceName;
+
 
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content);
 
@@ -98,23 +99,28 @@ namespace Business.Http.Services
 
 
 
-        protected async Task<IServiceResult<bool>> CreateRequest()
+        protected async virtual Task<IServiceResult<bool>> CreateRequest()
         {
-            // GET TARGET's (THIS) service MODEL:
+            // get targeted API service's remote service model:
 
             if (string.IsNullOrWhiteSpace(_remoteServiceName))
                 return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
 
+            // Load service model from Global Config
             var modelResult = GetServiceModel();
 
             if (!modelResult.Status)
             {
+                // Local Global Config DB could be obsolete or incomplete,
+                // Re-Load service models from Management API service into local Global Config:
                 var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
 
                 if (!modelsListResult.Status)
                     return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
 
-                modelResult = _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
+                // Load service model from Global Config again:
+                modelResult = GetServiceModel();
+
                 if (!modelResult.Status)
                     return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
             }
@@ -127,10 +133,12 @@ namespace Business.Http.Services
             _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
             if (string.IsNullOrWhiteSpace(_requestURL))
-                return _resultFact.Result(false, false, $"Request URL for Remote Service '{_remoteServiceName}' could not be constructed ! Missing URL data in Appsettings or Global Settings !");
+                return _resultFact.Result(false, false, $"Request URL for Remote Service could not be constructed ! Missing URL in '{_remoteServiceName}' model !");
 
 
             // add API Key to HTTP request header:
+
+            _useApiKey = !_service_model.GetPathByName(TypeOfService.REST, "GlobalConfig").IsNullOrEmpty();
 
             if (_useApiKey)
             {
@@ -144,14 +152,6 @@ namespace Business.Http.Services
             // initialize HTTP request message:
 
             InitializeHttpRequestMessage();
-
-
-            // build request URL:
-
-            _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
-
-            if (string.IsNullOrWhiteSpace(_requestURL))
-                return _resultFact.Result(false, false, "Failed to get request URL from remote service model !");
 
 
             return _resultFact.Result(true, true);
@@ -246,5 +246,15 @@ namespace Business.Http.Services
             return _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
         }
 
+
+        protected virtual async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReloadServiceModels()
+        {
+            var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
+
+            if (!modelsListResult.Status)
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Failed to fetch Remote Services Info models from Management service !");
+
+            return modelsListResult;
+        }
     }
 }

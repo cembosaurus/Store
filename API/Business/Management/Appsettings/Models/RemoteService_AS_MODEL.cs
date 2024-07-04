@@ -1,5 +1,6 @@
 ﻿using Business.Management.Enums;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using static Business.Management.Appsettings.Models.RemoteService_AS_MODEL.ServiceType;
 
 
@@ -9,8 +10,9 @@ namespace Business.Management.Appsettings.Models
     public class RemoteService_AS_MODEL
     {
 
-
+        [JsonProperty("Name")]
         public string Name { get; set; } = "";
+        [JsonProperty("Type")]
         public List<ServiceType> Type { get; set; } = new List<ServiceType>();
 
 
@@ -21,6 +23,7 @@ namespace Business.Management.Appsettings.Models
             private string _name = TypeOfService.Undefined.ToString();
 
 
+            [JsonProperty("Name")]
             public string Name 
             {
                 get { return _name; }
@@ -39,7 +42,9 @@ namespace Business.Management.Appsettings.Models
                     }
                 }
             }
+            [JsonProperty("BaseURL")]
             public SchemeHostPort BaseURL { get; set; } = new SchemeHostPort();
+            [JsonProperty("Paths")]
             public ICollection<URLPath> Paths { get; set; } = new List<URLPath>();
 
 
@@ -47,13 +52,17 @@ namespace Business.Management.Appsettings.Models
 
             public class SchemeHostPort
             {
+                [JsonProperty("Dev")]
                 public string Dev { get; set; } = "";
+                [JsonProperty("Prod")]
                 public string Prod { get; set; } = "";
             }
 
             public class URLPath
             {
+                [JsonProperty("Name")]
                 public string Name { get; set; } = "";
+                [JsonProperty("Route")]
                 public string Route { get; set; } = "";
             }
 

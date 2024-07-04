@@ -1,6 +1,6 @@
 ﻿using Business.Identity.Enums;
 using Business.Libraries.ServiceResult.Interfaces;
-using Identity.Services.JWT.Interfaces;
+using Identity.JWT.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Services.Identity.Models;
@@ -10,9 +10,9 @@ using System.Text;
 
 
 
-namespace Identity.Services.JWT
+namespace Identity.JWT
 {
-    public class TokenService : ITokenService
+    public class JWT_Provider : IJWT_Provider
     {
 
         private readonly SymmetricSecurityKey _key;
@@ -20,7 +20,7 @@ namespace Identity.Services.JWT
         private readonly IServiceResultFactory _resultFact;
 
 
-        public TokenService(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
+        public JWT_Provider(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
         {
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Config.Global:Auth:JWTKey").Value));
             _userManager = userManager;

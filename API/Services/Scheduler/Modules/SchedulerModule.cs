@@ -13,10 +13,10 @@ namespace Scheduler.Modules
             // --------------------------------------- Expired cart items: -------------------------------------------------------
 
 
-            var hourStr = config.GetSection("Scheduler:StartDateTimes:CartItemLock:hour").Value.TrimStart(new Char[] { '0' });
+            var hourStr = config.GetSection("Config.Local:Scheduler:StartDateTimes:CartItemLock:hour").Value.TrimStart(new Char[] { '0' });
             var hour = 0;
             int.TryParse(hourStr, out hour);
-            var minuteStr = config.GetSection("Scheduler:StartDateTimes:CartItemLock:minute").Value.TrimStart(new Char[] { '0' });
+            var minuteStr = config.GetSection("Config.Local:Scheduler:StartDateTimes:CartItemLock:minute").Value.TrimStart(new Char[] { '0' });
             var minute = 0;
             int.TryParse(minuteStr, out minute);
 

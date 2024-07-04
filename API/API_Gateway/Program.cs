@@ -7,6 +7,7 @@ using API_Gateway.Services.Business.Ordering.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
@@ -87,7 +88,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });
@@ -153,12 +154,10 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-
 app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
 
-// Custom Exception Handler:
 app.UseMiddleware<ErrorHandler_MW>();
 
 
@@ -182,16 +181,6 @@ app.UseAuthorization();
 //app.MapGet("/", () => "Zedous !");
 
 app.MapControllers();
-
-
-//app.Use(async (context, next) =>
-//{
-//    Console.WriteLine($".... LAST middleware BEFORE .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-//    await next.Invoke(context);
-//    Console.WriteLine($".... LAST middleware AFTER .....Req: {context.Request.Path} -- Resp: {context.Response.StatusCode}");
-
-//});
-
 
 
 using (var scope = app.Services.CreateScope())

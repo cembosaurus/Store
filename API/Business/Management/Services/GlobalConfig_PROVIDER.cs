@@ -1,4 +1,5 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
@@ -15,20 +16,24 @@ namespace Business.Management.Services
 {
     public class GlobalConfig_PROVIDER : IGlobalConfig_PROVIDER
     {
+
         private readonly bool _isProdEnv;
         private IConfig_Global_REPO _config_global_Repo;
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
+        private IAppsettings_PROVIDER _appsettings_Provider;
 
 
 
-        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService)
+        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IAppsettings_PROVIDER appsettings_Provider)
         {
             _isProdEnv = env.IsProduction();
             _config_global_Repo = config_global_Repo;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
+            _appsettings_Provider = appsettings_Provider;
         }
+
 
 
 
@@ -39,7 +44,12 @@ namespace Business.Management.Services
 
         public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
         {
-            return _resultFact.Result(_config_global_Repo.GlobalConfig, true);
+            var globalConfigModel = _config_global_Repo.GlobalConfig;
+
+            if (globalConfigModel == null)
+                return _resultFact.Result(globalConfigModel, false, $"Global Config model was not found in repository !");
+
+            return _resultFact.Result(globalConfigModel, true);
         }
 
 
@@ -242,6 +252,11 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("--> SUCCESS: ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Global Config was updated.");
+
             return _resultFact.Result(config, true);
         }
 
@@ -278,5 +293,7 @@ namespace Business.Management.Services
 
             return _resultFact.Result(servicesModels, true);
         }
+
+
     }
 }

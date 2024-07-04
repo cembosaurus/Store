@@ -60,7 +60,7 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
 
                             To Do: ----------------------------> WHAT if Management API service sends new Global Config UPDATE with NEW/UPDATED Management API service URL to all services ????????????????????????????????????????????????????????????????? Implement UPDATE/Rewrite functionality to correct data in Appsettings !!!
 
-
+                            To Do: Appsettings_PROVIDER --> AddOrUpdateAppSetting() --> implement ADD key if doesn't exist !!!!!!!!!!!!!!
 
 
                             To Do: ManagementService - > functionality for managinfg the remote services (ID's, etc)

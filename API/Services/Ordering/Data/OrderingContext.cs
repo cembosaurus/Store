@@ -5,9 +5,15 @@ namespace Ordering.Data
 {
     public class OrderingContext : DbContext
     {
-        public OrderingContext(DbContextOptions<OrderingContext> opt) : base(opt)
-        {
 
+        private IConfiguration _conf;
+        private readonly bool _isProdEnv;
+
+
+        public OrderingContext(DbContextOptions<OrderingContext> opt, IConfiguration conf, IWebHostEnvironment env) : base(opt)
+        {
+            _conf = conf;
+            _isProdEnv = env.IsProduction();
         }
 
 
@@ -18,6 +24,11 @@ namespace Ordering.Data
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<ActiveCart> ActiveCarts { get; set; }
 
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(_conf.GetSection($"Config.Local:ConnectionStrings:OrderingConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure());
+        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,4 +1,4 @@
-﻿namespace Business.Http.Clients
+﻿namespace Business.Http.Clients.Interfaces
 {
     public interface IHttpAppClient
     {

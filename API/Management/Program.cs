@@ -1,6 +1,7 @@
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
 using Business.Http.Services.Interfaces;
 using Business.Identity.Enums;
@@ -40,7 +41,7 @@ builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IHttpGlobalConfigService, HttpGlobalConfigService>();
+builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
 
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
@@ -64,7 +65,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - this app (server)
+                        ValidateIssuer = false,     // BE - API
                         ValidateAudience = false    // FE - angular
                     };
                 });

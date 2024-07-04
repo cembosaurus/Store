@@ -25,7 +25,6 @@ namespace Identity.Controllers.Business
 
 
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserToRegisterDTO userToRegister)
         {
@@ -36,7 +35,6 @@ namespace Identity.Controllers.Business
 
 
 
-        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserToLoginDTO user)
         {
