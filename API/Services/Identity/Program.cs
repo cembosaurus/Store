@@ -1,3 +1,5 @@
+using Business.Data;
+using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
@@ -62,7 +64,8 @@ builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 //builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
-builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

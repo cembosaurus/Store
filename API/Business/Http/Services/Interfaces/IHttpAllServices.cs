@@ -6,6 +6,6 @@ namespace Business.Http.Services.Interfaces
     public interface IHttpAllServices
     {
         Task<IServiceResult<Config_Global_AS_MODEL>> PostGlobalConfig(Config_Global_AS_MODEL globalConfig_Model);
-        Task<IServiceResult<Config_Global_AS_MODEL>> PostGlobalConfigToMultipleServices();
+        Task<IServiceResult<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>> PostGlobalConfigToMultipleServices();
     }
 }

@@ -1,4 +1,6 @@
-﻿using Business.Exceptions.Interfaces;
+﻿using Business.Data;
+using Business.Data.Tools.Interfaces;
+using Business.Exceptions.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
@@ -9,17 +11,34 @@ namespace Business.Middlewares
 {
     public class ErrorHandler_MW
     {
+
         private readonly RequestDelegate _next;
         private readonly IExId _exId;
+        private IGlobalVariables _globalVariables;
 
-        public ErrorHandler_MW(RequestDelegate next, IExId exId)
+
+
+        public ErrorHandler_MW(RequestDelegate next, IExId exId, IGlobalVariables globalVariables)
         {
             _next = next;
             _exId = exId;
+            _globalVariables = globalVariables;
         }
+
+
 
         public async Task Invoke(HttpContext context)
         {
+            // If DB connection fails return HTTP 500:
+            if (!_globalVariables.DBState)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                context.Response.ContentType = "text/plain";
+                await context.Response.WriteAsync($"HTTP Request failed! DB Server is not connected!");
+                return;
+            }
+
+
             try
             {
                 await _next(context);
@@ -69,7 +88,6 @@ namespace Business.Middlewares
                 await response.WriteAsync(result);
             }
         }
-
 
     }
 

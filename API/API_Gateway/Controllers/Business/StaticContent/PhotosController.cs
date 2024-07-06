@@ -1,43 +1,36 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 
 
 namespace API_Gateway.Controllers.Business.StaticContent
 {
-    //[Authorize]
     [Route("[controller]")]
     [ApiController]
     public class PhotosController : ControllerBase
     {
-        private readonly string _staticContentBaseUrl;
-        private readonly string _staticContentItemsUrl;
 
-        public PhotosController(IConfiguration config)
+        private IGlobalConfig_PROVIDER _globalConfig_Provider;
+
+
+        public PhotosController(IGlobalConfig_PROVIDER globalConfig_Provider)
         {
-            _staticContentBaseUrl = config.GetSection("RemoteServices_old:StaticContentService:REST:BaseURL").Value;
-            _staticContentItemsUrl = config.GetSection("RemoteServices_old:StaticContentService:REST:ItemsURL").Value;
+            _globalConfig_Provider = globalConfig_Provider;
         }
 
 
-        //[Authorize(Policy = "Everyone")]
+
+
         [HttpGet("items/{id}")]
         public async Task<IActionResult> GetById(string id)
         {
+            var urlResult = _globalConfig_Provider.GetRemoteServiceURL_WithPath("StaticContentService", "ItemsURL");
 
+            if (!urlResult.Status)
+                return StatusCode(StatusCodes.Status204NoContent, urlResult);
 
-
-
-
-
-            // f.e: http://localhost:4000  /  api  /  photos/items  /  onion.jpg
-
-            return Redirect($"{_staticContentBaseUrl}/{_staticContentItemsUrl}/{id}");
-
-
-
-
-
+            // f.e: http://localhost:4000/photos/items/onion.jpg
+            return Redirect($"{urlResult.Data}/{id}");
         }
 
 

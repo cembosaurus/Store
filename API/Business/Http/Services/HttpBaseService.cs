@@ -88,10 +88,6 @@ namespace Business.Http.Services
 
             var content = sendResponse.Content.ReadAsStringAsync().Result;
 
-
-            var TEST = _remoteServiceName;
-
-
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content);
 
             return result;
@@ -179,7 +175,7 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await _globalConfig_Provider.ReLoadRemoteServices();
+                var servicesModelsResult = await ReloadServiceModels();
 
                 if (!servicesModelsResult.Status)
                     throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
@@ -192,17 +188,10 @@ namespace Business.Http.Services
 
 
                 // SECOND attempt:
-                try
-                {
-                    // Rebuild the http request message, to prevent "Request already sent" error:
-                    InitializeHttpRequestMessage();
 
-                    return await _httpAppClient.Send(_requestMessage);
-                }
-                catch
-                {
-                    throw;
-                }
+                InitializeHttpRequestMessage();
+
+                return await _httpAppClient.Send(_requestMessage);
             }
 
         }

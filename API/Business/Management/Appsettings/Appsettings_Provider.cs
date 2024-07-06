@@ -26,7 +26,7 @@ namespace Business.Management.Appsettings
         }
 
 
-
+        //..................................   To Do: search in apsettings: --- var TEST_MODEL = _conf.GetSection("Config.Global:RemoteServices").Get<List<RemoteService_AS_MODEL>>().FirstOrDefault(m => m.Name == "StaticContentService");
 
 
 

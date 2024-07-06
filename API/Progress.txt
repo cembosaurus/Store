@@ -1,59 +1,11 @@
 
-changed API_Gateway appsettings remopte services URI format, it's mapped to RemoteService class
-
-
-HttpIdentityClkient - must be unified RemoteServices URI structure in appsettings for every service
 
 
 
-a. - if appsettings will not be centralized in API_Gateway, then for all services, replace old appsettings RemoteService section with (see API_Gateway):
-
-    "InventoryService": {
-      "REST": {
-        "BaseURL": "http://localhost:7000"
-      },
-      "AMQP": {
-        "BaseURL": "http://localhost:7010"
-      }
-    }
-
-
-b. - OR move RemoteServices class from API_Gateway to global Busieness.Management.Services and use it as a singleton service in all services 
-        for fetching remote services URLs from Management service and holding it for further use (instead reading them from appsettings). Not readonly because possible update during runtime!
-
-        1 - RemoteServices.cs used as singleton suppose to read appsettings on startup (ctor) into List<RemoteSerrvice> and then be accessible publically.
-        2 - What if during the run time appsettings was edited, URLs updated ? Make RemoteServices.cs reload it and update List<RemoteSerrvice> ---- (handle errors as well)
-        3 - every remote service shpould download URTL's list from Management service during deployment (program.cs) and handle missing URL in middleware (possibly re-download) and store it into RemoteServices singleton
-            OR make background process to manage it
-
-
-
-
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     --- ORDERING SERVICE and PAYMENT SERVICE are DISABLED - causing problem witrh HttpItemClient because HttpItemClient is uder re-construction !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-                            To Do: replace http clients with appclient and make changes in http services like in http item service. When it works delete all clients 
 
                             To DO: API_Gateway - RemoteServices Controller and Management - RemoteServices Coontroller -----> add FLUENT VALIDATION !!!
 
                             To Do: all HttpServices classes in all services -- ad EmptyResult condition like in HttpItemService ------ also "EmptyContent" in condition put into enum so it is not such a hack
-
-                            To Do:  1. send URLs from Management on startup to all services (first try API_Gateway) ---> BackgroundService !!!!!
-                                    2. load URLs from Management on startup
-                                    3. load URLs from Management on failed request
-                                    4. try catch in HttpBaseService --- have to pass httprequestmessage into client
-                                    5. FIX all http services, delete all http clients ....
-
-                            NOTE: Management service is called after wrong URL, but when it's called as a main request (on startup) it is called twice if it's not online :)
-
-
-                            
-
-
-
-
 
 
                             To Do: ALL HTTP services --> make only one HTTP method. All parameters (get/post/del, query string, content ...) inserted by callers (services) --> services and httpservices are identical
@@ -63,7 +15,17 @@ b. - OR move RemoteServices class from API_Gateway to global Busieness.Managemen
                             To Do: Appsettings_PROVIDER --> AddOrUpdateAppSetting() --> implement ADD key if doesn't exist !!!!!!!!!!!!!!
 
 
-                            To Do: ManagementService - > functionality for managinfg the remote services (ID's, etc)
+
+
+                            To Do: REMOVE bad request responses from controllers , replace with actual errors !!!!!!!!!!!!!!!!!!!!!!!!
+
+
+                            To Do: HttpBaseService --> Send() reloads GC models but _model is not updated because request is not rebuilt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RE_EXAMINE whole request flow in the class !!!!!!!
+                                    HttpAllServices --> Send() --> InitializeHttpRequestMessage(); ????????????????????????????????????????????
+
+
+                            To Do: PrepDB() inventory --> handle no connection EX
+
 
                                                 
 

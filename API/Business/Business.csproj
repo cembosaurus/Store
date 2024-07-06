@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\NewFolder\" />
     <Folder Include="Http\Controllers\Interfaces\" />
     <Folder Include="Management\Data\Interfaces\" />
   </ItemGroup>

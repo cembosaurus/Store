@@ -52,33 +52,39 @@ namespace Business.Http.Services
 
 
 
-        public async Task<IServiceResult<Config_Global_AS_MODEL>> PostGlobalConfigToMultipleServices()
+        public async Task<IServiceResult<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>> PostGlobalConfigToMultipleServices()
         {
             _remoteServicePathName = "GlobalConfig";
 
             var globalConfig_Model = _globalConfig_Provider.GetGlobalConfig();
 
+            var result = new List<KeyValuePair<RemoteService_AS_MODEL, bool>>();
+
             if (!globalConfig_Model.Status)
-                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, "Global Config DB not found!");
+                return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Global Config DB not found!");
             if (globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
-                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, "Remote Services were not found in Global Config DB!");
+                return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Remote Services were not found in Global Config DB!");
 
 
             foreach (var model in globalConfig_Model.Data.RemoteServices)
             {
                 if (!model.GetPathByName(TypeOfService.REST, _remoteServicePathName).IsNullOrEmpty())
                 {
-                    if (model.Name == "ManagementService")
-                        continue;
+                    //if (model.Name == "ManagementService")
+                    //    continue;
 
                     _remoteServiceName = model.Name;
 
                     try
                     {
                         await PostGlobalConfig(globalConfig_Model.Data);
+
+                        result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, true));
                     }
                     catch (Exception ex)
                     {
+                        result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, false));
+
                         Console.ForegroundColor = ConsoleColor.Red; 
                         Console.Write("FAIL: ");
                         Console.ForegroundColor = ConsoleColor.White;
@@ -86,9 +92,9 @@ namespace Business.Http.Services
                     }
                 }
             }
+            
 
-
-            return null;
+            return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(result, true);
         }
     }
 }

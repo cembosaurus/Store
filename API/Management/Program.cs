@@ -1,3 +1,5 @@
+using Business.Data;
+using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
@@ -33,7 +35,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddHostedService<Management_Worker>();
 
-builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.AddSingleton<FileSystemWatcher>();
 builder.Services.AddSingleton<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();

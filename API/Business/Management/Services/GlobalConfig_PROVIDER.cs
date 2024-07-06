@@ -119,21 +119,21 @@ namespace Business.Management.Services
 
 
 
-        public IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_AS_MODEL serviceUrl, string pathName)
+        public IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_AS_MODEL serviceModel, string pathName)
         {
-            if (string.IsNullOrWhiteSpace(serviceUrl.Name))
+            if (string.IsNullOrWhiteSpace(serviceModel.Name))
                 return _resultFact.Result("", false, "Remote Service name is missing !");
             if (string.IsNullOrWhiteSpace(pathName))
-                return _resultFact.Result("", false, $"Path for Remote Service '{serviceUrl.Name}' was NOT provided !");
+                return _resultFact.Result("", false, $"Path for Remote Service '{serviceModel.Name}' was NOT provided !");
 
             //................................... NOT every remote service URL has path:
             //if (string.IsNullOrWhiteSpace(serviceUrl.GetPathByName(TypeOfService.REST, pathName)))
             //    return _resultFact.Result("", false, $"Path '{pathName}' for Remote Service '{serviceUrl.Name}' NOT found !");
 
-            var urlWithPath = serviceUrl.GetUrlWithPath(TypeOfService.REST, pathName, _isProdEnv);
+            var urlWithPath = serviceModel.GetUrlWithPath(TypeOfService.REST, pathName, _isProdEnv);
 
             if (string.IsNullOrWhiteSpace(urlWithPath))
-                return _resultFact.Result("", false, $"Path: '{pathName}' for Remote Service: '{serviceUrl.Name}' NOT found !");
+                return _resultFact.Result("", false, $"Path: '{pathName}' for Remote Service: '{serviceModel.Name}' NOT found !");
 
             return _resultFact.Result(urlWithPath, true);
         }

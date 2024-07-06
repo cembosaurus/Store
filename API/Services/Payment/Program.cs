@@ -1,3 +1,5 @@
+using Business.Data;
+using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
@@ -35,7 +37,8 @@ builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
 //*********************************** TEST CLIENT: ***********************************
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();

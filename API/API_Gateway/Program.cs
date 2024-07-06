@@ -4,6 +4,8 @@ using API_Gateway.Services.Business.Inventory;
 using API_Gateway.Services.Business.Inventory.Interfaces;
 using API_Gateway.Services.Business.Ordering;
 using API_Gateway.Services.Business.Ordering.Interfaces;
+using Business.Data;
+using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
@@ -38,7 +40,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<Config_Global_DB>();

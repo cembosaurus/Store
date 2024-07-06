@@ -1,3 +1,5 @@
+using Business.Data;
+using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
@@ -22,6 +24,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
 builder.Services.AddControllers(opt =>
 {
@@ -133,6 +136,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Configuration);
+PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Services.GetService<IGlobalVariables>());
 
 app.Run();

@@ -1,8 +1,8 @@
-﻿using Business.Filters.Identity;
-using Business.Identity.DTOs;
+﻿using Business.Identity.DTOs;
 using Identity.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+
 
 namespace Identity.Controllers.Business
 {
