@@ -2,10 +2,13 @@
 using Inventory.Models;
 using Microsoft.EntityFrameworkCore;
 
+
+
 namespace Services.Inventory.Data
 {
     public static class PrepDB
     {
+
         public static void PrepPopulation(IApplicationBuilder app, bool isProd, IGlobalVariables globalVariables)
         {
             // because it is static class it can't be registered. Create scope manualy:
@@ -14,6 +17,8 @@ namespace Services.Inventory.Data
                 SeedData(serviceScope.ServiceProvider.GetService<InventoryContext>(), isProd, globalVariables);
             }
         }
+
+
 
 
         private static void SeedData(InventoryContext context, bool isProd, IGlobalVariables globalVariables)

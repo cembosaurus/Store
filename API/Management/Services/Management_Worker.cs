@@ -31,7 +31,9 @@ namespace Management.Services
         // On StartUp:
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("--> Management Service: Background worker is running ...");
+            Console.ForegroundColor = ConsoleColor.White;
 
             HandleAppsettingsUpdate(); /// called just temporarely for testing
         }
@@ -67,8 +69,21 @@ namespace Management.Services
                 {
                     congigGlobal_Repo.Initialize(appsettingsResult.Data);
 
-                    var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices();     
-                    //.....
+                    var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices();
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+
+                    Console.WriteLine($"\n\rGlobal Config was updated in all relevant API services:");
+
+                    foreach (var service in httpUpdateResult.Data)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write($" - {service.Key.Name}: ");
+                        Console.ForegroundColor = service.Value ? ConsoleColor.Yellow : ConsoleColor.Red;
+                        Console.WriteLine($"{(service.Value ? "SUCCESS" : "FAILED")}");
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 

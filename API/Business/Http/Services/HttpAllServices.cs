@@ -77,9 +77,9 @@ namespace Business.Http.Services
 
                     try
                     {
-                        await PostGlobalConfig(globalConfig_Model.Data);
+                        var requestResult = await PostGlobalConfig(globalConfig_Model.Data);
 
-                        result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, true));
+                        result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, requestResult.Status));
                     }
                     catch (Exception ex)
                     {

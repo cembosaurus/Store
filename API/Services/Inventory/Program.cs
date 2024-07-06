@@ -13,7 +13,6 @@ using Inventory.Services;
 using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Services.Inventory.Data;
 using Services.Inventory.Data.Repositories.Interfaces;
