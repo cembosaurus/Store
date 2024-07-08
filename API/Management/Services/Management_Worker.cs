@@ -32,10 +32,10 @@ namespace Management.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("--> Management Service: Background worker is running ...");
+            Console.WriteLine("Management Service: Background worker is running.");
             Console.ForegroundColor = ConsoleColor.White;
 
-            HandleAppsettingsUpdate(); /// called just temporarely for testing
+            PostGlobalConfigToAPIServices();
         }
 
 
@@ -45,7 +45,7 @@ namespace Management.Services
             if (_switch)
                 Console.WriteLine($"--> Appsettings UPDATE: \n{args.ChangeType}\n{args.Name}\n{args.FullPath}");
 
-            HandleAppsettingsUpdate();
+            PostGlobalConfigToAPIServices();
 
 
             _switch = !_switch;
@@ -55,35 +55,48 @@ namespace Management.Services
 
 
         // Send update to all relevant API services (K8 multiple replicas will NOT be reached, only the one selected by Loadbalancer):
-        private async void HandleAppsettingsUpdate()
+        private async void PostGlobalConfigToAPIServices()
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.WriteLine("Sending Global Config to all relevant API services ...");
+
             using (var scope = _serviceFactory.CreateScope())
             {           
                 var appsettings_Provider = scope.ServiceProvider.GetService<IAppsettings_PROVIDER>();
                 var congigGlobal_Repo = scope.ServiceProvider.GetService<IConfig_Global_REPO>();
                 var httpAllServices = scope.ServiceProvider.GetService<IHttpAllServices>();
 
-                var appsettingsResult = appsettings_Provider.GetGlobalConfig();
-
-                if (appsettingsResult.Status)
+                if (appsettings_Provider != null
+                    && congigGlobal_Repo != null
+                    && httpAllServices != null)
                 {
-                    congigGlobal_Repo.Initialize(appsettingsResult.Data);
+                    var appsettingsResult = appsettings_Provider.GetGlobalConfig();
 
-                    var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices();
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-
-                    Console.WriteLine($"\n\rGlobal Config was updated in all relevant API services:");
-
-                    foreach (var service in httpUpdateResult.Data)
+                    if (appsettingsResult.Status)
                     {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write($" - {service.Key.Name}: ");
-                        Console.ForegroundColor = service.Value ? ConsoleColor.Yellow : ConsoleColor.Red;
-                        Console.WriteLine($"{(service.Value ? "SUCCESS" : "FAILED")}");
-                    }
+                        congigGlobal_Repo.Initialize(appsettingsResult.Data);
 
+                        var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
+
+                        Console.WriteLine($"\n\rGlobal Config was sent to API services:");
+
+                        foreach (var service in httpUpdateResult.Data)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.Write($" - {service.Key.Name}: ");
+                            Console.ForegroundColor = service.Key.Name == "ManagementService" ? ConsoleColor.White : service.Value ? ConsoleColor.Yellow : ConsoleColor.Red;
+                            Console.WriteLine($"{(service.Key.Name == "ManagementService" ? "BYPASSED" : service.Value ? "SUCCESS" : "FAILED")}");
+                        }
+
+                        Console.ResetColor();
+                    }
+                }
+                else {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("FAIL: ");
                     Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"Unable to send HTTP requests to API services! Some of necessary services were not instantiated!");
                 }
             }
 

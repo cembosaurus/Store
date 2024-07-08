@@ -25,16 +25,16 @@ using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Quartz;
 using Scheduler.Data;
 using Scheduler.Data.Repositories;
 using Scheduler.Data.Repositories.Interfaces;
+using Scheduler.Middlewares;
 using Scheduler.Modules;
 using Scheduler.Services;
 using Scheduler.Services.Interfaces;
-using Scheduler.Startup;
+using Scheduler.StartUp.Interfaces;
+using Scheduler.StartUp;
 using Scheduler.Tasks;
 using Scheduler.Tasks.Interfaces;
 using System.Text;
@@ -66,10 +66,8 @@ builder.Services.AddFluentValidation(conf => {
 
 // Scheduler modules (CartItemLocker... etc):
 builder.Services.RegisterSchedulerTasks(builder.Configuration);
-
-builder.Services.AddTransient<IRunAtStartup, RunAtStartup>();
-
 builder.Services.AddDbContext<SchedulerDBContext>();
+builder.Services.AddTransient<IRunAtStartUp, RunAtStartUp>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -147,9 +145,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-app.UseMiddleware<Metrics_MW>();
+app.UseMiddleware<Metrics_Client_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
+
+app.UseMiddleware<Scheduler_DbGuard_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
@@ -173,12 +173,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
-using (var scope = app.Services.CreateScope())
-{
-    var runAtStartup = scope.ServiceProvider.GetRequiredService<IRunAtStartup>();
-
-    await runAtStartup.Run();
-}
+Scheduler_DbGuard_MW.HandleExpiredItems(app);
 
 app.Run();

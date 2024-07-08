@@ -3,12 +3,12 @@ using System.Globalization;
 
 namespace Business.Middlewares
 {
-    public class Metrics_MW
+    public class Metrics_Client_MW
     {
         private RequestDelegate _next;
         private DateTime _timeIn;
 
-        public Metrics_MW(RequestDelegate next)
+        public Metrics_Client_MW(RequestDelegate next)
         {
             _next = next;
         }

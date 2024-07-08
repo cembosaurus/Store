@@ -112,7 +112,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-app.UseMiddleware<Metrics_MW>();
+app.UseMiddleware<Metrics_Client_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
 

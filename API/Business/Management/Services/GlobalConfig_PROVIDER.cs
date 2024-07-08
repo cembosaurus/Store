@@ -1,5 +1,6 @@
-﻿using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
+﻿using AutoMapper;
+using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
@@ -21,17 +22,17 @@ namespace Business.Management.Services
         private IConfig_Global_REPO _config_global_Repo;
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
-        private IAppsettings_PROVIDER _appsettings_Provider;
+        private IMapper _mapper;
 
 
 
-        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IAppsettings_PROVIDER appsettings_Provider)
+        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IMapper mapper)
         {
             _isProdEnv = env.IsProduction();
             _config_global_Repo = config_global_Repo;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
-            _appsettings_Provider = appsettings_Provider;
+            _mapper = mapper;
         }
 
 
@@ -206,14 +207,14 @@ namespace Business.Management.Services
         // UPDATE Remote Services models by GET response from Management service:
         public async Task<IServiceResult<Config_Global_AS_MODEL>> ReLoad()
         {
-            var result = await _httpManagementService.GetGlobalConfig();
+            var httpResult = await _httpManagementService.GetGlobalConfig();
 
-            if (!result.Status || result.Data == null)
-                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config was NOT received from Management service ! Reason: {result.Message}");
+            if (!httpResult.Status || httpResult.Data == null)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config was NOT received from Management service ! Reason: {httpResult.Message}");
 
-            result = Update(result.Data);
+            var result = _mapper.Map<Config_Global_AS_MODEL>(httpResult.Data);
 
-            return result;
+            return Update(result);
         }
 
 
@@ -223,14 +224,14 @@ namespace Business.Management.Services
         // UPDATE Remote Services models by GET response from Management service:
         public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServices()
         {
-            var result = await _httpManagementService.GetAllRemoteServices();
+            var httpResult = await _httpManagementService.GetAllRemoteServices();
 
-            if (!result.Status || result.Data.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Remote Services models were NOT received from Management service ! Reason: {result.Message}");
+            if (!httpResult.Status || httpResult.Data.IsNullOrEmpty())
+                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Remote Services models were NOT received from Management service ! Reason: {httpResult.Message}");
 
-            result = UpdateRemoteServiceModels(result.Data);
+            var result = _mapper.Map<IEnumerable<RemoteService_AS_MODEL>>(httpResult.Data);
 
-            return result;
+            return UpdateRemoteServiceModels(result);
         }
 
 

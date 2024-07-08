@@ -27,6 +27,7 @@ using Identity.Data.Repositories;
 using Identity.Data.Repositories.Interfaces;
 using Identity.JWT;
 using Identity.JWT.Interfaces;
+using Identity.Middlewares;
 using Identity.Models;
 using Identity.Services;
 using Identity.Services.Interfaces;
@@ -63,7 +64,6 @@ builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-//builder.Services.AddScoped<IHttpApiKeyAuthService, HttpApiKeyAuthService>();
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
@@ -146,9 +146,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<Metrics_MW>();
+app.UseMiddleware<Metrics_Client_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
+
+app.UseMiddleware<Identity_DbGuard_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
@@ -174,41 +176,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// DB:
-try
-{
-    // Migrations:
-    PrepDB.RunMigrations(app, app.Environment.IsProduction(), app.Configuration);
-
-    // Users and Roles:
-    using (var scope = app.Services.CreateScope())
-    {
-        var service = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-        // Seed roples:
-        await service.AddRoles();
-        // Create admin and manager:
-        await service.AddDefaultUsers();
-    }
-
-    // Seed DB:
-    PrepDB.PrepPopulation(app);
-}
-catch (SqlException ex)
-{
-    Console.ForegroundColor = ConsoleColor.Yellow;
-
-    switch (ex.Number)
-    {
-        case 11001:
-            Console.WriteLine($"\n\n\n--> DB Connection failed ! Reason: {ex.Message}\n\n\n");
-            break;
-        default:
-            Console.WriteLine($"\n\n\n--> SQL Error ! Reason: {ex.Message}\n\n\n");
-            break;
-    }
-
-    Console.ResetColor();
-}
-
+Identity_DbGuard_MW.Migrate_Prep_Seed_DB(app);
 
 app.Run();

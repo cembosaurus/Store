@@ -24,7 +24,18 @@
                                     HttpAllServices --> Send() --> InitializeHttpRequestMessage(); ????????????????????????????????????????????
 
 
-                            To Do: PrepDB() inventory --> handle no connection EX
+                            To Do: DbGuard_MW middleware -> enable DB Status checkup after SQL server is able to send HTTP request to API service about being ready !!!!
+
+
+
+                            To Do: - API service -> serviceID --> Managhement ------------------------------ send ServiceID_DTO to Management at startup
+                                   - Management --> GC (with serviceID) --> Metrics
+                                   - Metrics needs serviceID, in-datetime, out-datetime
+
+                            To Do: HttpManagementService --> DTOs not models !!!!
+
+                                   
+
 
 
                                                 

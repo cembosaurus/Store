@@ -1,9 +1,10 @@
-﻿using AutoMapper;
-using Business.Data.Repositories;
+﻿using Business.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Scheduler.Data.Repositories.Interfaces;
 using Scheduler.Models;
+
+
 
 namespace Scheduler.Data.Repositories
 {
@@ -13,7 +14,7 @@ namespace Scheduler.Data.Repositories
         private readonly SchedulerDBContext _context;
 
 
-        public CartItemLockRepository(SchedulerDBContext context, IMapper mapper) : base(context)
+        public CartItemLockRepository(SchedulerDBContext context) : base(context)
         {
             _context = context;
         }

@@ -1,16 +1,16 @@
-﻿using Scheduler.Tasks.Interfaces;
+﻿using Scheduler.StartUp.Interfaces;
+using Scheduler.Tasks.Interfaces;
 
 
 
-namespace Scheduler.Startup
+namespace Scheduler.StartUp
 {
-    public class RunAtStartup : IRunAtStartup
+    public class RunAtStartUp : IRunAtStartUp
     {
-
         private readonly ICartItemLocker _cartItemLocker;
 
 
-        public RunAtStartup(ICartItemLocker cartItemLocker)
+        public RunAtStartUp(ICartItemLocker cartItemLocker)
         {
             _cartItemLocker = cartItemLocker;
         }
@@ -19,22 +19,12 @@ namespace Scheduler.Startup
 
         public async Task Run()
         {
-                await RemoveExpiredItemsFromCart();
+            await RemoveExpiredItemsFromCart();
         }
 
 
 
 
-        private async Task RemoveExpiredItemsFromCart()
-        {
-            try
-            {
-                await _cartItemLocker.RemoveExpiredLocks();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"--> APP STARTUP: - FAILED to remove expired cart-item locks ! Reason: '{ex.Message}'");
-            }
-        }
+        public async Task RemoveExpiredItemsFromCart() => await _cartItemLocker.RemoveExpiredLocks();
     }
 }

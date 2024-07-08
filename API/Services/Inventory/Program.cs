@@ -9,6 +9,7 @@ using Business.Libraries.ServiceResult.Interfaces;
 using Business.Middlewares;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Inventory.Middlewares;
 using Inventory.Services;
 using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -108,9 +109,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<Metrics_MW>();
+app.UseMiddleware<Metrics_Client_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
+
+app.UseMiddleware<Inventory_DbGuard_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
@@ -135,6 +138,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Services.GetService<IGlobalVariables>());
+Inventory_DbGuard_MW.Seed(app);
 
 app.Run();

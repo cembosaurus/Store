@@ -29,15 +29,18 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Ordering.Data;
 using Ordering.Data.Repositories;
 using Ordering.Data.Repositories.Interfaces;
+using Ordering.Middlewares;
 using Ordering.Services;
 using Ordering.Services.Interfaces;
 using Ordering.Tools;
 using Ordering.Tools.Interfaces;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 
@@ -152,9 +155,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<Metrics_MW>();
+app.UseMiddleware<Metrics_Client_MW>();
 
 app.UseMiddleware<ServiceId_MW>();
+
+app.UseMiddleware<Ordering_DbGuard_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
@@ -178,14 +183,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-if (app.Environment.IsProduction())
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        Console.WriteLine("--> Ordering service: MIGRATION...");
-        var db = scope.ServiceProvider.GetRequiredService<OrderingContext>();
-        db.Database.Migrate();
-    }
-}
+Ordering_DbGuard_MW.Migrate_DB(app);
 
 app.Run();
