@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;

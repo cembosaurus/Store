@@ -22,6 +22,9 @@ namespace Business.Management.Appsettings
 
 
 
+
+        // Read:
+
         public bool IsEmpty()
         {
             return _db.Data.RemoteServices.IsNullOrEmpty();
@@ -73,6 +76,9 @@ namespace Business.Management.Appsettings
 
 
 
+
+
+        // Write:
 
         public bool UpdateByName(string name, RemoteService_AS_MODEL serviceURL)
         {

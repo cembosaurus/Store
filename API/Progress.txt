@@ -28,12 +28,6 @@
 
 
 
-                            To Do: - API service -> serviceID --> Managhement ------------------------------ send ServiceID_DTO to Management at startup
-                                   - Management --> GC (with serviceID) --> Metrics
-                                   - Metrics needs serviceID, in-datetime, out-datetime
-
-                            To Do: HttpManagementService --> DTOs not models !!!!
-
                                    
 
 

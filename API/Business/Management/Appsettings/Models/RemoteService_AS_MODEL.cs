@@ -1,5 +1,4 @@
 ﻿using Business.Management.Enums;
-using Business.Management.Models;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using static Business.Management.Appsettings.Models.RemoteService_AS_MODEL.ServiceType;
@@ -15,7 +14,6 @@ namespace Business.Management.Appsettings.Models
         public string Name { get; set; } = "";
         [JsonProperty("Type")]
         public List<ServiceType> Type { get; set; } = new List<ServiceType>();
-        public List<ServiceID_MODEL> ServiceIDs { get; set; } = new List<ServiceID_MODEL>();
 
 
 

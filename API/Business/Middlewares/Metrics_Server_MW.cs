@@ -17,7 +17,7 @@ namespace Business.Middlewares
         public async Task Invoke(HttpContext context)
         {
             var v = context.Request.Headers["test_data"];
-            var vv = context.Request.Headers.TryGetValue("test_data", out var _secretApiKey);
+            var vv = context.Request.Headers.TryGetValue("test_data", out var whatever);
 
             context.Response.OnStarting(() =>
             {

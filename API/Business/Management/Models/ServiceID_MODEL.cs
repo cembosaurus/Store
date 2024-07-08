@@ -4,6 +4,7 @@
     {
         public Guid Id = Guid.Empty;
         public string Name;
+        public string Name_ProjectFileName;
         public string Deployed;
 
     }

@@ -1,5 +1,8 @@
 ﻿using Business.Filters.Identity;
 using Business.Management.Appsettings.Interfaces;
+using Business.Management.Models;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -13,12 +16,12 @@ namespace Management.Controllers
     {
 
         private readonly IAppsettings_PROVIDER _appsettings_Provider;
+        private GlobalConfig_PROVIDER _globalConfig_Provider;
 
-
-
-        public GlobalConfigController(IAppsettings_PROVIDER appsettings_Provider)
+        public GlobalConfigController(IAppsettings_PROVIDER appsettings_Provider, GlobalConfig_PROVIDER globalConfig_Provider)
         {
             _appsettings_Provider = appsettings_Provider;
+            _globalConfig_Provider = globalConfig_Provider;
         }
 
 
@@ -44,6 +47,8 @@ namespace Management.Controllers
 
             return result.Status ? Ok(result) : BadRequest(result);
         }
+
+
 
 
     }
