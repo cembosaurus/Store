@@ -28,7 +28,7 @@ namespace Business.Middlewares
             {
                 context.Response.OnStarting(() =>
                 {
-                    context.Response.Headers.Add("ServiceId", _gv.ServiceID.ToString());
+                    context.Response.Headers.Append($"ServiceId.{_gv.ServiceName}", _gv.ServiceID.ToString());
 
                     return Task.CompletedTask;
                 });

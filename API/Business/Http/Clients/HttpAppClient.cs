@@ -13,7 +13,6 @@ namespace Business.Http.Clients
         private IHttpContextAccessor _accessor;
         private readonly string _serviceName;
         private string _remoteServiceName;
-        private DateTime _timeIn;
 
 
         public HttpAppClient(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config)
@@ -30,22 +29,57 @@ namespace Business.Http.Clients
 
         public async Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage, string remoteServiceName)
         {
-            _timeIn = DateTime.UtcNow;
             _remoteServiceName = remoteServiceName;
 
-            _accessor.HttpContext?.Response.Headers.Append($"Metrics.{_serviceName}", $"CLIENT.{_serviceName}.TO.{_remoteServiceName}.AT.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            MetricsEnd();
+
 
             _result = await _httpClient.SendAsync(requestMessage);
 
-            var response = _result.Headers.Where(h => h.Key.StartsWith($"Metrics."));
-            foreach (var header in response)
-            { 
-                _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
-            }
 
-            _accessor.HttpContext?.Response.Headers.Append($"Metrics.{_serviceName}", $"CLIENT.{_serviceName}.FROM.{_remoteServiceName}.AT.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            MetricsStart();
 
             return _result;
+        }
+
+
+
+        private void MetricsEnd()
+        {
+            // request out:
+            _accessor.HttpContext?.Response.Headers.Append(
+                $"Metrics.{_serviceName}", 
+                $"CLIENT.{_serviceName}.TO.{_remoteServiceName}.AT.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                );
+
+        }
+
+        private void MetricsStart()
+        {
+            // response in:
+            var responseMetrics = _result.Headers.Where(h => h.Key.StartsWith($"Metrics."));
+            var responseServiceID = _result.Headers.Where(h => h.Key.StartsWith($"ServiceId."));
+
+            if (responseMetrics != null)
+            {
+                foreach (var header in responseMetrics)
+                {
+                    _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
+                }
+            }
+
+            if (responseServiceID != null)
+            {
+                foreach (var header in responseServiceID)
+                {
+                    _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
+                }
+            }
+
+            _accessor.HttpContext?.Response.Headers.Append(
+                $"Metrics.{_serviceName}", 
+                $"CLIENT.{_serviceName}.FROM.{_remoteServiceName}.AT.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                );
         }
 
     }
