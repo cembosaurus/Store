@@ -28,6 +28,14 @@
 
 
 
+
+                            To Do: keys of metrics headers with more than one services in one request chain should contain serviceID for identification by API Metrics service
+
+
+
+                            WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
+
+
                                    
 
 

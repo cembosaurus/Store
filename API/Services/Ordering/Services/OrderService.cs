@@ -44,10 +44,17 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()
         {
+
+            // ----------------------------------------------------- TEST
+
+            var test = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1,2,3});
+
+            //------------------------------------------------------------------------------------
+
+
+
+
             var message = "";
-
-            Console.WriteLine($"--> GETTING orders ......");
-
 
             var orders = await _orderRepo.GetAllOrders();
 
@@ -55,9 +62,6 @@ namespace Ordering.Services
                 return _resultFact.Result<IEnumerable<OrderReadDTO>>(null, true, "NO orders were found !");
 
             var result = _mapper.Map<IEnumerable<OrderReadDTO>>(orders);
-
-
-            Console.WriteLine($"--> GETTING addresses form orders ......");
 
 
             var addressesIds = orders.Select(o => o.OrderDetails.AddressId);
@@ -98,8 +102,6 @@ namespace Ordering.Services
                 return _resultFact.Result<OrderReadDTO>(null, true, $"Cart for Order with user Id '{userId}' does NOT exist !");
 
 
-            Console.WriteLine($"--> GETTING order '{userId}' ......");
-
             var message = "";
 
 
@@ -115,8 +117,6 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByCartId(Guid cartId)
         {
-            Console.WriteLine($"--> GETTING order '{cartId}' ......");
-
             var message = "";
 
 
@@ -132,8 +132,6 @@ namespace Ordering.Services
 
         public async Task<IServiceResult<OrderReadDTO>> GetOrderByOrderCode(string code)
         {
-            Console.WriteLine($"--> GETTING order '{code}' ......");
-
             var message = "";
 
 
@@ -168,8 +166,6 @@ namespace Ordering.Services
 
 
             var message = string.Empty;
-
-            Console.WriteLine($"--> CREATING order for user '{userId}'......");
 
 
             var order = _mapper.Map<Order>(orderCreateDTO);
@@ -213,9 +209,6 @@ namespace Ordering.Services
 
             var message = "";
 
-            Console.WriteLine($"--> UPDATING order '{order.OrderCode}' ......");
-
-
             var addressResult = await _httpIdentityService.GetAddressByAddressId(orderUpdateDTO.OrderDetails.AddressId ?? 0);
 
             if (addressResult == null || !addressResult.Status)
@@ -241,9 +234,6 @@ namespace Ordering.Services
 
             if (order == null)
                 return _resultFact.Result<OrderReadDTO>(null, false, $"Order for user '{userId}' NOT found !");
-
-
-            Console.WriteLine($"--> COMPLETING order '{order.OrderCode}' ......");
 
 
             var cartItems = await _cartItemsRepo.GetCartItemsByUserId(userId);
@@ -293,9 +283,6 @@ namespace Ordering.Services
 
             if (order == null)
                 return _resultFact.Result<OrderReadDTO>(null, false, $"Order for user '{userId}' NOT found !");
-
-
-            Console.WriteLine($"--> DELETING order for user '{userId}'......");
 
 
             var result = await _orderRepo.DeleteOrder(order);

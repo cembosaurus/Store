@@ -165,7 +165,7 @@ namespace Business.Http.Services
             {
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage);
+                return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
             {
@@ -191,7 +191,7 @@ namespace Business.Http.Services
 
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage);
+                return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
             }
 
         }

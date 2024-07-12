@@ -38,7 +38,7 @@ namespace Business.Management.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {         
-            return await _httpAppClient.Send(_requestMessage);
+            return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
         }
 
 
