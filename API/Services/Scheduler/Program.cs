@@ -147,7 +147,7 @@ var app = builder.Build();
 
 app.UseMiddleware<Metrics_Client_MW>();
 
-app.UseMiddleware<ServiceId_MW>();
+app.UseMiddleware<AppId_MW>();
 
 app.UseMiddleware<Scheduler_DbGuard_MW>();
 

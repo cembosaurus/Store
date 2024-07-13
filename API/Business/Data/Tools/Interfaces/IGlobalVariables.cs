@@ -4,11 +4,9 @@ namespace Business.Data.Tools.Interfaces
 {
     public interface IGlobalVariables
     {
+        Guid AppID { get; }
+        ServiceID_MODEL AppID_Model { get; }
         bool DBState { get; set; }
-        DateTime ServiceDeployed { get; }
-        Guid ServiceID { get; }
-        ServiceID_MODEL ServiceID_Model { get; }
-        string ServiceName { get; }
-        string ServiceName_ProjectFileName { get; }
+        DateTime Deployed { get; }
     }
 }

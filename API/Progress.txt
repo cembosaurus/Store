@@ -34,6 +34,10 @@
 
 
                             WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
+                                        
+                                        To Do: identify original request sender (if MW didn't add false bool isSender into httpcontext of incoming request the it is sender), he will send data to metrics!!!! 
+                                                f.e: FE -> API_Gateway -> Ordering -> Identity ------ API_Gateway is sender
+                                                f.e: Ordering -> Scheduler ------ Ordering is sender
 
 
                                    

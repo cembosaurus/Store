@@ -1,4 +1,5 @@
-﻿using Business.Http.Clients.Interfaces;
+﻿using Business.Data.Tools.Interfaces;
+using Business.Http.Clients.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
@@ -13,12 +14,14 @@ namespace Business.Http.Clients
         private IHttpContextAccessor _accessor;
         private readonly string _serviceName;
         private string _remoteServiceName;
+        private readonly Guid _appId;
 
 
-        public HttpAppClient(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config)
+        public HttpAppClient(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config, IGlobalVariables gv)
         {
             _httpClient = httpClient;
             _accessor = accessor;
+            _appId = gv.AppID;
             _serviceName = config.GetSection("Name").Value;
             _serviceName = !string.IsNullOrWhiteSpace(_serviceName) ? _serviceName : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
         }
@@ -48,8 +51,8 @@ namespace Business.Http.Clients
         {
             // request out:
             _accessor.HttpContext?.Response.Headers.Append(
-                $"Metrics.{_serviceName}", 
-                $"CLIENT.{_serviceName}.TO.{_remoteServiceName}.AT.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"Metrics.{_serviceName}.{_appId}", 
+                $"HTTPCLIENT.TO.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
 
         }
@@ -77,8 +80,8 @@ namespace Business.Http.Clients
             }
 
             _accessor.HttpContext?.Response.Headers.Append(
-                $"Metrics.{_serviceName}", 
-                $"CLIENT.{_serviceName}.FROM.{_remoteServiceName}.AT.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"Metrics.{_serviceName}.{_appId}", 
+                $"HTTPCLIENT.FROM.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 

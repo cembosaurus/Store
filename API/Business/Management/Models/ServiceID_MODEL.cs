@@ -2,10 +2,10 @@
 {
     public class ServiceID_MODEL
     {
-        public Guid Id = Guid.Empty;
-        public string Name;
-        public string Name_ProjectFileName;
-        public string Deployed;
+        public Guid AppId = Guid.Empty;
+        public string AppName = "";
+        public string ServiceName = "";
+        public DateTime Deployed;
 
     }
 }
