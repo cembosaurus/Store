@@ -58,7 +58,7 @@ namespace Business.Middlewares
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("FAIL: ");
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Yellow;
 
             switch (ex.Number)
             {
@@ -69,6 +69,8 @@ namespace Business.Middlewares
                     Console.WriteLine($"SQL Error! Reason: {ex.Message}");
                     break;
             }
+
+            Console.ResetColor();
         }
 
     }

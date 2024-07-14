@@ -2,6 +2,6 @@
 {
     public interface IHttpAppClient
     {
-        Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage, string remoteServiceName);
+        Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage);
     }
 }

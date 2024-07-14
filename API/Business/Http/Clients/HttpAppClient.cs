@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 
+
+
 namespace Business.Http.Clients
 {
     public class HttpAppClient : IHttpAppClient
     {
 
         private readonly HttpClient _httpClient;
+        private HttpRequestMessage _requestMessage;
         private HttpResponseMessage _result;
         private IHttpContextAccessor _accessor;
         private readonly string _serviceName;
-        private string _remoteServiceName;
+        private string? _remoteServiceName;
         private readonly Guid _appId;
 
 
@@ -30,12 +33,16 @@ namespace Business.Http.Clients
 
 
 
-        public async Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage, string remoteServiceName)
+        public async Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage)
         {
-            _remoteServiceName = remoteServiceName;
+            _requestMessage = requestMessage;
+
+            _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestAPIServiceName"), out _remoteServiceName);
+
+
 
             MetricsEnd();
-
+          
 
             _result = await _httpClient.SendAsync(requestMessage);
 
@@ -50,9 +57,12 @@ namespace Business.Http.Clients
         private void MetricsEnd()
         {
             // request out:
+
+            _requestMessage.Headers.Add("Metrics.Sender", false.ToString());
+
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_serviceName}.{_appId}", 
-                $"HTTPCLIENT.TO.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"REQ.OUT.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
 
         }
@@ -60,8 +70,9 @@ namespace Business.Http.Clients
         private void MetricsStart()
         {
             // response in:
+
             var responseMetrics = _result.Headers.Where(h => h.Key.StartsWith($"Metrics."));
-            var responseServiceID = _result.Headers.Where(h => h.Key.StartsWith($"ServiceId."));
+            var responseAppID = _result.Headers.Where(h => h.Key.StartsWith($"AppId."));
 
             if (responseMetrics != null)
             {
@@ -71,9 +82,9 @@ namespace Business.Http.Clients
                 }
             }
 
-            if (responseServiceID != null)
+            if (responseAppID != null)
             {
-                foreach (var header in responseServiceID)
+                foreach (var header in responseAppID)
                 {
                     _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }
@@ -81,7 +92,7 @@ namespace Business.Http.Clients
 
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_serviceName}.{_appId}", 
-                $"HTTPCLIENT.FROM.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"RESP.IN.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 

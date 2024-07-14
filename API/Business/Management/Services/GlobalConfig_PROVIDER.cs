@@ -249,13 +249,13 @@ namespace Business.Management.Services
             if (config == null)
                 return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config data for Management service was NOT provided !");
 
-
             _config_global_Repo.Initialize(config);
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("SUCCESS: ");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("--> SUCCESS: ");
-            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Global Config was updated.");
+            Console.ResetColor();
 
             return _resultFact.Result(config, true);
         }

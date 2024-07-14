@@ -165,7 +165,7 @@ namespace Business.Http.Services
             {
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
+                return await _httpAppClient.Send(_requestMessage);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
             {
@@ -191,7 +191,7 @@ namespace Business.Http.Services
 
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
+                return await _httpAppClient.Send(_requestMessage);
             }
 
         }
@@ -203,9 +203,14 @@ namespace Business.Http.Services
             _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestURL + (string.IsNullOrWhiteSpace(_requestQuery) ? "" : "/" + _requestQuery)) };
             _requestMessage.Method = _method;
             _requestMessage.Content = _content;
+            _requestMessage.Options.Set(new HttpRequestOptionsKey<string>("RequestAPIServiceName"), _remoteServiceName);
+
+            // Headers:
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
+
             if (!string.IsNullOrWhiteSpace(_token) || !_useApiKey)
                 _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
             if (!_requestHeaders.IsNullOrEmpty())
             {
                 foreach (var h in _requestHeaders)

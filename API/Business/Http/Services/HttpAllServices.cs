@@ -38,7 +38,7 @@ namespace Business.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
-            return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
+            return await _httpAppClient.Send(_requestMessage);
         }
 
 
@@ -97,8 +97,13 @@ namespace Business.Http.Services
 
                         Console.ForegroundColor = ConsoleColor.Red; 
                         Console.Write("FAIL: ");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine($"HTTP request to '{_remoteServiceName}' --> Message: {ex.Message}");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write($"HTTP request to ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"'{_remoteServiceName}'");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($" --> Message: {ex.Message}");
+                        Console.ResetColor();
                     }
                 }
             }

@@ -31,9 +31,9 @@ namespace Management.Services
         // On StartUp:
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Management Service: Background worker is running.");
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
 
             PostGlobalConfigToAPIServices();
         }
@@ -57,7 +57,7 @@ namespace Management.Services
         // Send update to all relevant API services (K8 multiple replicas will NOT be reached, only the one selected by Loadbalancer):
         private async void PostGlobalConfigToAPIServices()
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Cyan;
 
             Console.WriteLine("Sending Global Config to all relevant API services ...");
 
@@ -79,11 +79,12 @@ namespace Management.Services
 
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
 
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"\n\rGlobal Config was sent to API services:");
 
                         foreach (var service in httpUpdateResult.Data)
                         {
-                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.Write($" - {service.Key.Name}: ");
                             Console.ForegroundColor = service.Key.Name == "ManagementService" ? ConsoleColor.White : service.Value ? ConsoleColor.Yellow : ConsoleColor.Red;
                             Console.WriteLine($"{(service.Key.Name == "ManagementService" ? "BYPASSED" : service.Value ? "SUCCESS" : "FAILED")}");
@@ -95,8 +96,9 @@ namespace Management.Services
                 else {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("FAIL: ");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"Unable to send HTTP requests to API services! Some of necessary services were not instantiated!");
+                    Console.ResetColor();
                 }
             }
 

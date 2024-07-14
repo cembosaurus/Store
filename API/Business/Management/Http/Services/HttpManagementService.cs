@@ -38,7 +38,7 @@ namespace Business.Management.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {         
-            return await _httpAppClient.Send(_requestMessage, _remoteServiceName);
+            return await _httpAppClient.Send(_requestMessage);
         }
 
 
@@ -63,12 +63,12 @@ namespace Business.Management.Http.Services
 
 
 
-        public async Task<IServiceResult<RemoteService_AS_DTO>> GetGlobalConfig()
+        public async Task<IServiceResult<Config_Global_AS_DTO>> GetGlobalConfig()
         {
             _method = HttpMethod.Get;
             _requestQuery = $"";
 
-            return await HTTP_Request_Handler<RemoteService_AS_DTO>();
+            return await HTTP_Request_Handler<Config_Global_AS_DTO>();
         }
 
 

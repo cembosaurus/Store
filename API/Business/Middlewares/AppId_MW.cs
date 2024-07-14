@@ -36,7 +36,7 @@ namespace Business.Middlewares
             {
                 context.Response.OnStarting(() =>
                 {
-                    context.Response.Headers.Append($"AppId.{_serviceName}", _gv.AppID.ToString());
+                    context.Response.Headers.Append($"AppId", $"{_serviceName}.{ _gv.AppID}");
 
                     return Task.CompletedTask;
                 });

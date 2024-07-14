@@ -12,6 +12,7 @@ namespace Business.Middlewares
         private RequestDelegate _next;
         private readonly Guid _appId;
         private readonly string _serviceName;
+        private bool _isHttpSender;
 
 
         public Metrics_Client_MW(RequestDelegate next, IConfiguration config, IGlobalVariables gv)
@@ -25,17 +26,32 @@ namespace Business.Middlewares
         {
             var _timeIn = DateTime.UtcNow;
 
-            context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"MIDDLEWARE.IN.{""}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            var isHttpSender = context.Request.Headers.FirstOrDefault(x => x.Key == "Metrics.Sender").Value;
+
+            _isHttpSender = !isHttpSender.Any(x => x.Equals(false.ToString()));
+
+            context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"REQ.IN.{""}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+
 
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"MIDDLEWARE.OUT.{""}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+                context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"RESP.OUT.{""}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+
+
+
+
+                // To Do: send METRICS data to metrics service if _isHttpSender !!!!
+                if (_isHttpSender)
+                {
+                    context.Response.Headers.Append($"Metrics.Sender", $"{_serviceName}.{_appId}");
+                }
+                
+
 
                 return Task.CompletedTask;
             });
 
             await _next(context);
-
         }
     }
 }

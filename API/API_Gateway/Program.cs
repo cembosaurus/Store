@@ -188,15 +188,25 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var remoteServicesInfoService = scope.ServiceProvider.GetRequiredService<IGlobalConfig_PROVIDER>();
+    var service = scope.ServiceProvider.GetRequiredService<IGlobalConfig_PROVIDER>();
 
-    // load all remote services models from, Management service:
+    // load Global Config from Management service:
     try { 
-        var result = await remoteServicesInfoService.ReLoadRemoteServices();
-        Console.WriteLine($"--> Loading remote services info models from Management service: {(result.Status ? "Success !" : $"Failed: {result.Message}")}");
+        var result = await service.ReLoad();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"Loading Global Config from Management service...");
+        Console.ForegroundColor = result.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+        Console.Write($"{(result.Status ? "Success !" : $"Failed: ")}");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"{(result.Status ? "" : result.Message)}");
+        Console.ResetColor();
     }
     catch (HttpRequestException ex) {
-        Console.WriteLine($"--> Remote service info models were NOT loaded from Management service ! EX: {ex.Message}");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write("FAIL: ");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"Global config was NOT loaded from Management service ! EX: {ex.Message}");
+        Console.ResetColor();
     }
 }
 
