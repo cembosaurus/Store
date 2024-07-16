@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Models;
-using Business.Management.Models;
 using static Business.Management.Appsettings.DTOs.RabbitMQ_AS_DTO;
 using static Business.Management.Appsettings.DTOs.RemoteService_AS_DTO;
 using static Business.Management.Appsettings.DTOs.RemoteService_AS_DTO.ServiceType_DTO;

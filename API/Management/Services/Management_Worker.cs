@@ -77,7 +77,9 @@ namespace Management.Services
                     {
                         congigGlobal_Repo.Initialize(appsettingsResult.Data);
 
+
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
+
 
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"\n\rGlobal Config was sent to API services:");

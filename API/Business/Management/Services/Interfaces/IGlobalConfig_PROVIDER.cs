@@ -1,6 +1,5 @@
 ﻿using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Models;
-using Business.Management.Models;
 
 namespace Business.Management.Services.Interfaces
 {

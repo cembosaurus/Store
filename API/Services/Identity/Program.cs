@@ -146,9 +146,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<Metrics_Client_MW>();
-
-app.UseMiddleware<AppId_MW>();
+app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<Identity_DbGuard_MW>();
 

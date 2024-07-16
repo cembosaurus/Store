@@ -38,7 +38,6 @@ builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>(); 
-builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
 //*********************************** TEST CLIENT: ***********************************
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
@@ -108,9 +107,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-app.UseMiddleware<Metrics_Client_MW>();
-
-app.UseMiddleware<AppId_MW>();
+app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 

@@ -5,7 +5,6 @@ using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Http.Services.Interfaces;
-using Business.Management.Models;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 
@@ -80,16 +79,6 @@ namespace Business.Management.Http.Services
             return await HTTP_Request_Handler<IEnumerable<RemoteService_AS_DTO>>();
         }
 
-
-
-        public async Task<IServiceResult<RemoteService_AS_DTO>> PostRemoteServiceID(ServiceID_MODEL serviceID)
-        {
-            _method = HttpMethod.Post;
-            _requestQuery = $"{"services/id"}";
-            _content = new StringContent(JsonConvert.SerializeObject(serviceID), _encoding, _mediaType);
-
-            return await HTTP_Request_Handler<RemoteService_AS_DTO>();
-        }
 
 
 

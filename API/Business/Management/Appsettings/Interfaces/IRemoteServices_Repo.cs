@@ -1,7 +1,5 @@
 ﻿using Business.Management.Appsettings.Models;
-using Business.Management.Data;
 using Business.Management.Enums;
-using Business.Management.Models;
 
 namespace Business.Management.Appsettings.Interfaces
 {

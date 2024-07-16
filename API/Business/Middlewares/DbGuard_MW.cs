@@ -1,3 +1,4 @@
+﻿
 ﻿using Business.Data.Tools.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;

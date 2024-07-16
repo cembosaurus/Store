@@ -36,7 +36,6 @@ builder.Services.AddControllers();
 builder.Services.AddHostedService<Management_Worker>();
 
 builder.Services.AddSingleton<IExId, ExId>(); 
-builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.AddSingleton<FileSystemWatcher>();
 builder.Services.AddSingleton<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
@@ -112,9 +111,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-app.UseMiddleware<Metrics_Client_MW>();
-
-app.UseMiddleware<AppId_MW>();
+app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 

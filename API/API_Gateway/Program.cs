@@ -157,9 +157,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
-app.UseMiddleware<Metrics_Client_MW>();
-
-app.UseMiddleware<AppId_MW>();
+app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
@@ -191,21 +189,22 @@ using (var scope = app.Services.CreateScope())
     var service = scope.ServiceProvider.GetRequiredService<IGlobalConfig_PROVIDER>();
 
     // load Global Config from Management service:
-    try { 
+    try {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"Updating Global Config. Waiting for response from Management service...");
+        Console.ResetColor();
         var result = await service.ReLoad();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Loading Global Config from Management service...");
         Console.ForegroundColor = result.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-        Console.Write($"{(result.Status ? "Success !" : $"Failed: ")}");
+        Console.Write($"{(result.Status ? "Success: " : $"Failed: ")}");
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"{(result.Status ? "" : result.Message)}");
+        Console.WriteLine($"{(result.Status ? "Response from Management service received." : result.Message)}");
         Console.ResetColor();
     }
     catch (HttpRequestException ex) {
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("FAIL: ");
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Global config was NOT loaded from Management service ! EX: {ex.Message}");
+        Console.WriteLine($"Global config was NOT received from Management service ! EX: {ex.Message}");
         Console.ResetColor();
     }
 }

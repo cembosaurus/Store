@@ -203,7 +203,7 @@ namespace Business.Http.Services
             _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestURL + (string.IsNullOrWhiteSpace(_requestQuery) ? "" : "/" + _requestQuery)) };
             _requestMessage.Method = _method;
             _requestMessage.Content = _content;
-            _requestMessage.Options.Set(new HttpRequestOptionsKey<string>("RequestAPIServiceName"), _remoteServiceName);
+            _requestMessage.Options.Set(new HttpRequestOptionsKey<string>("RequestTo"), _remoteServiceName);
 
             // Headers:
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));

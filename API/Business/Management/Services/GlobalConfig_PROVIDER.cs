@@ -252,7 +252,7 @@ namespace Business.Management.Services
             _config_global_Repo.Initialize(config);
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("SUCCESS: ");
+            Console.Write("Success: ");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Global Config was updated.");
             Console.ResetColor();

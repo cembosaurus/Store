@@ -39,6 +39,59 @@
                                                 f.e: FE -> API_Gateway -> Ordering -> Identity ------ API_Gateway is sender
                                                 f.e: Ordering -> Scheduler ------ Ordering is sender
 
+                                        To Do: isert service name into $"REQ.IN.{".........."}.{_timeIn..
+
+
+
+
+
+
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        client 
+
+
+           var xxx = _accessor.HttpContext?.Request.Headers.FirstOrDefault(x => x.Key.StartsWith("Metrics.Sender")).Value[0];
+            if (!string.IsNullOrWhiteSpace(xxx))
+                requestMessage.Headers.Add("Metrics.Sender", xxx);
+
+
+
+
+middelware
+
+
+
+            // is this service first in chain (http sender) ? 
+            var httpSender = context.Request.Headers.FirstOrDefault(x => x.Key == "Metrics.Sender").Value;
+
+            if (httpSender.IsNullOrEmpty())
+                context.Request.Headers.Append("Metrics.Sender", _serviceName);
+
+......
+
+
+
+                var v = context.Request.Headers.FirstOrDefault(x =>x.Key == "Metrics.Sender").Value;
+                bool X = v.Any(x => x.Equals(_serviceName));
+
+
 
                                    
 
