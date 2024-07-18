@@ -94,6 +94,9 @@ var app = builder.Build();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
+app.UseMiddleware<Metrics_MW>();
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

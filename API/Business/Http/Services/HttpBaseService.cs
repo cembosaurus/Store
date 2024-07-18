@@ -112,7 +112,7 @@ namespace Business.Http.Services
                 var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
 
                 if (!modelsListResult.Status)
-                    return _resultFact.Result(false, false, $"Failed to fetch Remote Services Info models from Management service !");
+                    return _resultFact.Result(false, false, $"Failed to fetch Remote Services models from Management service !");
 
                 // Load service model from Global Config again:
                 modelResult = GetServiceModel();

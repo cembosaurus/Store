@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 
 
@@ -14,15 +15,15 @@ namespace Business.Middlewares
         private static readonly AppId_MODEL _appId_Model = new AppId_MODEL { AppId = _appId, Deployed = _deployed };
 
         private RequestDelegate _next;
-        private readonly string _serviceName;
-        private StringValues _httpHeaderValue;
-        private string? _requestFrom;
+        private readonly string _thisService;
+        private StringValues _requestFrom;
+        private bool _metricsDataSender;
 
 
 
         public Metrics_MW(RequestDelegate next, IConfiguration config)
         {
-            _serviceName = config.GetSection("Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
+            _thisService = config.GetSection("Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
             _next = next;
         }
 
@@ -39,6 +40,50 @@ namespace Business.Middlewares
         }
 
 
+
+
+        private async Task RequestHandler(HttpContext context)
+        {
+            var _timeIn = DateTime.UtcNow;
+
+            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.DataSender", out StringValues result);
+
+            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
+
+            context.Request.Headers.Append($"Metrics.DataSender", $"{_metricsDataSender}");
+
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+
+
+            context.Response.OnStarting(() =>
+            {
+                context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+
+
+
+
+                //---------------------------------------------------------------------------------------------- To Do:
+
+                // send data collected from whole chain of HTTP requests to Metrics API serevice:
+                if (_metricsDataSender)
+                {
+                    Console.BackgroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
+                    Console.ResetColor();
+                }
+                //-------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+                return Task.CompletedTask;
+            });
+
+        }
+
+
         private async Task AppId(HttpContext context)
         {
             if (context.Request.Path == "/appid")
@@ -49,7 +94,7 @@ namespace Business.Middlewares
             {
                 context.Response.OnStarting(() =>
                 {
-                    context.Response.Headers.Append($"AppId", $"{_serviceName}.{_appId}");
+                    context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
 
                     return Task.CompletedTask;
                 });
@@ -58,34 +103,6 @@ namespace Business.Middlewares
         }
 
 
-        private async Task RequestHandler(HttpContext context)
-        {
-            var _timeIn = DateTime.UtcNow;
-
-            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _httpHeaderValue) ? _httpHeaderValue : "client_app";
-
-            context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
-
-
-            context.Response.OnStarting(() =>
-            {
-                context.Response.Headers.Append($"Metrics.{_serviceName}.{_appId}", $"RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
-
-
-
-
-                // To Do: send METRICS data to metrics service if _isHttpSender !!!!
-                if (_requestFrom == "client_app")
-                {
-                    Console.WriteLine();
-                }
-
-
-
-                return Task.CompletedTask;
-            });
-
-        }
 
 
 

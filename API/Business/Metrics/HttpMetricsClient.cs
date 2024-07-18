@@ -1,6 +1,7 @@
 ﻿using Business.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System.Globalization;
 
 
@@ -14,8 +15,9 @@ namespace Business.Metrics
         private HttpRequestMessage _requestMessage;
         private HttpResponseMessage _result;
         private IHttpContextAccessor _accessor;
-        private readonly string _serviceName;
-        private string? _remoteServiceName;
+        private readonly string _thisService;
+        private string? _sendToService;
+        private bool _metricsDataSender;
         private readonly Guid _appId;
 
 
@@ -25,8 +27,8 @@ namespace Business.Metrics
             _httpClient = httpClient;
             _accessor = accessor;
             _appId = Metrics_MW.AppId_Model.AppId;
-            _serviceName = config.GetSection("Name").Value;
-            _serviceName = !string.IsNullOrWhiteSpace(_serviceName) ? _serviceName : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
+            _thisService = config.GetSection("Name").Value;
+            _thisService = !string.IsNullOrWhiteSpace(_thisService) ? _thisService : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
         }
 
 
@@ -37,7 +39,8 @@ namespace Business.Metrics
         {
             _requestMessage = requestMessage;
 
-            _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _remoteServiceName);
+            _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
+            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.DataSender") ?? false;
 
 
 
@@ -57,13 +60,15 @@ namespace Business.Metrics
         {
             // request out:
 
-            _requestMessage.Headers.Add("Metrics.RequestFrom", _serviceName);
+            if(_metricsDataSender)
+                _requestMessage.Headers.Add("Metrics.DataSender", _metricsDataSender.ToString());
+
+            _requestMessage.Headers.Add("Metrics.RequestFrom", _thisService);
 
             _accessor.HttpContext?.Response.Headers.Append(
-                $"Metrics.{_serviceName}.{_appId}",
-                $"REQ.OUT.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"Metrics.{_thisService}.{_appId}",
+                $"REQ.OUT.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
-
         }
 
         private void MetricsStart()
@@ -90,8 +95,8 @@ namespace Business.Metrics
             }
 
             _accessor.HttpContext?.Response.Headers.Append(
-                $"Metrics.{_serviceName}.{_appId}",
-                $"RESP.IN.{_remoteServiceName}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"Metrics.{_thisService}.{_appId}",
+                $"RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 
