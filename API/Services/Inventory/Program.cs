@@ -6,6 +6,8 @@ using Business.Filters.Validation;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Http.Services;
 using Business.Middlewares;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -18,13 +20,28 @@ using Microsoft.IdentityModel.Tokens;
 using Services.Inventory.Data;
 using Services.Inventory.Data.Repositories.Interfaces;
 using System.Text;
-
-
+using Business.Http.Clients.Interfaces;
+using Business.Http.Clients;
+using Business.Management.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Data;
+using Business.Management.Http.Services.Interfaces;
+using Business.Management.Http.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
+
+builder.Services.AddSingleton<Config_Global_DB>();
+builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
+builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddControllers(opt =>
 {

@@ -38,6 +38,8 @@ using Scheduler.StartUp;
 using Scheduler.Tasks;
 using Scheduler.Tasks.Interfaces;
 using System.Text;
+using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Http.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +58,7 @@ builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

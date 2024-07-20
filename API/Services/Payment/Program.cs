@@ -15,6 +15,8 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
+using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Http.Services;
 using Business.Middlewares;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,11 +39,10 @@ builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IExId, ExId>();
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
-//*********************************** TEST CLIENT: ***********************************
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
-//************************************************************************************
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

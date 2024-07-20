@@ -6,7 +6,7 @@ using System.Globalization;
 
 
 
-namespace Business.Metrics
+namespace Business.Metrics.Http.Clients
 {
     public class HttpMetricsClient
     {
@@ -19,6 +19,7 @@ namespace Business.Metrics
         private string? _sendToService;
         private bool _metricsDataSender;
         private readonly Guid _appId;
+        private int _index;
 
 
 
@@ -39,8 +40,9 @@ namespace Business.Metrics
         {
             _requestMessage = requestMessage;
 
+            _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
+            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
             _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
-            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.DataSender") ?? false;
 
 
 
@@ -60,20 +62,24 @@ namespace Business.Metrics
         {
             // request out:
 
-            if(_metricsDataSender)
-                _requestMessage.Headers.Add("Metrics.DataSender", _metricsDataSender.ToString());
+            _requestMessage.Headers.Add("Metrics.Index", (++_index).ToString());
+
+            if (_metricsDataSender)
+                _requestMessage.Headers.Add("Metrics.Reporter", _metricsDataSender.ToString());
 
             _requestMessage.Headers.Add("Metrics.RequestFrom", _thisService);
 
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_thisService}.{_appId}",
-                $"REQ.OUT.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"{_index}.REQ.OUT.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 
         private void MetricsStart()
         {
             // response in:
+
+            _index = _result.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
 
             var responseMetrics = _result.Headers.Where(h => h.Key.StartsWith($"Metrics."));
             var responseAppID = _result.Headers.Where(h => h.Key.StartsWith($"AppId."));
@@ -94,9 +100,12 @@ namespace Business.Metrics
                 }
             }
 
+            _accessor.HttpContext?.Response.Headers.Remove("Metrics.Index");
+            _accessor.HttpContext?.Response.Headers.Add("Metrics.Index", _index.ToString());
+
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_thisService}.{_appId}",
-                $"RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"{_index}.RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 

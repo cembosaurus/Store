@@ -41,6 +41,8 @@
 
                                         TYo Do: calling GC Provider on app start -> encapsulate to class like in DB Seed example. For all services
 
+                                        To Do: Metrics API Service  should collect data from itself !!!!!! do it in MW
+
 
 
 

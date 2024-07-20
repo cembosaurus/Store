@@ -2,6 +2,8 @@ using Business.Filters.Validation;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Http.Services;
 using Business.Middlewares;
 using Inventory.Consumer.AMQPServices;
 using Inventory.Consumer.Data;
@@ -13,6 +15,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Business.Http.Clients.Interfaces;
+using Business.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +34,9 @@ builder.Services.AddHostedService(provider => provider.GetService<MessageBusSubs
 // Register DbContext as SINGLETON:
 builder.Services.AddDbContext<InventoryContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("InventoryConnStr"), opt => opt.EnableRetryOnFailure()), ServiceLifetime.Singleton);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddSingleton<IItemRepository, ItemRepository>();
 builder.Services.AddSingleton<IItemService, ItemService>();

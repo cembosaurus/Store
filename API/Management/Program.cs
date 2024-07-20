@@ -1,5 +1,3 @@
-using Business.Data;
-using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
@@ -19,6 +17,8 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
+using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
@@ -44,12 +44,12 @@ builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();

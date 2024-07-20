@@ -2,8 +2,12 @@ using Business.Data;
 using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
+using Business.Http.Clients.Interfaces;
+using Business.Http.Clients;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using StaticContent.Services;
 using StaticContent.Services.Interfaces;
@@ -22,6 +26,9 @@ builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 builder.Services.AddScoped<IImageFilesService, ImageFilesService>();
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
+
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
 
 
 builder.Services.AddCors(options =>

@@ -1,5 +1,5 @@
 ﻿using Business.Http.Clients.Interfaces;
-using Business.Metrics;
+using Business.Metrics.Http.Clients;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 

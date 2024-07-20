@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using System.Globalization;
 
 
@@ -16,14 +19,17 @@ namespace Business.Middlewares
 
         private RequestDelegate _next;
         private readonly string _thisService;
+        private readonly IHttpMetricsService _httpMetricsService;
         private StringValues _requestFrom;
         private bool _metricsDataSender;
+        private int _index;
 
 
 
-        public Metrics_MW(RequestDelegate next, IConfiguration config)
+        public Metrics_MW(RequestDelegate next, IConfiguration config, IHttpMetricsService httpMetricsService)
         {
             _thisService = config.GetSection("Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
+            _httpMetricsService = httpMetricsService;
             _next = next;
         }
 
@@ -46,18 +52,23 @@ namespace Business.Middlewares
         {
             var _timeIn = DateTime.UtcNow;
 
-            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.DataSender", out StringValues result);
-
+            _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
+            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
 
-            context.Request.Headers.Append($"Metrics.DataSender", $"{_metricsDataSender}");
-
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Request.Headers.Remove("Metrics.Index");
+            context.Request.Headers.Add("Metrics.Index", _index.ToString());
+            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsDataSender}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
 
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+                _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
+                context.Response.Headers.Remove("Metrics.Index");
+                context.Response.Headers.Add("Metrics.Index", _index.ToString());
+
+                context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
 
 
@@ -67,6 +78,16 @@ namespace Business.Middlewares
                 // send data collected from whole chain of HTTP requests to Metrics API serevice:
                 if (_metricsDataSender)
                 {
+                    context.Response.Headers.Remove("Metrics.Index");
+
+                    var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).AsEnumerable();
+
+
+
+                    var v = _httpMetricsService.Update(metricsData);
+
+
+
                     Console.BackgroundColor = ConsoleColor.Green;
                     Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
                     Console.ResetColor();
@@ -87,19 +108,8 @@ namespace Business.Middlewares
         private async Task AppId(HttpContext context)
         {
             if (context.Request.Path == "/appid")
-            {
-                await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(_appId_Model));
-            }
-            else
-            {
-                context.Response.OnStarting(() =>
-                {
-                    context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
+                context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
 
-                    return Task.CompletedTask;
-                });
-
-            }
         }
 
 

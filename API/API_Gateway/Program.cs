@@ -25,6 +25,8 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
+using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Http.Services;
 using Business.Middlewares;
 using Business.Ordering.Http.Services;
 using Business.Ordering.Http.Services.Interfaces;
@@ -43,12 +45,13 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
