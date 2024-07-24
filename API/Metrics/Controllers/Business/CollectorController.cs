@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
-namespace Metrics.Controllers
+namespace Metrics.Controllers.Business
 {
 
     [Route("api/[controller]")]
@@ -28,7 +28,12 @@ namespace Metrics.Controllers
         {
 
             // metrics data are sent in headers
-            var v = metricsData.ToList();
+            var data = metricsData.ToList();
+
+
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.WriteLine($"------------------- {data} -------------------------- SENDING METRICS ");
+            Console.ResetColor();
 
 
             return Ok();

@@ -40,6 +40,9 @@ using Scheduler.Tasks.Interfaces;
 using System.Text;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Metrics.Http.Services;
+using Business.Management.Tools;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,14 +53,10 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
-builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+Management_Register.Register(builder);
+
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddFluentValidation(conf => {
@@ -73,7 +72,7 @@ builder.Services.AddDbContext<SchedulerDBContext>();
 builder.Services.AddTransient<IRunAtStartUp, RunAtStartUp>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddTransient<ICartItemLocker, CartItemLocker>();
 
@@ -174,5 +173,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 Scheduler_DbGuard_MW.HandleExpiredItems(app);
+
+GlobalConfig_Seed.Load(app);
 
 app.Run();

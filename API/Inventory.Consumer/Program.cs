@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Clients;
+using Business.Management.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,9 +32,10 @@ builder.Services.AddSingleton<MessageBusSubscriber>();
 // ... deploy MessageBusSubscriber singleton service as a Background Service for AMQP listenning:
 builder.Services.AddHostedService(provider => provider.GetService<MessageBusSubscriber>());
 
-// Register DbContext as SINGLETON:
-builder.Services.AddDbContext<InventoryContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("InventoryConnStr"), opt => opt.EnableRetryOnFailure()), ServiceLifetime.Singleton);
+builder.Services.AddDbContext<InventoryContext>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+Management_Register.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
@@ -126,5 +128,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Configuration);
+
+GlobalConfig_Seed.Load(app);
 
 app.Run();

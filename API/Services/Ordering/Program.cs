@@ -20,8 +20,9 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
-using Business.Metrics.Http.Services.Interfaces;
+using Business.Management.Tools;
 using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Payment.Http.Services;
 using Business.Payment.Http.Services.Interfaces;
@@ -31,7 +32,6 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Ordering.Data;
@@ -42,7 +42,6 @@ using Ordering.Services;
 using Ordering.Services.Interfaces;
 using Ordering.Tools;
 using Ordering.Tools.Interfaces;
-using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 
@@ -57,14 +56,10 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
-builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+Management_Register.Register(builder);
+
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddFluentValidation(conf => {
@@ -102,7 +97,7 @@ builder.Services.AddScoped<IArchiveRepository , ArchiveRepository>();
 builder.Services.AddScoped<ICart, OrderingTools>();
 builder.Services.AddScoped<IOrder, OrderingTools>();
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 // Middleware that authenticate request before hitting controller (endpoint):
@@ -186,5 +181,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 Ordering_DbGuard_MW.Migrate_DB(app);
+
+GlobalConfig_Seed.Load(app);
 
 app.Run();

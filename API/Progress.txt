@@ -1,8 +1,6 @@
 
 
 
-
-
                             To DO: API_Gateway - RemoteServices Controller and Management - RemoteServices Coontroller -----> add FLUENT VALIDATION !!!
 
                             To Do: all HttpServices classes in all services -- ad EmptyResult condition like in HttpItemService ------ also "EmptyContent" in condition put into enum so it is not such a hack
@@ -13,6 +11,9 @@
                             To Do: ----------------------------> WHAT if Management API service sends new Global Config UPDATE with NEW/UPDATED Management API service URL to all services ????????????????????????????????????????????????????????????????? Implement UPDATE/Rewrite functionality to correct data in Appsettings !!!
 
                             To Do: Appsettings_PROVIDER --> AddOrUpdateAppSetting() --> implement ADD key if doesn't exist !!!!!!!!!!!!!!
+
+
+
 
 
 
@@ -31,6 +32,8 @@
 
                             To Do: keys of metrics headers with more than one services in one request chain should contain serviceID for identification by API Metrics service
 
+                            To Do: RabbitMQW --- Invewntory.Consumer --> FIX temporary dodgy appsettings data management in MessageBusSubscriber
+
 
 
                             WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
@@ -39,9 +42,19 @@
                                                 f.e: FE -> API_Gateway -> Ordering -> Identity ------ API_Gateway is sender
                                                 f.e: Ordering -> Scheduler ------ Ordering is sender
 
-                                        TYo Do: calling GC Provider on app start -> encapsulate to class like in DB Seed example. For all services
 
                                         To Do: Metrics API Service  should collect data from itself !!!!!! do it in MW
+
+                                        To Do: DEV/PROD in global config should be decided directly in DB or Repo, then work with adequate environmental data all over the project !!!!
+
+                                        To Do: Rest of the services now need GlobalkConfig path in appsettings to contact Management API service to obtain Metrics URL !!!!!! maybe it should be in Local.Config appsettings becaus eit is not business but management subject
+
+
+
+
+
+                                        INVESTIGATE: Managemet doesn't update GC in Metrics on startup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
 

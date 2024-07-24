@@ -18,6 +18,7 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
+using Business.Management.Tools;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -57,15 +58,12 @@ builder.Services.AddFluentValidation(conf => {
     conf.AutomaticValidationEnabled = true;
 });
 
-builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
-builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+Management_Register.Register(builder);
+
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<IdentityContext>();
@@ -175,5 +173,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 Identity_DbGuard_MW.Migrate_Prep_Seed_DB(app);
+
+GlobalConfig_Seed.Load(app);
 
 app.Run();

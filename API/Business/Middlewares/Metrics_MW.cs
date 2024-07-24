@@ -1,7 +1,9 @@
-﻿using Business.Metrics.Http.Services;
+﻿using Business.Management.Appsettings.Interfaces;
+using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
@@ -19,25 +21,27 @@ namespace Business.Middlewares
 
         private RequestDelegate _next;
         private readonly string _thisService;
-        private readonly IHttpMetricsService _httpMetricsService;
+        private readonly IServiceScopeFactory _serviceFactory;
         private StringValues _requestFrom;
         private bool _metricsDataSender;
         private int _index;
+        private IHttpMetricsService _httpMetricsService;
 
-
-
-        public Metrics_MW(RequestDelegate next, IConfiguration config, IHttpMetricsService httpMetricsService)
+        public Metrics_MW(RequestDelegate next, IConfiguration config, IServiceScopeFactory serviceFactory)
         {
             _thisService = config.GetSection("Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
-            _httpMetricsService = httpMetricsService;
+            _serviceFactory = serviceFactory;
             _next = next;
         }
 
 
 
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService)
         {
+
+            _httpMetricsService = httpMetricsService;
+
             await AppId(context);
 
             await RequestHandler(context);
@@ -64,6 +68,11 @@ namespace Business.Middlewares
 
             context.Response.OnStarting(() =>
             {
+
+                // if HTTP response was not received:
+                if (context.Response.StatusCode == 503)
+                    _index++;
+
                 _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
                 context.Response.Headers.Remove("Metrics.Index");
                 context.Response.Headers.Add("Metrics.Index", _index.ToString());
@@ -82,15 +91,23 @@ namespace Business.Middlewares
 
                     var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).AsEnumerable();
 
+                    if (_thisService == "MetricsService")
+                    {
+                        // To Do: write data into DB --> Metrics API Service can't send data to itself via HTTP request !!!!
 
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
+                        Console.ResetColor();
+                    }
+                    else 
+                    {
+                        var vvv = _httpMetricsService.Update(metricsData);
 
-                    var v = _httpMetricsService.Update(metricsData);
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
+                        Console.ResetColor();
+                    }
 
-
-
-                    Console.BackgroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
-                    Console.ResetColor();
                 }
                 //-------------------------------------------------------------------------------------------------------------------------------------------------
 

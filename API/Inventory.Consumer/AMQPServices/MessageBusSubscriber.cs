@@ -12,6 +12,7 @@ namespace Inventory.Consumer.AMQPServices
 {
     public class MessageBusSubscriber : BackgroundService, IMessageBusSubscriber
     {
+        private readonly bool _isProdEnv;
         private readonly IItemService _itemService;
         private readonly IServiceResultFactory _resultFact;
         private readonly IConfiguration _config;
@@ -26,17 +27,18 @@ namespace Inventory.Consumer.AMQPServices
         private string _requestQueueName;
 
 
-        public MessageBusSubscriber(IConfiguration config, IItemService itemService, IServiceResultFactory resultFact)
+        public MessageBusSubscriber(IConfiguration config, IItemService itemService, IServiceResultFactory resultFact, IWebHostEnvironment env)
         {
+            _isProdEnv = env.IsProduction();
             _itemService = itemService;
             _resultFact = resultFact;
             _config = config;
 
-            _requestQueueName = _config.GetSection("RabbitMQ:Server:ItemRequestQueueName").Value;
+            _requestQueueName = _config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:ItemRequestQueueName").Value;
             _connFact = new ConnectionFactory()
             {
-                HostName = _config.GetSection("RabbitMQ:Server:Host").Value,
-                Port = int.Parse(_config.GetSection("RabbitMQ:Server:Port").Value)
+                HostName = _config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Host").Value,
+                Port = int.Parse(_config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Port").Value)
             };
 
             CreateConnection();

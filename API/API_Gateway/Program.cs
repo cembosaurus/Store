@@ -17,14 +17,7 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
-using Business.Management.Appsettings.Interfaces;
-using Business.Management.Appsettings.Models;
-using Business.Management.Data;
-using Business.Management.Http.Services;
-using Business.Management.Http.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Services.Interfaces;
+using Business.Management.Tools;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Middlewares;
@@ -45,18 +38,14 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
-builder.Services.AddSingleton<Config_Global_DB>();
-builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
-builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
-builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+Management_Register.Register(builder);
+
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IJWTTokenStore, JWTTokenStore>();
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
@@ -187,30 +176,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-using (var scope = app.Services.CreateScope())
-{
-    var service = scope.ServiceProvider.GetRequiredService<IGlobalConfig_PROVIDER>();
-
-    // load Global Config from Management service:
-    try {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Updating Global Config. Waiting for response from Management service...");
-        Console.ResetColor();
-        var result = await service.ReLoad();
-        Console.ForegroundColor = result.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-        Console.Write($"{(result.Status ? "Success: " : $"Failed: ")}");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"{(result.Status ? "Response from Management service received." : result.Message)}");
-        Console.ResetColor();
-    }
-    catch (HttpRequestException ex) {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write("FAIL: ");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Global config was NOT received from Management service ! EX: {ex.Message}");
-        Console.ResetColor();
-    }
-}
+GlobalConfig_Seed.Load(app);
 
 
 app.Run();

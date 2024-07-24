@@ -9,14 +9,10 @@ using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
 using Business.Management.Appsettings.Interfaces;
-using Business.Management.Appsettings.Models;
-using Business.Management.Data;
+using Business.Management.Appsettings;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Services.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -26,6 +22,10 @@ using Management.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Business.Management.Data;
+using Business.Management.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Appsettings.Models;
 
 
 
@@ -35,21 +35,23 @@ builder.Services.AddControllers();
 
 builder.Services.AddHostedService<Management_Worker>();
 
-builder.Services.AddSingleton<IExId, ExId>(); 
-builder.Services.AddSingleton<FileSystemWatcher>();
-builder.Services.AddSingleton<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
-
-builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
+builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+
+builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
+
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<FileSystemWatcher>();
+builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
+
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
 builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
 builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
