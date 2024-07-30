@@ -9,10 +9,16 @@ using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
+using Business.Management.Data;
 using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
+using Business.Management.Services;
+using Business.Management.Services.Interfaces;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -22,10 +28,7 @@ using Management.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Business.Management.Data;
-using Business.Management.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Appsettings.Models;
+
 
 
 
@@ -56,7 +59,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

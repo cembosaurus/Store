@@ -9,6 +9,8 @@ using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -26,6 +28,7 @@ using System.Text;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IExId, ExId>();
@@ -34,7 +37,8 @@ builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 Management_Register.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers(opt =>

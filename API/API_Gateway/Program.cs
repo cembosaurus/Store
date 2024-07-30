@@ -28,8 +28,8 @@ using Business.Scheduler.JWT.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
-
+using Business.Metrics.Http.Clients.Interfaces;
+using Business.Metrics.Http.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +68,7 @@ builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
@@ -173,10 +173,10 @@ app.UseAuthorization();
 
 //app.MapGet("/", () => "Zedous !");
 
-app.MapControllers();
-
-
 GlobalConfig_Seed.Load(app);
+
+
+app.MapControllers();
 
 
 app.Run();

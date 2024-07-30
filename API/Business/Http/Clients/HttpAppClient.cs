@@ -1,28 +1,30 @@
 ﻿using Business.Http.Clients.Interfaces;
-using Business.Metrics.Http.Clients;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+using Business.Metrics.Http.Clients.Interfaces;
 
 
 
 namespace Business.Http.Clients
 {
-    public class HttpAppClient : HttpMetricsClient, IHttpAppClient
+    public class HttpAppClient : IHttpAppClient
     {
 
-        public HttpAppClient(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config) 
-            : base(httpClient, accessor, config)
-        {
+        private IHttpClient_Metrics _httpClient;
 
+
+        public HttpAppClient(IHttpClient_Metrics httpClient) 
+        {
+            _httpClient = httpClient;
         }
 
 
 
 
 
-        public async Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage)
+        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
         {
-            var _result = await base.Send(requestMessage);
+            // to implement Metrics into project, inherit from HttpMetricsClient
+            // and replace calling to HttpClient's SendAsync() by its SendAsync() method.
+            var _result = await _httpClient.SendAsync(requestMessage);
 
             return _result;
         }

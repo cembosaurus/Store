@@ -5,7 +5,7 @@ using Microsoft.Extensions.Primitives;
 namespace Metrics.Controllers.Business
 {
 
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CollectorController : ControllerBase
     {
@@ -38,6 +38,19 @@ namespace Metrics.Controllers.Business
 
             return Ok();
         }
+
+
+
+        //[ApiKeyAuth]
+        //[HttpPost()]
+        //public ActionResult TEST()
+        //{
+
+        //    Console.WriteLine("test");
+
+
+        //    return Ok();
+        //}
 
 
     }

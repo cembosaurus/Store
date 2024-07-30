@@ -134,7 +134,7 @@ namespace Business.Http.Services
 
             // add API Key to HTTP request header:
 
-            _useApiKey = !_service_model.GetPathByName(TypeOfService.REST, "GlobalConfig").IsNullOrEmpty();
+            _useApiKey = !_service_model.GetPathByName(TypeOfService.REST, "GlobalConfig").IsNullOrEmpty() || !_service_model.GetPathByName(TypeOfService.REST, "Collector").IsNullOrEmpty();
 
             if (_useApiKey)
             {
@@ -165,7 +165,7 @@ namespace Business.Http.Services
             {
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage);
+                return await _httpAppClient.SendAsync(_requestMessage);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
             {
@@ -191,7 +191,11 @@ namespace Business.Http.Services
 
                 InitializeHttpRequestMessage();
 
-                return await _httpAppClient.Send(_requestMessage);
+                return await _httpAppClient.SendAsync(_requestMessage);
+            }
+            catch(Exception ex)
+            {
+                throw;//----------------------------------------------------------------------------------------- http response mesage is NULL if metrics API serevice is OFF
             }
 
         }

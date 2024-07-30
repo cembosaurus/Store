@@ -12,15 +12,9 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
-using Business.Management.Appsettings.Interfaces;
-using Business.Management.Appsettings.Models;
-using Business.Management.Data;
-using Business.Management.Http.Services;
-using Business.Management.Http.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Services.Interfaces;
 using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -87,7 +81,8 @@ builder.Services.AddScoped<IHttpAddressService, HttpAddressService>();
 builder.Services.AddScoped<IHttpPaymentService, HttpPaymentService>();
 builder.Services.AddScoped<IHttpSchedulerService, HttpSchedulerService>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();

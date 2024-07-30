@@ -38,7 +38,7 @@ namespace Business.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
-            return await _httpAppClient.Send(_requestMessage);
+            return await _httpAppClient.SendAsync(_requestMessage);
         }
 
 
@@ -67,10 +67,11 @@ namespace Business.Http.Services
 
             if (!globalConfig_Model.Status)
                 return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Global Config DB not found!");
-            if (globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
+            if (globalConfig_Model.Data == null || globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
                 return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Remote Services were not found in Global Config DB!");
 
 
+            // send Http requests to specific API services:
             foreach (var model in globalConfig_Model.Data.RemoteServices)
             {
                 if (!model.GetPathByName(TypeOfService.REST, _remoteServicePathName).IsNullOrEmpty())
@@ -101,8 +102,10 @@ namespace Business.Http.Services
                         Console.Write($"HTTP request to ");
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write($"'{_remoteServiceName}'");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write($" Message: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($" --> Message: {ex.Message}");
+                        Console.WriteLine($"{ex.Message}");
                         Console.ResetColor();
                     }
                 }

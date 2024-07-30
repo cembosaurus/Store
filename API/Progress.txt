@@ -52,11 +52,9 @@
 
 
 
-
-                                        INVESTIGATE: Managemet doesn't update GC in Metrics on startup !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
+                                        To Do: HttpBaseService --> when using Api Key (f.e. Metrics) Bearer is loaded as well !!!!!!!
+                                                404: Can't find Metrics - Collector endpoint !!!!!!!
+                                                if request seccess but metrics request doesn't then add EX response into OK result about metrics not success !!!!!
 
 
 

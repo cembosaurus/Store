@@ -7,11 +7,14 @@ using Business.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using StaticContent.Services;
 using StaticContent.Services.Interfaces;
+
 
 
 
@@ -33,7 +36,8 @@ builder.Services.AddScoped<IImageFilesService, ImageFilesService>();
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddHttpContextAccessor();
 

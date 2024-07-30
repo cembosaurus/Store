@@ -15,6 +15,8 @@ namespace Business.Management.Tools
 
                 try
                 {
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write($"HTTP Get: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"Updating Global Config. Waiting for response from Management service...");
                     Console.ResetColor();
@@ -22,7 +24,7 @@ namespace Business.Management.Tools
                     Console.ForegroundColor = result.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
                     Console.Write($"{(result.Status ? "Success: " : $"Failed: ")}");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{(result.Status ? "Response from Management service received." : result.Message)}");
+                    Console.WriteLine($"{(result.Status ? "Global Config update: GET Response from Management service was received." : result.Message)}");
                     Console.ResetColor();
                 }
                 catch (HttpRequestException ex)
@@ -30,7 +32,11 @@ namespace Business.Management.Tools
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("FAIL: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"Global config was NOT received from Management service ! EX: {ex.Message}");
+                    Console.Write($"Global Config update: GET Response from Management API service was not received ! ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"EX: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{ex.Message}");
                     Console.ResetColor();
                 }
             }

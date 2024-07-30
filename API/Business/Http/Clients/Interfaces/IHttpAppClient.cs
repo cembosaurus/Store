@@ -2,6 +2,6 @@
 {
     public interface IHttpAppClient
     {
-        Task<HttpResponseMessage> Send(HttpRequestMessage requestMessage);
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage);
     }
 }

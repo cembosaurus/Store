@@ -1,12 +1,7 @@
-﻿using Business.Management.Appsettings.Interfaces;
-using Business.Metrics.Http.Services;
-using Business.Metrics.Http.Services.Interfaces;
+﻿using Business.Metrics.Http.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Tokens;
-using RabbitMQ.Client;
 using System.Globalization;
 
 
@@ -21,18 +16,19 @@ namespace Business.Middlewares
 
         private RequestDelegate _next;
         private readonly string _thisService;
-        private readonly IServiceScopeFactory _serviceFactory;
         private StringValues _requestFrom;
         private bool _metricsDataSender;
         private int _index;
         private IHttpMetricsService _httpMetricsService;
 
-        public Metrics_MW(RequestDelegate next, IConfiguration config, IServiceScopeFactory serviceFactory)
+
+
+        public Metrics_MW(RequestDelegate next, IConfiguration config)
         {
-            _thisService = config.GetSection("Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
-            _serviceFactory = serviceFactory;
+            _thisService = config.GetSection("Metrics:Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
             _next = next;
         }
+
 
 
 
@@ -66,17 +62,17 @@ namespace Business.Middlewares
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
 
-            context.Response.OnStarting(() =>
+            context.Response.OnStarting(async () =>
             {
 
-                // if HTTP response was not received:
+                // increase index if HTTP response was not received:
                 if (context.Response.StatusCode == 503)
                     _index++;
 
                 _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
+
                 context.Response.Headers.Remove("Metrics.Index");
                 context.Response.Headers.Add("Metrics.Index", _index.ToString());
-
                 context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
 
@@ -89,22 +85,27 @@ namespace Business.Middlewares
                 {
                     context.Response.Headers.Remove("Metrics.Index");
 
-                    var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).AsEnumerable();
+                    var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
 
                     if (_thisService == "MetricsService")
                     {
                         // To Do: write data into DB --> Metrics API Service can't send data to itself via HTTP request !!!!
 
-                        Console.BackgroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"{_thisService}: Updating metrics data localy... ");
                         Console.ResetColor();
                     }
                     else 
                     {
-                        var vvv = _httpMetricsService.Update(metricsData);
+                        var metricsHttpResult = await _httpMetricsService.Update(metricsData);
 
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"------------------- {_thisService} -------------------------- SENDING METRICS ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Sending metrics data to Metrics API service...");
+                        Console.ResetColor();
+                        Console.ForegroundColor = metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                        Console.Write(metricsHttpResult.Status ? "Success: " : "Fail: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(metricsHttpResult.Message);
                         Console.ResetColor();
                     }
 
@@ -116,10 +117,11 @@ namespace Business.Middlewares
 
 
 
-                return Task.CompletedTask;
+                return;// Task.CompletedTask;
             });
 
         }
+
 
 
         private async Task AppId(HttpContext context)
@@ -131,15 +133,10 @@ namespace Business.Middlewares
 
 
 
-
-
         public static AppId_MODEL AppId_Model
         {
             get { return _appId_Model; }
         }
-
-
-
 
 
 

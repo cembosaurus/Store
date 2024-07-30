@@ -1,5 +1,3 @@
-using Business.Data;
-using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
@@ -8,21 +6,16 @@ using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
-using Business.Management.Appsettings.Interfaces;
-using Business.Management.Data;
-using Business.Management.Http.Services;
-using Business.Management.Http.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Services.Interfaces;
-using Business.Metrics.Http.Services.Interfaces;
+using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Business.Management.Tools;
 
 
 
@@ -41,7 +34,8 @@ builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

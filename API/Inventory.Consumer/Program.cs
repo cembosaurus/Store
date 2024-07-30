@@ -1,9 +1,14 @@
 using Business.Filters.Validation;
+using Business.Http.Clients;
+using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Metrics.Http.Services.Interfaces;
+using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Inventory.Consumer.AMQPServices;
 using Inventory.Consumer.Data;
@@ -12,12 +17,11 @@ using Inventory.Consumer.Data.Repositories.Interfaces;
 using Inventory.Consumer.Services;
 using Inventory.Consumer.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Business.Http.Clients.Interfaces;
-using Business.Http.Clients;
-using Business.Management.Tools;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +42,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 Management_Register.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddSingleton<IItemRepository, ItemRepository>();
 builder.Services.AddSingleton<IItemService, ItemService>();

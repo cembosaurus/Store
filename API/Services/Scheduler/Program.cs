@@ -12,14 +12,11 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Appsettings;
-using Business.Management.Appsettings.Interfaces;
-using Business.Management.Appsettings.Models;
-using Business.Management.Data;
-using Business.Management.Http.Services;
-using Business.Management.Http.Services.Interfaces;
-using Business.Management.Services;
-using Business.Management.Services.Interfaces;
+using Business.Management.Tools;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
+using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
@@ -33,14 +30,12 @@ using Scheduler.Middlewares;
 using Scheduler.Modules;
 using Scheduler.Services;
 using Scheduler.Services.Interfaces;
-using Scheduler.StartUp.Interfaces;
 using Scheduler.StartUp;
+using Scheduler.StartUp.Interfaces;
 using Scheduler.Tasks;
 using Scheduler.Tasks.Interfaces;
 using System.Text;
-using Business.Metrics.Http.Services.Interfaces;
-using Business.Metrics.Http.Services;
-using Business.Management.Tools;
+
 
 
 
@@ -90,7 +85,8 @@ builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpCatalogueItemService, HttpCatalogueItemService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 
 // Middleware that authenticate request before hitting controller (endpoint):
