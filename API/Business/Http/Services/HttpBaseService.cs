@@ -22,11 +22,11 @@ namespace Business.Http.Services
 
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
-        private readonly IExId _exId;
         private readonly bool _isProdEnv;
 
         protected readonly IServiceResultFactory _resultFact;
         protected IGlobalConfig_PROVIDER _globalConfig_Provider;
+        protected readonly IExId _exId;
 
         protected bool _useApiKey;
         protected RemoteService_AS_MODEL _service_model;

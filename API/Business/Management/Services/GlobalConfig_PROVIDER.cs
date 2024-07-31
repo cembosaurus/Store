@@ -251,10 +251,6 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Global Config was updated.");
-            Console.ResetColor();
-
             return _resultFact.Result(config, true);
         }
 

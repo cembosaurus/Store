@@ -35,7 +35,7 @@ namespace Management.Services
             Console.WriteLine("Management Service: Background worker is running.");
             Console.ResetColor();
 
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Thread.Sleep(30000);
+            Thread.Sleep(10000);
 
             PostGlobalConfigToAPIServices();
         }
@@ -77,7 +77,7 @@ namespace Management.Services
 
                     if (appsettingsResult.Status)
                     {
-                        congigGlobal_Repo.Initialize(appsettingsResult.Data);
+                        congigGlobal_Repo.Initialize(appsettingsResult.Data ?? null!);
 
 
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
@@ -86,7 +86,7 @@ namespace Management.Services
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"\n\rGlobal Config was sent to API services:");
 
-                        foreach (var service in httpUpdateResult.Data)
+                        foreach (var service in httpUpdateResult.Data ?? null!)
                         {
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             Console.Write($" - {service.Key.Name}: ");

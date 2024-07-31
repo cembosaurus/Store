@@ -60,6 +60,20 @@
 
 
 
+
+
+
+                                                ***************************************************************** IMPORTANT ********************************************
+
+
+                                        To Do: TEST ---> 1. run api_gateway - do http://localhost:5000/order/all, observe M anagement service not rerached !!!!
+                                                         2. run Management service observe whether5 API_Gateway updates GlobalConfig !!!!!!
+                                                         3. run Order service observe whether request reached this service !!!!!
+
+
+
+
+
                                         
                                         
                                         
