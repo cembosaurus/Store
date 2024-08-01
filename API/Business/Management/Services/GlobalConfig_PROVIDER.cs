@@ -251,6 +251,12 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"Global Config: ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"initialized.");
+            Console.ResetColor();
+
             return _resultFact.Result(config, true);
         }
 
@@ -284,6 +290,12 @@ namespace Business.Management.Services
             }
 
             _config_global_Repo.RemoteServices.Initialize(servicesModels.ToList());
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"Global Config - Remote Services: ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"initialized.");
+            Console.ResetColor();
 
             return _resultFact.Result(servicesModels, true);
         }

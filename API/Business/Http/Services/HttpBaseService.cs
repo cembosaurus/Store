@@ -212,7 +212,7 @@ namespace Business.Http.Services
             // Headers:
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
 
-            if (!string.IsNullOrWhiteSpace(_token) || !_useApiKey)
+            if (!string.IsNullOrWhiteSpace(_token) && !_useApiKey)
                 _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
             if (!_requestHeaders.IsNullOrEmpty())

@@ -97,11 +97,18 @@ namespace Business.Middlewares
                     }
                     else 
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("HTTP Post: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Sending metrics data to Metrics API service...");
+                        Console.ResetColor();
+
                         var metricsHttpResult = await _httpMetricsService.Update(metricsData);
 
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Sending metrics data to Metrics API service...");
-                        Console.ResetColor();
+                        Console.Write("HTTP Response: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("from Metrics collector service ");
                         Console.ForegroundColor = metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
                         Console.Write(metricsHttpResult.Status ? "Success: " : "Fail: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;

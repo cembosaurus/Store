@@ -52,9 +52,13 @@
 
 
 
-                                        To Do: HttpBaseService --> when using Api Key (f.e. Metrics) Bearer is loaded as well !!!!!!!
-                                                404: Can't find Metrics - Collector endpoint !!!!!!!
-                                                if request seccess but metrics request doesn't then add EX response into OK result about metrics not success !!!!!
+
+
+
+
+
+
+                                        To Do: s3ending METRICS data wrong and api key doesn't authorize
 
 
 

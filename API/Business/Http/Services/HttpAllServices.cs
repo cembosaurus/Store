@@ -88,7 +88,29 @@ namespace Business.Http.Services
 
                     try
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"HTTP Post: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write($"Sending Global Config update to ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"{_remoteServiceName} ...");
+                        Console.ResetColor();
+
                         var requestResult = await PostGlobalConfig(globalConfig_DTO);
+
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"HTTP Response: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write($"Global Config update for ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"{_remoteServiceName} ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write($"was ");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write($"{(requestResult.Status ? "" : "NOT ")}");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"received.");
+                        Console.ResetColor();
 
                         result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, requestResult.Status));
                     }
@@ -96,14 +118,16 @@ namespace Business.Http.Services
                     {
                         result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, false));
 
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"HTTP Response: ");
                         Console.ForegroundColor = ConsoleColor.Red; 
                         Console.Write("FAIL: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write($"HTTP request to ");
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write($"'{_remoteServiceName}'");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write($" Message: ");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write($" EX: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine($"{ex.Message}");
                         Console.ResetColor();

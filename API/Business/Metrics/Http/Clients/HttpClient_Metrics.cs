@@ -49,16 +49,8 @@ namespace Business.Metrics.Http.Clients
 
             MetricsEnd();
 
-            try
-            {
+
             _responseMessage = await _httpClient.SendAsync(requestMessage);
-
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
 
 
             MetricsStart();

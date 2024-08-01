@@ -27,7 +27,6 @@ namespace Metrics.Controllers.Business
         public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, StringValues>> metricsData)
         {
 
-            // metrics data are sent in headers
             var data = metricsData.ToList();
 
 

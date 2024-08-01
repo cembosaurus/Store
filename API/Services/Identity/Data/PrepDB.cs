@@ -32,17 +32,31 @@ namespace Identity.Data
             // Apply migrations if it's in PRODUCTION env:
             if (isProd)
             {
-                Console.WriteLine("--> Attempring to apply MIGRATIONS ...");
+                Console.ForegroundColor = ConsoleColor.Cyan;  
+                Console.Write("Migrations:");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(" in progress ...");
+                Console.ResetColor();
 
                 try
                 {
                     context.Database.Migrate();
 
-                    Console.WriteLine($"--> MIGRATIONS - applied ...");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Migrations:");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($" completed succesfuly.");
+                    Console.ResetColor();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"--> Could not run MIGRATIONS: {ex.Message}");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("Migrations:");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"Fail: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"{ex.Message}");                   
+                    Console.ResetColor();
                 }
             }
         }
@@ -53,6 +67,12 @@ namespace Identity.Data
         {
             if (!context.Address.Any())
             {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("DB Seed: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("in progress ...");
+                Console.ResetColor();
+
                 context.Address.AddRange(
                     new Address { City = "Sydney", Street = "Pitt", Number = 2 },
                     new Address { City = "Sydney", Street = "King", Number = 5 },
@@ -92,11 +112,21 @@ namespace Identity.Data
                     new CurrentUsersAddress { UserId = 5, AddressId = 3 }
                     );
 
-                context.SaveChanges();
+                var seedRerrsult =  context.SaveChanges();
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("DB Seed: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Success: {seedRerrsult} were saved into DB");
+                Console.ResetColor();
             }
             else
             {
-                Console.WriteLine("---> SEED was NOT run. DATA is already present in DB !");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("DB Seed: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("was NOT run. DATA is already present in DB !");
+                Console.ResetColor();
             }
 
         }

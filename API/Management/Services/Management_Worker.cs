@@ -35,7 +35,7 @@ namespace Management.Services
             Console.WriteLine("Management Service: Background worker is running.");
             Console.ResetColor();
 
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
 
             PostGlobalConfigToAPIServices();
         }
