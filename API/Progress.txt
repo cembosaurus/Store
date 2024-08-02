@@ -60,6 +60,8 @@
 
                                         To Do: s3ending METRICS data wrong and api key doesn't authorize
 
+                                                - also don't authorize any service with JWT every time, only after 401 response in HtrtpBaseService
+
 
 
 

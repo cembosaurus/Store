@@ -30,13 +30,27 @@ namespace Business.Metrics.Http.Services
 
 
 
+        //public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, StringValues>> metricsData)
+        //{
+        //    _method = HttpMethod.Post;
+        //    _requestQuery = $"";
+        //    _content = new StringContent(JsonConvert.SerializeObject(metricsData), _encoding, _mediaType);
+
+        //    return await HTTP_Request_Handler<string>();
+        //}
         public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, StringValues>> metricsData)
         {
             _method = HttpMethod.Post;
             _requestQuery = $"";
-            _content = new StringContent(JsonConvert.SerializeObject(metricsData), _encoding, _mediaType);
+            _content = new StringContent(JsonConvert.SerializeObject("******** TEST ********"), _encoding, _mediaType);
 
-            return await HTTP_Request_Handler<string>();
+
+
+            var res = await HTTP_Request_Handler<string>();
+
+
+
+            return res;
         }
 
 

@@ -30,6 +30,10 @@ namespace Business.Management.Controllers
         [HttpPut("remoteservices")]
         public ActionResult UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_AS_MODEL> models)
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Incoming HTTP Post to update Remote Services ... ");
+            Console.ResetColor();
+
             var result = _globalConfig_Provider.UpdateRemoteServiceModels(models);
 
             return result.Status ? Ok(result) : BadRequest(result);
@@ -40,6 +44,10 @@ namespace Business.Management.Controllers
         [HttpPut()]
         public ActionResult Update([FromBody] Config_Global_AS_MODEL globalConfig)
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Incoming HTTP Post to update Global Config ... ");
+            Console.ResetColor();
+
             var result = _globalConfig_Provider.Update(globalConfig);
 
             return result.Status ? Ok(result) : BadRequest(result);

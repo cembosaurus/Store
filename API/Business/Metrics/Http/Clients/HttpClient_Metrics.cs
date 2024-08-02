@@ -50,7 +50,7 @@ namespace Business.Metrics.Http.Clients
             MetricsEnd();
 
 
-            _responseMessage = await _httpClient.SendAsync(requestMessage);
+            _responseMessage = await _httpClient.SendAsync(requestMessage);     // sometimes on startup when Metrics API service is not yet on gives NULL ref EX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
             MetricsStart();

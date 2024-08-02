@@ -254,7 +254,7 @@ namespace Business.Management.Services
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write($"Global Config: ");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"initialized.");
+            Console.WriteLine($"Initialized.");
             Console.ResetColor();
 
             return _resultFact.Result(config, true);
@@ -294,7 +294,7 @@ namespace Business.Management.Services
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write($"Global Config - Remote Services: ");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"initialized.");
+            Console.WriteLine($"Initialized.");
             Console.ResetColor();
 
             return _resultFact.Result(servicesModels, true);

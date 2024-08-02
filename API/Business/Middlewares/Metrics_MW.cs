@@ -20,6 +20,7 @@ namespace Business.Middlewares
         private bool _metricsDataSender;
         private int _index;
         private IHttpMetricsService _httpMetricsService;
+        private DateTime _timeIn;
 
 
 
@@ -50,30 +51,14 @@ namespace Business.Middlewares
 
         private async Task RequestHandler(HttpContext context)
         {
-            var _timeIn = DateTime.UtcNow;
 
-            _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
-            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
-            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
-
-            context.Request.Headers.Remove("Metrics.Index");
-            context.Request.Headers.Add("Metrics.Index", _index.ToString());
-            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsDataSender}");
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            MetricsIn(context);
 
 
             context.Response.OnStarting(async () =>
             {
 
-                // increase index if HTTP response was not received:
-                if (context.Response.StatusCode == 503)
-                    _index++;
-
-                _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
-
-                context.Response.Headers.Remove("Metrics.Index");
-                context.Response.Headers.Add("Metrics.Index", _index.ToString());
-                context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+                MetricsOut(context);
 
 
 
@@ -100,19 +85,27 @@ namespace Business.Middlewares
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("HTTP Post: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Sending metrics data to Metrics API service...");
+                        Console.Write("Sending metrics data to ");
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.Write("Metrics ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("API service...");
                         Console.ResetColor();
 
-                        var metricsHttpResult = await _httpMetricsService.Update(metricsData);
+                        var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("HTTP Response: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("from Metrics collector service ");
-                        Console.ForegroundColor = metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                        Console.Write(metricsHttpResult.Status ? "Success: " : "Fail: ");
+                        Console.Write("from ");
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        Console.Write("Metrics ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine(metricsHttpResult.Message);
+                        Console.Write("collector service ");
+                        Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                        Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
                         Console.ResetColor();
                     }
 
@@ -127,6 +120,34 @@ namespace Business.Middlewares
                 return;// Task.CompletedTask;
             });
 
+        }
+
+
+        private void MetricsIn(HttpContext context)
+        {
+            _timeIn = DateTime.UtcNow;
+
+            _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
+            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
+            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
+
+            context.Request.Headers.Remove("Metrics.Index");
+            context.Request.Headers.Add("Metrics.Index", _index.ToString());
+            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsDataSender}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+        }
+
+        private void MetricsOut(HttpContext context)
+        {
+            // increase index if HTTP response was not received:
+            if (context.Response.StatusCode == 503)
+                _index++;
+
+            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
+
+            context.Response.Headers.Remove("Metrics.Index");
+            context.Response.Headers.Add("Metrics.Index", _index.ToString());
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 

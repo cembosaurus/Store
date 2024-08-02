@@ -92,7 +92,7 @@ namespace Business.Http.Services
                         Console.Write($"HTTP Post: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write($"Sending Global Config update to ");
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.WriteLine($"{_remoteServiceName} ...");
                         Console.ResetColor();
 
@@ -102,7 +102,7 @@ namespace Business.Http.Services
                         Console.Write($"HTTP Response: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write($"Global Config update for ");
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.Write($"{_remoteServiceName} ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write($"was ");
@@ -124,7 +124,7 @@ namespace Business.Http.Services
                         Console.Write("FAIL: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write($"HTTP request to ");
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.Write($"'{_remoteServiceName}'");
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write($" EX: ");

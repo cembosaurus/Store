@@ -132,9 +132,9 @@ namespace Business.Http.Services
                 return _resultFact.Result(false, false, $"Request URL for Remote Service could not be constructed ! Missing URL in '{_remoteServiceName}' model !");
 
 
-            // add API Key to HTTP request header:
+            // use API Key:
 
-            _useApiKey = !_service_model.GetPathByName(TypeOfService.REST, "GlobalConfig").IsNullOrEmpty() || !_service_model.GetPathByName(TypeOfService.REST, "Collector").IsNullOrEmpty();
+            _useApiKey = _remoteServicePathName == "GlobalConfig" || _remoteServicePathName == "Collector";
 
             if (_useApiKey)
             {
@@ -163,8 +163,6 @@ namespace Business.Http.Services
             // FIRST attempt:
             try
             {
-                InitializeHttpRequestMessage();
-
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
