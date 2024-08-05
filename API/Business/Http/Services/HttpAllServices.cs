@@ -101,11 +101,11 @@ namespace Business.Http.Services
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write($"HTTP Response: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write($"Global Config update for ");
+                        Console.Write($"from ");
                         Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        Console.Write($"{_remoteServiceName} ");
+                        Console.Write($"{_remoteServiceName}: ");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write($"was ");
+                        Console.Write($"Global Config update was ");
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write($"{(requestResult.Status ? "" : "NOT ")}");
                         Console.ForegroundColor = ConsoleColor.Yellow;

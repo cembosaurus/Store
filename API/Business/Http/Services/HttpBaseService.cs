@@ -109,10 +109,10 @@ namespace Business.Http.Services
             {
                 // Local Global Config DB could be obsolete or incomplete,
                 // Re-Load service models from Management API service into local Global Config:
-                var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
+                var GCResult = await _globalConfig_Provider.ReLoad();
 
-                if (!modelsListResult.Status)
-                    return _resultFact.Result(false, false, $"Failed to fetch Remote Services models from Management service !");
+                if (!GCResult.Status)
+                    return _resultFact.Result(false, false, $"Failed to fetch Global Config from Management service !");
 
                 // Load service model from Global Config again:
                 modelResult = GetServiceModel();
@@ -165,7 +165,7 @@ namespace Business.Http.Services
             {
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
-            catch (Exception ex) when (_exId.Http_503(ex))
+            catch(HttpRequestException ex)//catch (Exception ex) when (_exId.Http_503(ex))
             {
                 // Catch ex 503: if HTTP Request URL provided by global settings is not up-to-date or wrong, request will fail ! ...
                 // Send the HTTP request to Management API service to update global settings by new data. ...
@@ -173,7 +173,7 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await ReloadServiceModels();
+                var servicesModelsResult = await ReloadGloalConfig();
 
                 if (!servicesModelsResult.Status)
                     throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
@@ -190,10 +190,6 @@ namespace Business.Http.Services
                 InitializeHttpRequestMessage();
 
                 return await _httpAppClient.SendAsync(_requestMessage);
-            }
-            catch(Exception ex)
-            {
-                throw;//----------------------------------------------------------------------------------------- http response mesage is NULL if metrics API serevice is OFF
             }
 
         }
@@ -243,14 +239,14 @@ namespace Business.Http.Services
         }
 
 
-        protected virtual async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReloadServiceModels()
+        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> ReloadGloalConfig()
         {
-            var modelsListResult = await _globalConfig_Provider.ReLoadRemoteServices();
+            var GCResult = await _globalConfig_Provider.ReLoad();
 
-            if (!modelsListResult.Status)
-                return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Failed to fetch Remote Services Info models from Management service !");
+            if (!GCResult.Status)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Failed to fetch Global Config from Management service !");
 
-            return modelsListResult;
+            return GCResult;
         }
     }
 }

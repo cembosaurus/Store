@@ -1,4 +1,5 @@
-﻿using Business.Http.Clients.Interfaces;
+﻿using Business.Exceptions.Interfaces;
+using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.DTOs;
@@ -18,15 +19,17 @@ namespace Business.Management.Http.Services
     public class HttpManagementService : HttpBaseService, IHttpManagementService
     {
 
+        private readonly IExId _exId;
         private readonly IHttpAppClient _httpAppClient;
         private IAppsettings_PROVIDER _appsettings_Provider;
 
 
-        public HttpManagementService(IWebHostEnvironment env, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpManagementService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
             : base(env, httpAppClient, resultFact)
         {
             _remoteServiceName = "ManagementService";
             _remoteServicePathName = "GlobalConfig";
+            _exId = exId;
             _httpAppClient = httpAppClient;
             _appsettings_Provider = appsettings_Provider;
         }
@@ -36,8 +39,20 @@ namespace Business.Management.Http.Services
 
 
         protected async override Task<HttpResponseMessage> Send()
-        {         
-            return await _httpAppClient.SendAsync(_requestMessage);
+        {
+            try
+            {
+                return await _httpAppClient.SendAsync(_requestMessage);
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX MANAGEMENT EX - http client call XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                Console.ResetColor();
+
+                throw;
+            }
+
         }
 
 

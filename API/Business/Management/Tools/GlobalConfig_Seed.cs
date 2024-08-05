@@ -36,28 +36,27 @@ namespace Business.Management.Tools
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write($"service ");
                     Console.ForegroundColor = result.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                    Console.Write($"{(result.Status ? " received. " : $"Failed ! : ")}");
+                    Console.Write($"{(result.Status ? " was received. " : $"Failed ! ")}");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{(result.Status ? "" : result.Message)}");
+                    Console.WriteLine($"{(result.Status ? "" : ": " + result.Message)}");
                     Console.ResetColor();
                 }
                 catch (HttpRequestException ex)
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write($"HTTP Response: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write($"from ");
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
                     Console.Write($"Management ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write($"service ");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("Failed ! : ");
+                    Console.Write($"service: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write($"Global Config update was not received ! ");
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write($"EX: ");
+                    Console.Write($"EX ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"{ex.Message}");
+                    Console.WriteLine($": {ex.StatusCode}, {ex.Message}");
                     Console.ResetColor();
                 }
             }

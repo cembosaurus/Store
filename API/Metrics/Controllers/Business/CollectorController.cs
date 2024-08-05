@@ -52,7 +52,7 @@ namespace Metrics.Controllers.Business
 
 
             var a = new ServiceResultFactory();
-            var result = a.Result<string>("test", true, "hovno");
+            var result = a.Result<string>("test", true, metricsData);
 
 
             return Ok(result);

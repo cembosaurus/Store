@@ -58,28 +58,23 @@
 
 
 
-                                        To Do: s3ending METRICS data wrong and api key doesn't authorize
-
-                                                - also don't authorize any service with JWT every time, only after 401 response in HtrtpBaseService
-
-
-
-
-
-
-
 
                                                 ***************************************************************** IMPORTANT ********************************************
 
 
-                                        To Do: TEST ---> 1. run api_gateway - do http://localhost:5000/order/all, observe M anagement service not rerached !!!!
-                                                         2. run Management service observe whether5 API_Gateway updates GlobalConfig !!!!!!
-                                                         3. run Order service observe whether request reached this service !!!!!
+                         To Do: TEST ---> 1. run api_gateway - do http://localhost:5000/order/all, observe Metrics service not rerached !!!! ---> EX unhandled !!!!
+                                                API_Gateway to Metrics have to call Management (to fetch Metrics URL) where (unlike HttpBaseService) Management.Send() is UNHANDLED!!!!!!!!!!!
+                                                CHECK: HttpBaseService line: 112
+
+                                          2. run Management service observe whether5 API_Gateway updates GlobalConfig !!!!!! ---> GC updated but Management says API_Gasteway not updated ?????
+
+                                          3. run Order service observe whether request reached this service !!!!! ---> doesn't upodate GC !!!
 
 
 
 
 
+                                          To Do: fix wrong metrics index in headers when sender sends data to Metrrics after request
                                         
                                         
                                         
