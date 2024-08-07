@@ -107,6 +107,13 @@ namespace Business.Http.Services
 
             if (!modelResult.Status)
             {
+
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.WriteLine($"---------------------- HttpBaseService: --> calling:   {_remoteServiceName}   -----------------------------------");
+                Console.ResetColor();
+
+
+
                 // Local Global Config DB could be obsolete or incomplete,
                 // Re-Load service models from Management API service into local Global Config:
                 var GCResult = await _globalConfig_Provider.ReLoad();
@@ -163,10 +170,20 @@ namespace Business.Http.Services
             // FIRST attempt:
             try
             {
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HttpBaseService: --> calling:   {_remoteServiceName}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                Console.ResetColor();
+
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
-            catch(HttpRequestException ex)//catch (Exception ex) when (_exId.Http_503(ex))
+            catch (Exception ex) when (_exId.Http_503(ex))
             {
+
+                Console.BackgroundColor = ConsoleColor.Magenta;
+                Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpBaseService: 503 Exception - http client call:   {_remoteServiceName}  1 attempt failed   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                Console.ResetColor();
+
+
                 // Catch ex 503: if HTTP Request URL provided by global settings is not up-to-date or wrong, request will fail ! ...
                 // Send the HTTP request to Management API service to update global settings by new data. ...
                 // Create new request URL. ...

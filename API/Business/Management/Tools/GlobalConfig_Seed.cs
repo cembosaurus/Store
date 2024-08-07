@@ -18,7 +18,7 @@ namespace Business.Management.Tools
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write($"HTTP Get: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write($"Updating Global Config. Waiting for response from ");
+                    Console.Write($"App startup - Updating Global Config. Waiting for response from ");
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
                     Console.Write($"Management ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
