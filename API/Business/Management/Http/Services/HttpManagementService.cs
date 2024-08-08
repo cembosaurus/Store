@@ -40,23 +40,23 @@ namespace Business.Management.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
-            try
-            {
-                Console.BackgroundColor = ConsoleColor.Blue;
-                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HttpManagementService: --> calling:   {_remoteServiceName}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                Console.ResetColor();
+            //try
+            //{
+            //    Console.BackgroundColor = ConsoleColor.Blue;
+            //    Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HttpManagementService: --> calling:   {_remoteServiceName}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            //    Console.ResetColor();
 
 
                 return await _httpAppClient.SendAsync(_requestMessage);
-            }
-            catch (Exception ex) when (_exId.Http_503(ex))
-            {
-                Console.BackgroundColor = ConsoleColor.DarkBlue;
-                Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpManagementService: 503 Exception - http client call:   {_remoteServiceName}  UNHANDLED   <<<<<<<<<<<<<<<<<<< RE-THROW <<<<<<<<<<<<<<<<<<");
-                Console.ResetColor();
+            //}
+            //catch (Exception ex) when (_exId.Http_503(ex))
+            //{
+            //    Console.BackgroundColor = ConsoleColor.DarkBlue;
+            //    Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpManagementService: 503 Exception - http client call:   {_remoteServiceName}  UNHANDLED   <<<<<<<<<<<<<<<<<<< RE-THROW <<<<<<<<<<<<<<<<<<");
+            //    Console.ResetColor();
 
-                throw;
-            }
+            //    throw;
+            //}
 
         }
 
