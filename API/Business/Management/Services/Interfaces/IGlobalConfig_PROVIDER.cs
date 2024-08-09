@@ -15,8 +15,8 @@ namespace Business.Management.Services.Interfaces
         IServiceResult<string> GetRemoteServiceURL_WithPath(RemoteService_AS_MODEL serviceModel, string pathName);
         IServiceResult<string> GetRemoteServiceURL_WithPath(string serviceName, string pathName);
         IServiceResult<bool> IsEmpty_RemoteServiceModels();
-        Task<IServiceResult<Config_Global_AS_MODEL>> ReLoad();
-        Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServices();
+        Task<IServiceResult<Config_Global_AS_MODEL>> ReLoadGlobalConfig_FromRemote();
+        Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServicesModels_FromRemote();
         IServiceResult<Config_Global_AS_MODEL> Update(Config_Global_AS_MODEL config);
         IServiceResult<IEnumerable<RemoteService_AS_MODEL>> UpdateRemoteServiceModels(IEnumerable<RemoteService_AS_MODEL> servicesModels);
     }

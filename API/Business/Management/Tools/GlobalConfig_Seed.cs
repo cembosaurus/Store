@@ -25,7 +25,7 @@ namespace Business.Management.Tools
                     Console.WriteLine($"service...");
                     Console.ResetColor();
 
-                    var result = await service.ReLoad();
+                    var result = await service.ReLoadGlobalConfig_FromRemote();
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write($"HTTP Response: ");

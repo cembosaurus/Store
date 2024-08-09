@@ -54,8 +54,14 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);     // To Do: sometimes on startup when Metrics API service is not ON yet, it gives NULL ref EX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("HTTP Client: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"response from {_sendToService}: {ex.Message}");
+                Console.ResetColor();
+
                 throw;
             }
             finally 

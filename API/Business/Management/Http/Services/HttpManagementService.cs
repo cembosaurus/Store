@@ -61,7 +61,7 @@ namespace Business.Management.Http.Services
         }
 
 
-        protected override IServiceResult<RemoteService_AS_MODEL> GetServiceModel()
+        protected override IServiceResult<RemoteService_AS_MODEL> GetServiceModel_FromLocal()
         {
             return _appsettings_Provider.GetRemoteServiceModel(_remoteServiceName);
         }
@@ -87,7 +87,16 @@ namespace Business.Management.Http.Services
             _method = HttpMethod.Get;
             _requestQuery = $"";
 
-            return await HTTP_Request_Handler<Config_Global_AS_DTO>();
+            try
+            {
+                return await HTTP_Request_Handler<Config_Global_AS_DTO>();
+
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS HTTP MANAGEMENT SERVICE get global config.... FAIL..... SSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+                return _resultFact.Result<Config_Global_AS_DTO>(null, false, ex.Message);
+            }
         }
 
 

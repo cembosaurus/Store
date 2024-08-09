@@ -204,7 +204,7 @@ namespace Business.Management.Services
         // HTTP
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<Config_Global_AS_MODEL>> ReLoad()
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> ReLoadGlobalConfig_FromRemote()
         {
             var httpResult = await _httpManagementService.GetGlobalConfig();
 
@@ -221,7 +221,7 @@ namespace Business.Management.Services
         // HTTP
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServices()
+        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServicesModels_FromRemote()
         {
             var httpResult = await _httpManagementService.GetAllRemoteServices();
 

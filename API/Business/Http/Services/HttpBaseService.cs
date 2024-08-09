@@ -97,40 +97,41 @@ namespace Business.Http.Services
 
         protected async virtual Task<IServiceResult<bool>> CreateRequest()
         {
-            // get targeted API service's remote service model:
 
             if (string.IsNullOrWhiteSpace(_remoteServiceName))
                 return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
 
-            // Load service model from Global Config
-            var modelResult = GetServiceModel();
+            // Load service spec from local Global Config
+            var modelResult = GetServiceModel_FromLocal();
 
             if (!modelResult.Status)
             {
 
                 Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine($"---------------------- HttpBaseService: --> calling:   {_remoteServiceName}   -----------------------------------");
+                Console.WriteLine($"HttpBaseService: --> FAIL -- Load service model from Management Service for:   {_remoteServiceName} -- {modelResult.Message}   -----------------------------------");
                 Console.ResetColor();
 
 
 
                 // Local Global Config DB could be obsolete or incomplete,
-                // Re-Load service models from Management API service into local Global Config:
-                var GCResult = await _globalConfig_Provider.ReLoad();
+                // Re-Load Global Config data from remote API source (Management Service):
+                var GCResult = await _globalConfig_Provider.ReLoadGlobalConfig_FromRemote();
 
                 if (!GCResult.Status)
-                    return _resultFact.Result(false, false, $"Failed to fetch Global Config from Management service !");
+                    return _resultFact.Result(false, false, $"Failed to re-load Global Config from Management service. URL for {_remoteServiceName} is not available !");
 
-                // Load service model from Global Config again:
-                modelResult = GetServiceModel();
+                // Make sure local Global Config was updated,
+                // Load service model from local Global Config again:
+                modelResult = GetServiceModel_FromLocal();
 
                 if (!modelResult.Status)
-                    return _resultFact.Result(false, false, $"Remote Service Info model '{_remoteServiceName}' was NOT found !");
+                    return _resultFact.Result(false, false, $"Global Config with URL for '{_remoteServiceName}' was NOT found locally !");
             }
 
-            _service_model = modelResult.Data;
+            _service_model = modelResult.Data ?? null!;
 
 
+            // URL found in local Global Config,
             // build HTTP request URL:
 
             _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
@@ -139,7 +140,7 @@ namespace Business.Http.Services
                 return _resultFact.Result(false, false, $"Request URL for Remote Service could not be constructed ! Missing URL in '{_remoteServiceName}' model !");
 
 
-            // use API Key:
+            // use API Key for relevant API services:
 
             _useApiKey = _remoteServicePathName == "GlobalConfig" || _remoteServicePathName == "Collector";
 
@@ -152,9 +153,9 @@ namespace Business.Http.Services
             }
 
 
-            // initialize HTTP request message:
+            // create HTTP request message:
 
-            InitializeHttpRequestMessage();
+            CreateHttpRequestMessage();
 
 
             return _resultFact.Result(true, true);
@@ -190,7 +191,7 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await ReloadGloalConfig();
+                var servicesModelsResult = await ReloadGloalConfig_FromRemote();
 
                 if (!servicesModelsResult.Status)
                     throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
@@ -204,7 +205,7 @@ namespace Business.Http.Services
 
                 // SECOND attempt:
 
-                InitializeHttpRequestMessage();
+                CreateHttpRequestMessage();
 
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
@@ -213,7 +214,7 @@ namespace Business.Http.Services
 
 
 
-        protected void InitializeHttpRequestMessage()
+        protected void CreateHttpRequestMessage()
         {
             _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestURL + (string.IsNullOrWhiteSpace(_requestQuery) ? "" : "/" + _requestQuery)) };
             _requestMessage.Method = _method;
@@ -250,15 +251,15 @@ namespace Business.Http.Services
 
 
 
-        protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel()
+        protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel_FromLocal()
         {
             return _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
         }
 
 
-        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> ReloadGloalConfig()
+        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> ReloadGloalConfig_FromRemote()
         {
-            var GCResult = await _globalConfig_Provider.ReLoad();
+            var GCResult = await _globalConfig_Provider.ReLoadGlobalConfig_FromRemote();
 
             if (!GCResult.Status)
                 return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Failed to fetch Global Config from Management service !");
