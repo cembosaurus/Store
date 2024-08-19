@@ -67,7 +67,7 @@
 
 
 
-
+                                          To Do: catch EX in HttpBaseService -> HTTP_Request_Handler(), wrap Send() into try block, attach serviceResult for Ex MW to add that result with specification and message into HTTP Response.
 
 
                                           

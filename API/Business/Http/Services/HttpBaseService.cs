@@ -79,10 +79,7 @@ namespace Business.Http.Services
 
             // send HTTP reequest:
 
-            var sendResponse = await Send();
-
-
-            var TEST = sendResponse.Content.ReadAsStringAsync().Result;
+            var sendResponse = await Send();             // EX handled only in startup process or Ex MW. To Do - handle it !!!!!!!
 
 
 
@@ -105,7 +102,9 @@ namespace Business.Http.Services
         // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL from Management API service:
         protected async virtual Task<HttpResponseMessage> Send()
         {
+
             // FIRST attempt:
+
             try
             {
                 Console.BackgroundColor = ConsoleColor.Green;
@@ -118,7 +117,7 @@ namespace Business.Http.Services
             {
 
                 Console.BackgroundColor = ConsoleColor.Magenta;
-                Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpBaseService: 503 Exception - http client call:   {_remoteServiceName}  1 attempt failed   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpBaseService: 503 Exception - from:   {_remoteServiceName}  1 attempt failed   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 Console.ResetColor();
 
 
@@ -140,6 +139,7 @@ namespace Business.Http.Services
                 if (string.IsNullOrWhiteSpace(_requestURL))
                     return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"Failed to get '{_remoteServiceName}' URL from local Global Config !", ex);
             }
+
 
 
             // SECOND attempt:

@@ -2,6 +2,6 @@
 {
     public interface IHttpAppClient
     {
-        Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage);
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, bool bypassMetrics = default);
     }
 }

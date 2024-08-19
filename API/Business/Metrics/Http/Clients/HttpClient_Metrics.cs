@@ -50,9 +50,10 @@ namespace Business.Metrics.Http.Clients
             MetricsEnd();
 
 
+            // Handle Ex to add Metrics data, then re-throw:
             try
             {
-                _responseMessage = await _httpClient.SendAsync(requestMessage);     // To Do: sometimes on startup when Metrics API service is not ON yet, it gives NULL ref EX !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
             catch (Exception ex)
             {
