@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -70,15 +71,19 @@ namespace Business.Http.Services
         {
             // create HTTP request:
 
-            var initResponse = await CreateRequest();
+            var createReqResponse = await CreateRequest();
 
-            if (!initResponse.Status)
-                return _resultFact.Result(default(T), false, $"HTTP request for remote service '{_remoteServiceName}' was NOT created ! Reason: {initResponse.Message}");
+            if (!createReqResponse.Status)
+                return _resultFact.Result(default(T), false, $"HTTP request for remote service '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
 
 
             // send HTTP reequest:
 
             var sendResponse = await Send();
+
+
+            var TEST = sendResponse.Content.ReadAsStringAsync().Result;
+
 
 
             // handle HTTP response:
@@ -91,74 +96,6 @@ namespace Business.Http.Services
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content);
 
             return result;
-        }
-
-
-
-        protected async virtual Task<IServiceResult<bool>> CreateRequest()
-        {
-
-            if (string.IsNullOrWhiteSpace(_remoteServiceName))
-                return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
-
-            // Load service spec from local Global Config
-            var modelResult = GetServiceModel_FromLocal();
-
-            if (!modelResult.Status)
-            {
-
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine($"HttpBaseService: --> FAIL -- Load service model from Management Service for:   {_remoteServiceName} -- {modelResult.Message}   -----------------------------------");
-                Console.ResetColor();
-
-
-
-                // Local Global Config DB could be obsolete or incomplete,
-                // Re-Load Global Config data from remote API source (Management Service):
-                var GCResult = await _globalConfig_Provider.ReLoadGlobalConfig_FromRemote();
-
-                if (!GCResult.Status)
-                    return _resultFact.Result(false, false, $"Failed to re-load Global Config from Management service. URL for {_remoteServiceName} is not available !");
-
-                // Make sure local Global Config was updated,
-                // Load service model from local Global Config again:
-                modelResult = GetServiceModel_FromLocal();
-
-                if (!modelResult.Status)
-                    return _resultFact.Result(false, false, $"Global Config with URL for '{_remoteServiceName}' was NOT found locally !");
-            }
-
-            _service_model = modelResult.Data ?? null!;
-
-
-            // URL found in local Global Config,
-            // build HTTP request URL:
-
-            _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
-
-            if (string.IsNullOrWhiteSpace(_requestURL))
-                return _resultFact.Result(false, false, $"Request URL for Remote Service could not be constructed ! Missing URL in '{_remoteServiceName}' model !");
-
-
-            // use API Key for relevant API services:
-
-            _useApiKey = _remoteServicePathName == "GlobalConfig" || _remoteServicePathName == "Collector";
-
-            if (_useApiKey)
-            {
-                var apiKeyResult = AddApiKeyToHeader();
-
-                if (!apiKeyResult.Status)
-                    return apiKeyResult;
-            }
-
-
-            // create HTTP request message:
-
-            CreateHttpRequestMessage();
-
-
-            return _resultFact.Result(true, true);
         }
 
 
@@ -191,25 +128,94 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await ReloadGloalConfig_FromRemote();
+                var servicesModelsResult = await DownloadGloalConfig_FromRemoteService();
 
                 if (!servicesModelsResult.Status)
-                    throw new HttpRequestException($"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to get correct URL from 'Management' API Service FAILED ! \\n Message: {servicesModelsResult.Message}");
+                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to download Global Config from 'Management' API service FAILED ! \\n Message: {servicesModelsResult.Message}", ex);
+
 
 
                 _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
                 if (string.IsNullOrWhiteSpace(_requestURL))
-                    throw new HttpRequestException("Failed to get request URL from remote service model !");
-
-
-                // SECOND attempt:
-
-                CreateHttpRequestMessage();
-
-                return await _httpAppClient.SendAsync(_requestMessage);
+                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"Failed to get '{_remoteServiceName}' URL from local Global Config !", ex);
             }
 
+
+            // SECOND attempt:
+
+            CreateHttpRequestMessage();
+
+            return await _httpAppClient.SendAsync(_requestMessage);
+
+        }
+
+
+
+        protected async virtual Task<IServiceResult<bool>> CreateRequest()
+        {
+
+            if (string.IsNullOrWhiteSpace(_remoteServiceName))
+                return _resultFact.Result(false, false, $"Remote Service NOT found, service's name was NOT provided !");
+
+            // Load service spec from local Global Config
+            var modelResult = GetServiceModel_FromLocalGlobalConfig();
+
+            if (!modelResult.Status)
+            {
+
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.WriteLine($"HttpBaseService: --> FAIL -- couldn't find model in LOCAL GLOBAL CONFIG :   {_remoteServiceName} -- {modelResult.Message}   -----------------------------------");
+                Console.ResetColor();
+
+
+
+                // Local Global Config DB could be obsolete or incomplete,
+                // Re-Load Global Config data from remote API source (Management Service):
+                var GCResult = await DownloadGloalConfig_FromRemoteService();
+
+                if (!GCResult.Status)
+                    return _resultFact.Result(false, false, $"Failed to download Global Config from Management API service. Message: {GCResult.Message}");
+
+                // Make sure local Global Config was updated,
+                // Load service model from local Global Config again:
+                modelResult = GetServiceModel_FromLocalGlobalConfig();
+
+                if (!modelResult.Status)
+                    return _resultFact.Result(false, false, $"Config data with URL for service '{_remoteServiceName}' was NOT found in local Global Config !");
+            }
+
+            _service_model = modelResult.Data ?? null!;
+
+
+            // URL found in local Global Config,
+            // build HTTP request URL:
+
+            _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
+
+            if (string.IsNullOrWhiteSpace(_requestURL))
+                return _resultFact.Result(false, false, $"Request URL string for service '{_remoteServiceName}' could not be constructed ! Missing data in local Global Config !");
+
+
+            // use API Key for relevant API services:
+
+            _useApiKey = _remoteServicePathName == "GlobalConfig" || _remoteServicePathName == "Collector";
+
+            if (_useApiKey)
+            {
+                var apiKeyResult = AddApiKeyToHeader();
+
+                if (!apiKeyResult.Status)
+                    return apiKeyResult;
+            }
+
+
+            // create HTTP request message:
+
+            CreateHttpRequestMessage();
+
+
+            return _resultFact.Result(true, true);
         }
 
 
@@ -251,13 +257,13 @@ namespace Business.Http.Services
 
 
 
-        protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel_FromLocal()
+        protected virtual IServiceResult<RemoteService_AS_MODEL> GetServiceModel_FromLocalGlobalConfig()
         {
             return _globalConfig_Provider.GetRemoteServiceByName(_remoteServiceName);
         }
 
 
-        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> ReloadGloalConfig_FromRemote()
+        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> DownloadGloalConfig_FromRemoteService()
         {
             var GCResult = await _globalConfig_Provider.ReLoadGlobalConfig_FromRemote();
 

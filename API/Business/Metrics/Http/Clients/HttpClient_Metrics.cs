@@ -66,7 +66,7 @@ namespace Business.Metrics.Http.Clients
             }
             finally 
             {
-                _responseMessage = new HttpResponseMessage();
+                _responseMessage = _responseMessage ?? new HttpResponseMessage();
 
                 _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
 

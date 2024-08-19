@@ -6,10 +6,8 @@
                             To Do: all HttpServices classes in all services -- ad EmptyResult condition like in HttpItemService ------ also "EmptyContent" in condition put into enum so it is not such a hack
 
 
-                            To Do: ALL HTTP services --> make only one HTTP method. All parameters (get/post/del, query string, content ...) inserted by callers (services) --> services and httpservices are identical
 
                             To Do: ----------------------------> WHAT if Management API service sends new Global Config UPDATE with NEW/UPDATED Management API service URL to all services ????????????????????????????????????????????????????????????????? Implement UPDATE/Rewrite functionality to correct data in Appsettings !!!
-
                             To Do: Appsettings_PROVIDER --> AddOrUpdateAppSetting() --> implement ADD key if doesn't exist !!!!!!!!!!!!!!
 
 
@@ -21,33 +19,29 @@
                             To Do: REMOVE bad request responses from controllers , replace with actual errors !!!!!!!!!!!!!!!!!!!!!!!!
 
 
-                            To Do: HttpBaseService --> Send() reloads GC models but _model is not updated because request is not rebuilt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RE_EXAMINE whole request flow in the class !!!!!!!
-                                    HttpAllServices --> Send() --> InitializeHttpRequestMessage(); ????????????????????????????????????????????
 
-
-                            To Do: DbGuard_MW middleware -> enable DB Status checkup after SQL server is able to send HTTP request to API service about being ready !!!!
+                            To Do: DbGuard_MW middleware -> enable DB Status checkup after SQL server is able to send HTTP request to API service about being ready ???????????????????????????
 
 
 
 
-                            To Do: keys of metrics headers with more than one services in one request chain should contain serviceID for identification by API Metrics service
 
                             To Do: RabbitMQW --- Invewntory.Consumer --> FIX temporary dodgy appsettings data management in MessageBusSubscriber
 
 
 
-                            WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
+
+
+          WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
                                         
                                         To Do: identify original request sender (if MW didn't add false bool isSender into httpcontext of incoming request the it is sender), he will send data to metrics!!!! 
                                                 f.e: FE -> API_Gateway -> Ordering -> Identity ------ API_Gateway is sender
                                                 f.e: Ordering -> Scheduler ------ Ordering is sender
 
 
-                                        To Do: Metrics API Service  should collect data from itself !!!!!! do it in MW
 
                                         To Do: DEV/PROD in global config should be decided directly in DB or Repo, then work with adequate environmental data all over the project !!!!
 
-                                        To Do: Rest of the services now need GlobalkConfig path in appsettings to contact Management API service to obtain Metrics URL !!!!!! maybe it should be in Local.Config appsettings becaus eit is not business but management subject
 
 
 
@@ -69,6 +63,8 @@
                                           2. run Management service observe whether5 API_Gateway updates GlobalConfig !!!!!! ---> GC updated but Management says API_Gasteway not updated ?????
 
                                           3. run Order service observe whether request reached this service !!!!! ---> doesn't upodate GC !!!
+
+
 
 
 

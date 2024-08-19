@@ -41,7 +41,7 @@ namespace Business.Management.Controllers
 
 
         [ApiKeyAuth]
-        [HttpPut()]
+        [HttpPost()]
         public ActionResult Update([FromBody] Config_Global_AS_MODEL globalConfig)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;

@@ -45,7 +45,7 @@ namespace Business.Http.Services
 
         public async Task<IServiceResult<Config_Global_AS_DTO>> PostGlobalConfig(Config_Global_AS_DTO globalConfig_Model)
         {
-            _method = HttpMethod.Put;
+            _method = HttpMethod.Post;
             _requestQuery = $"";
             _content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(globalConfig_Model), _encoding, _mediaType);
 
