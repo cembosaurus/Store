@@ -11,11 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 
 
-namespace Business.Management.Tools
+namespace Business.Management.DI
 {
     public static class Management_Register
     {
-        public static void Register(WebApplicationBuilder builder) 
+        public static void Register(WebApplicationBuilder builder)
         {
             var services = builder.Services;
 
@@ -25,7 +25,7 @@ namespace Business.Management.Tools
             services.AddScoped<IHttpManagementService, HttpManagementService>();
             services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
             services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
-            
+
         }
     }
 }

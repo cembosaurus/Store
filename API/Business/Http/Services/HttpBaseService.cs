@@ -56,9 +56,10 @@ namespace Business.Http.Services
             _resultFact = resultFact;
         }
         // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER:
-        public HttpBaseService(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
         {
             _isProdEnv = env.IsProduction();
+            _exId = exId;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
         }
@@ -79,20 +80,61 @@ namespace Business.Http.Services
 
             // send HTTP reequest:
 
-            var sendResponse = await Send();             // EX handled only in startup process or Ex MW. To Do - handle it !!!!!!!
+            try
+            {
+                var sendResponse = await Send();
 
 
+                if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
+                {
 
-            // handle HTTP response:
+                    // HTTP request to update local Global Config Failed:
 
-            if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
-                return _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
+                    var response = _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
 
-            var content = sendResponse.Content.ReadAsStringAsync().Result;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("HTTP Response: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("from ");
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write($"{_remoteServiceName}: ");
+                    Console.ForegroundColor = response.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                    Console.Write("Message: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(response.Message);
+                    Console.ResetColor();
 
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content);
+                    return response;
+                }
 
-            return result;
+                var content = sendResponse.Content.ReadAsStringAsync().Result;
+
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? null!;
+
+                return result;
+
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {
+                // HTTP request SECOND attempt Failed:
+
+                var response = _resultFact.Result(default(T), false, $"Http requiest to '{_remoteServiceName}' failed. Reason: {ex.Message}");
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("HTTP Response: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("from ");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write($"{_remoteServiceName}: ");
+                Console.ForegroundColor = response.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                Console.Write("Message: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(response.Message);
+                Console.ResetColor();
+
+                return response;
+            }
+
         }
 
 
@@ -163,21 +205,17 @@ namespace Business.Http.Services
 
             if (!modelResult.Status)
             {
-
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine($"HttpBaseService: --> FAIL -- couldn't find model in LOCAL GLOBAL CONFIG :   {_remoteServiceName} -- {modelResult.Message}   -----------------------------------");
-                Console.ResetColor();
-
+                // Local Global Config could be obsolete or incomplete.
+                // Send HHTP Get requiest to Management API service to update local Global Config,
+                // and try toi build HTTP request again.
 
 
-                // Local Global Config DB could be obsolete or incomplete,
-                // Re-Load Global Config data from remote API source (Management Service):
+                // Update local Global Config data from remote API source (Management Service):
                 var GCResult = await DownloadGloalConfig_FromRemoteService();
 
                 if (!GCResult.Status)
                     return _resultFact.Result(false, false, $"Failed to download Global Config from Management API service. Message: {GCResult.Message}");
 
-                // Make sure local Global Config was updated,
                 // Load service model from local Global Config again:
                 modelResult = GetServiceModel_FromLocalGlobalConfig();
 

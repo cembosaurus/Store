@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
@@ -23,8 +24,8 @@ namespace Business.Http.Services
         private IMapper _mapper;
 
 
-        public HttpAllServices(IWebHostEnvironment env, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER globalConfig_Provider, IMapper mapper)
-            : base(env, httpAppClient, resultFact)
+        public HttpAllServices(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, IGlobalConfig_PROVIDER globalConfig_Provider, IMapper mapper)
+            : base(env, exId, httpAppClient, resultFact)
         {
             _httpAppClient = httpAppClient;
             _globalConfig_Provider = globalConfig_Provider;

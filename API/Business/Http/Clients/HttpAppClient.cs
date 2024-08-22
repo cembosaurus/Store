@@ -11,6 +11,8 @@ namespace Business.Http.Clients
         private IHttpClient_Metrics _httpMetricsClient;
 
 
+        // to implement Metrics into project replace call to HttpClient by HttpMetricsClient:
+
         public HttpAppClient(IHttpClient_Metrics httpMetricsClient) 
         {
             _httpMetricsClient = httpMetricsClient;
@@ -22,8 +24,6 @@ namespace Business.Http.Clients
 
         public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, bool bypassMetrics = default)
         {
-            // to implement Metrics into project replace call to HttpClient by HttpMetricsClient:
-
             return await (bypassMetrics ?
                 _httpMetricsClient.HtpClient.SendAsync(requestMessage) :
                 _httpMetricsClient.SendAsync(requestMessage));

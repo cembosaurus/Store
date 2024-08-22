@@ -30,6 +30,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Clients;
+using Business.Management.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -25,7 +25,7 @@ namespace Business.Management.Http.Services
 
 
         public HttpManagementService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
-            : base(env, httpAppClient, resultFact)
+            : base(env, exId, httpAppClient, resultFact)
         {
             _remoteServiceName = "ManagementService";
             _remoteServicePathName = "GlobalConfig";
