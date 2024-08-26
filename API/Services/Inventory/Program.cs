@@ -8,13 +8,14 @@ using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
+using Business.Tools;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Inventory.Middlewares;
@@ -70,6 +71,9 @@ builder.Services.AddScoped<IItemRepository, ItemRepository>();
 builder.Services.AddScoped<IItemPriceRepository, ItemPriceRepository>();
 builder.Services.AddScoped<ICatalogueItemRepository, CatalogueItemRepository>();
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
+
+builder.Services.AddTransient<ConsoleWriter>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

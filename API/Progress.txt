@@ -74,7 +74,7 @@
                                                     MW will not catch EX but checking for service result with FALSE status
 
 
-                                          To Do: console writeline for HTTP requests info put into cetral class
+                                          To Do: create group of common DIs for all services to register it as a group (similarly to Management_Register.cs)
                                         
                                         
                                         

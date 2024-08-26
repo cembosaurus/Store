@@ -5,6 +5,7 @@ using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -13,8 +14,8 @@ namespace Business.Identity.Http.Services
     public class HttpUserService : HttpBaseService, IHttpUserService
     {
 
-        public HttpUserService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpUserService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact, cm)
         {
             _remoteServiceName = "IdentityService";
             _remoteServicePathName = "User";

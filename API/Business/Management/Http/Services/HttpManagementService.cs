@@ -6,6 +6,7 @@ using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Http.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 
@@ -19,17 +20,15 @@ namespace Business.Management.Http.Services
     public class HttpManagementService : HttpBaseService, IHttpManagementService
     {
 
-        private readonly IExId _exId;
         private readonly IHttpAppClient _httpAppClient;
         private IAppsettings_PROVIDER _appsettings_Provider;
 
 
-        public HttpManagementService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
-            : base(env, exId, httpAppClient, resultFact)
+        public HttpManagementService(IWebHostEnvironment env, IExId exId, IAppsettings_PROVIDER appsettings_Provider, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, ConsoleWriter cm)
+            : base(env, exId, httpAppClient, resultFact, cm)
         {
             _remoteServiceName = "ManagementService";
             _remoteServicePathName = "GlobalConfig";
-            _exId = exId;
             _httpAppClient = httpAppClient;
             _appsettings_Provider = appsettings_Provider;
         }
@@ -40,24 +39,7 @@ namespace Business.Management.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
-            //try
-            //{
-            //    Console.BackgroundColor = ConsoleColor.Blue;
-            //    Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HttpManagementService: --> calling:   {_remoteServiceName}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            //    Console.ResetColor();
-
-
                 return await _httpAppClient.SendAsync(_requestMessage);
-            //}
-            //catch (Exception ex) when (_exId.Http_503(ex))
-            //{
-            //    Console.BackgroundColor = ConsoleColor.DarkBlue;
-            //    Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpManagementService: 503 Exception - http client call:   {_remoteServiceName}  UNHANDLED   <<<<<<<<<<<<<<<<<<< RE-THROW <<<<<<<<<<<<<<<<<<");
-            //    Console.ResetColor();
-
-            //    throw;
-            //}
-
         }
 
 

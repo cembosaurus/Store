@@ -5,6 +5,7 @@ using Business.Inventory.DTOs.CatalogueItem;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -16,8 +17,8 @@ namespace Business.Inventory.Http.Services
     public class HttpCatalogueItemService : HttpBaseService, IHttpCatalogueItemService
     {
 
-        public HttpCatalogueItemService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpCatalogueItemService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm) 
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact, cm)
         {
             _remoteServiceName = "InventoryService";
             _remoteServicePathName = "CatalogueItem";

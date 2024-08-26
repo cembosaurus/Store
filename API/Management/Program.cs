@@ -24,6 +24,7 @@ using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
+using Business.Tools;
 using Management.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -61,6 +62,8 @@ builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
+builder.Services.AddTransient<ConsoleWriter>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

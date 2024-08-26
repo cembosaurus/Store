@@ -1,5 +1,6 @@
 ﻿using Business.Metrics.Http.Clients.Interfaces;
 using Business.Middlewares;
+using Business.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -17,6 +18,7 @@ namespace Business.Metrics.Http.Clients
         private HttpResponseMessage? _responseMessage;
         private IHttpContextAccessor _accessor;
         private readonly string _thisService;
+        private readonly ConsoleWriter _consoleMessages;
         private string? _sendToService;
         private bool _metricsDataSender;
         private readonly Guid _appId;
@@ -24,13 +26,14 @@ namespace Business.Metrics.Http.Clients
 
 
 
-        public HttpClient_Metrics(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config)
+        public HttpClient_Metrics(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config, ConsoleWriter consoleMessages)
         {
             _httpClient = httpClient;
             _accessor = accessor;
             _appId = Metrics_MW.AppId_Model.AppId;
             _thisService = config.GetSection("Metrics:Name").Value;
             _thisService = !string.IsNullOrWhiteSpace(_thisService) ? _thisService : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
+            _consoleMessages = consoleMessages;
         }
 
 
@@ -57,11 +60,7 @@ namespace Business.Metrics.Http.Clients
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("HTTP Client: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"response from {_sendToService}: {ex.Message}");
-                Console.ResetColor();
+                _consoleMessages.Message("Http Response", "HttpClient", $"response from {_sendToService}", Enums.TypeOfInfo.FAIL, ex.Message);
 
                 throw;
             }

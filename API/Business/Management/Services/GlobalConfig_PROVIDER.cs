@@ -5,6 +5,7 @@ using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -22,16 +23,16 @@ namespace Business.Management.Services
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
         private IMapper _mapper;
+        private readonly ConsoleWriter _consoleMessages;
 
-
-
-        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IMapper mapper)
+        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IMapper mapper, ConsoleWriter consoleMessages)
         {
             _isProdEnv = env.IsProduction();
             _config_global_Repo = config_global_Repo;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
             _mapper = mapper;
+            _consoleMessages = consoleMessages;
         }
 
 
@@ -251,11 +252,7 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write($"Global Config: ");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Updated.");
-            Console.ResetColor();
+            _consoleMessages.Message("Global Config update", "Global Config Provider", "", Business.Enums.TypeOfInfo.SUCCESS, "Global Config Updated.");
 
             return _resultFact.Result(config, true);
         }

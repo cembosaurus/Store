@@ -6,13 +6,14 @@ using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
+using Business.Tools;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -47,6 +48,9 @@ builder.Services.AddFluentValidation(conf => {
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
+
+builder.Services.AddTransient<ConsoleWriter>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

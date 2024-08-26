@@ -1,10 +1,12 @@
-﻿using Business.Exceptions.Interfaces;
+﻿using Business.Enums;
+using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Models;
 using Business.Management.Enums;
 using Business.Management.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +28,7 @@ namespace Business.Http.Services
         private readonly bool _isProdEnv;
 
         protected readonly IServiceResultFactory _resultFact;
+        private readonly ConsoleWriter _cm;
         protected IGlobalConfig_PROVIDER _globalConfig_Provider;
         protected readonly IExId _exId;
 
@@ -46,7 +49,7 @@ namespace Business.Http.Services
 
 
         // any Http service (except 'HTTPManagementService'):
-        public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact)
+        public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)
         {
             _accessor = accessor;
             _isProdEnv = env.IsProduction();
@@ -54,14 +57,16 @@ namespace Business.Http.Services
             _httpAppClient = httpAppClient;
             _globalConfig_Provider = globalConfig_Provider;
             _resultFact = resultFact;
+            _cm = cm;
         }
         // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER:
-        public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact)
+        public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, ConsoleWriter cm)
         {
             _isProdEnv = env.IsProduction();
             _exId = exId;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
+            _cm = cm;
         }
 
 
@@ -92,17 +97,7 @@ namespace Business.Http.Services
 
                     var response = _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
 
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("HTTP Response: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("from ");
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write($"{_remoteServiceName}: ");
-                    Console.ForegroundColor = response.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                    Console.Write("Message: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(response.Message);
-                    Console.ResetColor();
+                    _cm.Message("HTTP Response", _remoteServiceName, $"{sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}", TypeOfInfo.WARNING, sendResponse.StatusCode + " - " + sendResponse.ReasonPhrase);
 
                     return response;
                 }
@@ -120,17 +115,7 @@ namespace Business.Http.Services
 
                 var response = _resultFact.Result(default(T), false, $"Http requiest to '{_remoteServiceName}' failed. Reason: {ex.Message}");
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("HTTP Response: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("from ");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write($"{_remoteServiceName}: ");
-                Console.ForegroundColor = response.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                Console.Write("Message: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(response.Message);
-                Console.ResetColor();
+                _cm.Message("HTTP Response", _remoteServiceName, "", TypeOfInfo.FAIL, ex.Message);
 
                 return response;
             }
@@ -149,19 +134,10 @@ namespace Business.Http.Services
 
             try
             {
-                Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> HttpBaseService: --> calling:   {_remoteServiceName}   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                Console.ResetColor();
-
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
             catch (Exception ex) when (_exId.Http_503(ex))
             {
-
-                Console.BackgroundColor = ConsoleColor.Magenta;
-                Console.WriteLine($"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< HttpBaseService: 503 Exception - from:   {_remoteServiceName}  1 attempt failed   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                Console.ResetColor();
-
 
                 // Catch ex 503: if HTTP Request URL provided by global settings is not up-to-date or wrong, request will fail ! ...
                 // Send the HTTP request to Management API service to update global settings by new data. ...

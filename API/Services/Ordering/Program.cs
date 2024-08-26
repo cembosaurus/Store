@@ -12,8 +12,8 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
@@ -23,6 +23,7 @@ using Business.Payment.Http.Services;
 using Business.Payment.Http.Services.Interfaces;
 using Business.Scheduler.Http.Services;
 using Business.Scheduler.Http.Services.Interfaces;
+using Business.Tools;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -95,6 +96,9 @@ builder.Services.AddScoped<IOrder, OrderingTools>();
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+
+builder.Services.AddTransient<ConsoleWriter>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

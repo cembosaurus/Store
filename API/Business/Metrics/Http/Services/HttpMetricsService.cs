@@ -4,6 +4,7 @@ using Business.Http.Services;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Metrics.Http.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -19,8 +20,8 @@ namespace Business.Metrics.Http.Services
 
 
 
-        public HttpMetricsService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpMetricsService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact, cm)
         {
             _remoteServiceName = "MetricsService";
             _remoteServicePathName = "Collector";

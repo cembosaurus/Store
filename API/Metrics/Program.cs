@@ -6,15 +6,14 @@ using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
-
-
+using Business.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +31,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
+builder.Services.AddTransient<ConsoleWriter>();
 
 
 var app = builder.Build();

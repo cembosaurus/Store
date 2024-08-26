@@ -10,8 +10,8 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
@@ -19,6 +19,7 @@ using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
+using Business.Tools;
 using FluentValidation.AspNetCore;
 using Identity.Data.Repositories;
 using Identity.Data.Repositories.Interfaces;
@@ -75,6 +76,9 @@ builder.Services.AddScoped<IJWT_Provider, JWT_Provider>();
 
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
+builder.Services.AddTransient<ConsoleWriter>();
+
 
 
 builder.Services.AddIdentityCore<AppUser>(opt => {

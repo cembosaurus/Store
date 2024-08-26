@@ -1,7 +1,7 @@
-﻿using Business.Http.Services.Interfaces;
+﻿using Business.Enums;
+using Business.Http.Services.Interfaces;
 using Business.Management.Appsettings.Interfaces;
-
-
+using Business.Tools;
 
 namespace Management.Services
 {
@@ -11,15 +11,17 @@ namespace Management.Services
 
         private readonly IServiceScopeFactory _serviceFactory;
         private FileSystemWatcher _watcher;
+        private readonly ConsoleWriter _cm;
         private bool _switch = true; // MS bug - firing event twice. Prevent it by using the switch.
                                      // Not ideal solution as two independet events could be fired in sequence so second one will be ignored.
                                      // But this event is fired rarely f.e: after Appsettings is updated
 
 
-        public Management_Worker(FileSystemWatcher watcher, IServiceScopeFactory serviceFactory)
+        public Management_Worker(FileSystemWatcher watcher, IServiceScopeFactory serviceFactory, ConsoleWriter cm)
         {
             _serviceFactory = serviceFactory;
             _watcher = watcher;
+            _cm = cm;
 
             Initialize();
         }
@@ -31,9 +33,7 @@ namespace Management.Services
         // On StartUp:
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Management Service: Background worker is running.");
-            Console.ResetColor();
+            _cm.Message("App Startup", "Background Worker", "", TypeOfInfo.INFO, "Running...");
 
             //Thread.Sleep(10000);
 
@@ -45,7 +45,7 @@ namespace Management.Services
         public void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
         {
             if (_switch)
-                Console.WriteLine($"--> Appsettings UPDATE: \n{args.ChangeType}\n{args.Name}\n{args.FullPath}");
+                _cm.Message("Appsettings WRITE event", "Background Worker", "Appsettings was updated...", TypeOfInfo.INFO, $"\n - {args.ChangeType}\n - {args.Name}\n - {args.FullPath}");
 
             PostGlobalConfigToAPIServices();
 
@@ -59,9 +59,7 @@ namespace Management.Services
         // Send update to all relevant API services (K8 multiple replicas will NOT be reached, only the one selected by Loadbalancer):
         private async void PostGlobalConfigToAPIServices()
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            Console.WriteLine("Sending Global Config to all relevant API services ...");
+            _cm.Message("Http Post", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sending to all relevant API services ...");
 
             using (var scope = _serviceFactory.CreateScope())
             {           
@@ -79,30 +77,26 @@ namespace Management.Services
                     {
                         congigGlobal_Repo.Initialize(appsettingsResult.Data ?? null!);
 
-
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
 
-
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"\n\rGlobal Config was sent to API services:");
+                        _cm.Message("Http Response", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sent to API services:");
 
                         foreach (var service in httpUpdateResult.Data ?? null!)
                         {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.Write($" - {service.Key.Name}: ");
-                            Console.ForegroundColor = service.Key.Name == "ManagementService" ? ConsoleColor.White : service.Value ? ConsoleColor.Yellow : ConsoleColor.Red;
-                            Console.WriteLine($"{(service.Key.Name == "ManagementService" ? "BYPASSED" : service.Value ? "SUCCESS" : "FAILED")}");
+                            _cm.Text(
+                                ConsoleColor.Black, 
+                                ConsoleColor.Cyan, 
+                                $" - {service.Key.Name}: ", 
+                                ConsoleColor.Black, 
+                                service.Key.Name == "ManagementService" ? ConsoleColor.White : service.Value ? ConsoleColor.Yellow : ConsoleColor.Red, 
+                                $"{(service.Key.Name == "ManagementService" ? "BYPASSED" : service.Value ? "SUCCESS" : "FAILED")}");
                         }
 
                         Console.ResetColor();
                     }
                 }
                 else {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("FAIL: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"Unable to send HTTP requests to API services! Some of necessary services were not instantiated!");
-                    Console.ResetColor();
+                    _cm.Message("Create Service Scope", "Management Worker", "Unable to send 'Global Config Update' HTTP request to relevant API services!", TypeOfInfo.FAIL, "Some of necessary DI services were not instantiated!");
                 }
             }
 

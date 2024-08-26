@@ -11,6 +11,7 @@ using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
+using Business.Tools;
 using FluentValidation.AspNetCore;
 using Inventory.Publisher.AMQPServices;
 using Inventory.Publisher.AMQPServices.Interfaces;
@@ -49,6 +50,8 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IAMQPItemService, AMQPItemService>();
 builder.Services.AddScoped<IAMQClient, AMQPClient>();
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
+
+builder.Services.AddTransient<ConsoleWriter>();
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -5,6 +5,7 @@ using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Scheduler.DTOs;
 using Business.Scheduler.Http.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -13,8 +14,8 @@ namespace Business.Scheduler.Http.Services
     public class HttpSchedulerService : HttpBaseService, IHttpSchedulerService
     {
 
-        public HttpSchedulerService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact)
-            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact)
+        public HttpSchedulerService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)
+            : base(accessor, env, exId, httpAppClient, remoteServices_Provider, resultFact, cm)
         {
             _remoteServiceName = "SchedulerService";
             _remoteServicePathName = "Scheduler";

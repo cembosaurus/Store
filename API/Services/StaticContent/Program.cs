@@ -6,13 +6,14 @@ using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Data;
 using Business.Management.DI;
-using Business.Management.Tools;
 using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
+using Business.Tools;
 using StaticContent.Services;
 using StaticContent.Services.Interfaces;
 
@@ -41,6 +42,8 @@ builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddTransient<ConsoleWriter>();
 
 
 builder.Services.AddCors(options =>

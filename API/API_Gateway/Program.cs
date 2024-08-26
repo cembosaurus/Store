@@ -17,7 +17,6 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Management.Tools;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Middlewares;
@@ -31,6 +30,8 @@ using System.Text;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Clients;
 using Business.Management.DI;
+using Business.Management.Data;
+using Business.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,9 @@ builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
+
+builder.Services.AddTransient<ConsoleWriter>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

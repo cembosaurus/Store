@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Management\Data\Interfaces\" />
+    <Folder Include="Management\Tools\" />
   </ItemGroup>
 
 </Project>
