@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Enums;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Appsettings.Models;
@@ -23,16 +24,16 @@ namespace Business.Management.Services
         private readonly IHttpManagementService _httpManagementService;
         private readonly IServiceResultFactory _resultFact;
         private IMapper _mapper;
-        private readonly ConsoleWriter _consoleMessages;
+        private readonly ConsoleWriter _cw;
 
-        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IMapper mapper, ConsoleWriter consoleMessages)
+        public GlobalConfig_PROVIDER(IWebHostEnvironment env, IServiceResultFactory resultFact, IConfig_Global_REPO config_global_Repo, IHttpManagementService httpManagementService, IMapper mapper, ConsoleWriter cw)
         {
             _isProdEnv = env.IsProduction();
             _config_global_Repo = config_global_Repo;
             _httpManagementService = httpManagementService;
             _resultFact = resultFact;
             _mapper = mapper;
-            _consoleMessages = consoleMessages;
+            _cw = cw;
         }
 
 
@@ -252,7 +253,7 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
-            _consoleMessages.Message("Global Config update", "Global Config Provider", "", Business.Enums.TypeOfInfo.SUCCESS, "Global Config Updated.");
+            _cw.Message("Global Config update", "Global Config Provider", "", TypeOfInfo.SUCCESS, "Global Config Updated.");
 
             return _resultFact.Result(config, true);
         }
@@ -288,11 +289,7 @@ namespace Business.Management.Services
 
             _config_global_Repo.RemoteServices.Initialize(servicesModels.ToList());
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write($"Global Config - Remote Services: ");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Updated.");
-            Console.ResetColor();
+            _cw.Message("Global Config", "Remote Services", "Update", TypeOfInfo.INFO, "Completed.");
 
             return _resultFact.Result(servicesModels, true);
         }

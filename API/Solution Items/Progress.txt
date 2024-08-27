@@ -74,6 +74,7 @@
                                                     MW will not catch EX but checking for service result with FALSE status
 
 
+                                          To Do: create group of common DIs for all services to register it as a group (similarly to Management_Register.cs)
                                           To Do: fix project filesystem - doesn't match it's structure in VS
                                         
                                         

@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\API_Gateway\API_Gateway.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Identity\Identity.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Inventory\Inventory.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Ordering\Ordering.csproj" />
     <ProjectReference Include="..\Services\Identity\Identity.csproj" />
     <ProjectReference Include="..\Services\Inventory\Inventory.csproj" />
     <ProjectReference Include="..\Services\Ordering\Ordering.csproj" />

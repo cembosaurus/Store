@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-Management_Register.Register(builder);
+ManagementService_DI.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddSingleton<IExId, ExId>();

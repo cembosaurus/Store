@@ -1,3 +1,5 @@
+using Business.Exceptions;
+using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
@@ -12,52 +14,49 @@ using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Tools;
-using Inventory.Consumer.AMQPServices;
-using Inventory.Consumer.Data;
-using Inventory.Consumer.Data.Repositories;
-using Inventory.Consumer.Data.Repositories.Interfaces;
-using Inventory.Consumer.Services;
-using Inventory.Consumer.Services.Interfaces;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
 
-
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
 
 builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ValidationFilter>();
 });
 
-// Add RABBIT_MQ listener / subscriber:
-// ... register MessageBusSubscriber as Singleton for DI access:
-builder.Services.AddSingleton<MessageBusSubscriber>();
-// ... deploy MessageBusSubscriber singleton service as a Background Service for AMQP listenning:
-builder.Services.AddHostedService(provider => provider.GetService<MessageBusSubscriber>());
+ManagementService_DI.Register(builder);
 
-builder.Services.AddDbContext<InventoryContext>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-Management_Register.Register(builder);
-
+builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
-builder.Services.AddSingleton<IItemRepository, ItemRepository>();
-builder.Services.AddSingleton<IItemService, ItemService>();
-builder.Services.AddSingleton<IServiceResultFactory, ServiceResultFactory>();
+builder.Services.AddFluentValidation(conf => {
+    conf.DisableDataAnnotationsValidation = true;
+    //conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
+    conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
+    conf.AutomaticValidationEnabled = true;
+});
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 
 builder.Services.AddTransient<ConsoleWriter>();
+
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    var secret = builder.Configuration.GetSection("Auth:JWTKey").Value;
+                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
                     var secretByteArray = Encoding.ASCII.GetBytes(secret);
 
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -100,21 +99,18 @@ builder.Services.AddAuthorization(opt => {
     ));
 });
 
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
 var app = builder.Build();
-
 
 app.UseMiddleware<ErrorHandler_MW>();
 
 app.UseMiddleware<Metrics_MW>();
 
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -127,15 +123,11 @@ app.UseCors(opt => {
     .AllowAnyHeader();
 });
 
-//app.UseHttpsRedirection();
-
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
-PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Configuration);
 
 GlobalConfig_Seed.Load(app);
 

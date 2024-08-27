@@ -40,7 +40,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
-Management_Register.Register(builder);
+ManagementService_DI.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 

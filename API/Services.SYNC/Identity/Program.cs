@@ -6,6 +6,8 @@ using Business.Filters.Validation;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
 using Business.Identity.Enums;
+using Business.Inventory.Http.Services;
+using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Data;
@@ -15,65 +17,79 @@ using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
+using Business.Scheduler.JWT;
+using Business.Scheduler.JWT.Interfaces;
 using Business.Tools;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Inventory.Middlewares;
-using Inventory.Services;
-using Inventory.Services.Interfaces;
+using Identity.Data.Repositories;
+using Identity.Data.Repositories.Interfaces;
+using Identity.JWT;
+using Identity.JWT.Interfaces;
+using Identity.Middlewares;
+using Identity.Models;
+using Identity.Services;
+using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Services.Inventory.Data;
-using Services.Inventory.Data.Repositories.Interfaces;
+using Services.Identity.Data;
+using Services.Identity.Data.Repositories;
+using Services.Identity.Data.Repositories.Interfaces;
+using Services.Identity.Models;
 using System.Text;
 
 
 
-
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddSingleton<IExId, ExId>();
-builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
-
-Management_Register.Register(builder);
-
-builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
-builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
-builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ValidationFilter>();
 });
 
-//builder.Services.AddFluentValidation(conf => {
-//    conf.DisableDataAnnotationsValidation = true;
-//    //conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
-//    conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
-//    conf.AutomaticValidationEnabled = true;
-//});
-builder.Services.AddFluentValidationAutoValidation(opt => opt.DisableDataAnnotationsValidation = true);
-builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssembly(typeof(ValidationFilter).Assembly);
+builder.Services.AddFluentValidation(conf => {
+    conf.DisableDataAnnotationsValidation = true;
+    conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
+    //conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
+    conf.AutomaticValidationEnabled = true;
+});
 
-// Allow optional argument in controller's action
-builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });    
+ManagementService_DI.Register(builder);
 
-builder.Services.AddDbContext<InventoryContext>();
+builder.Services.AddSingleton<IExId, ExId>(); 
+builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
+builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-builder.Services.AddScoped<IItemService, ItemService>();
-builder.Services.AddScoped<ICatalogueItemService, CatalogueItemService>();
-builder.Services.AddScoped<IItemPriceService, ItemPriceService>();
-builder.Services.AddScoped<IItemRepository, ItemRepository>();
-builder.Services.AddScoped<IItemPriceRepository, ItemPriceRepository>();
-builder.Services.AddScoped<ICatalogueItemRepository, CatalogueItemRepository>();
+builder.Services.AddDbContext<IdentityContext>();
+builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
+builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IHttpCartService, HttpCartService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
+builder.Services.AddScoped<IJWT_Provider, JWT_Provider>();
+
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddTransient<ConsoleWriter>();
 
+
+
+builder.Services.AddIdentityCore<AppUser>(opt => {
+    opt.Password.RequireNonAlphanumeric = false;    // Add more options to customize password complexity.
+    opt.Password.RequireDigit = false;
+    opt.Password.RequireUppercase = false;
+}).AddRoles<AppRole>()
+  .AddRoleManager<RoleManager<AppRole>>()
+  .AddRoleValidator<RoleValidator<AppRole>>()
+  .AddSignInManager<SignInManager<AppUser>>()
+  .AddEntityFrameworkStores<IdentityContext>();
 
 // Middleware that authenticate request before hitting controller (endpoint):
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -122,8 +138,6 @@ builder.Services.AddAuthorization(opt => {
     ));
 });
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -133,7 +147,7 @@ app.UseMiddleware<ErrorHandler_MW>();
 
 app.UseMiddleware<Metrics_MW>();
 
-app.UseMiddleware<Inventory_DbGuard_MW>();
+app.UseMiddleware<Identity_DbGuard_MW>();
 
 
 // Configure the HTTP request pipeline.
@@ -151,13 +165,14 @@ app.UseCors(opt => {
 
 //app.UseHttpsRedirection();
 
+// Run authentiction service:
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-Inventory_DbGuard_MW.Seed(app);
+Identity_DbGuard_MW.Migrate_Prep_Seed_DB(app);
 
 GlobalConfig_Seed.Load(app);
 

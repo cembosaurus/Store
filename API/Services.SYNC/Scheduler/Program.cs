@@ -50,7 +50,7 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-Management_Register.Register(builder);
+ManagementService_DI.Register(builder);
 
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();

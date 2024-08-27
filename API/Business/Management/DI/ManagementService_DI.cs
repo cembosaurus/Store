@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Business.Management.DI
 {
-    public static class Management_Register
+    public static class ManagementService_DI
     {
         public static void Register(WebApplicationBuilder builder)
         {
