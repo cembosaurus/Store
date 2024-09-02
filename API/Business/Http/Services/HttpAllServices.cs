@@ -11,8 +11,7 @@ using Business.Management.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Tokens;
-
-
+using System.Net;
 
 namespace Business.Http.Services
 {
@@ -43,7 +42,14 @@ namespace Business.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
-            return await _httpAppClient.SendAsync(_requestMessage);
+            try
+            {
+                return await _httpAppClient.SendAsync(_requestMessage);
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {
+                return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Respoonse from '{_remoteServiceName}'. Message: {ex.Message}", ex);
+            }
         }
 
 
@@ -73,7 +79,7 @@ namespace Business.Http.Services
             if (!globalConfig_Model.Status)
                 return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Global Config DB not found!");
             if (globalConfig_Model.Data == null || globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
-                return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Remote Services were not found in Global Config DB!");
+                return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Remote Services config data were not found in Global Config DB!");
 
 
             // send Http requests to specific API services:

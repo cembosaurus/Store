@@ -7,6 +7,7 @@ using Business.Management.Enums;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Tools;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -166,8 +167,8 @@ namespace Business.Management.Services
         {
             var apiKey = _config_global_Repo.Auth.Apikey;
 
-            return _resultFact.Result(apiKey, !string.IsNullOrWhiteSpace(apiKey), string.IsNullOrWhiteSpace(apiKey) 
-                ? $"Api-Key not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+            return _resultFact.Result(apiKey, !string.IsNullOrWhiteSpace(apiKey), string.IsNullOrWhiteSpace(apiKey) ? "API-Key was NOT found in Global Config !" : "");
+
         }
 
 
@@ -177,8 +178,7 @@ namespace Business.Management.Services
         {
             var JWTKey = _config_global_Repo.Auth.JWTKey;
 
-            return _resultFact.Result(JWTKey, !string.IsNullOrWhiteSpace(JWTKey), string.IsNullOrWhiteSpace(JWTKey)
-                ? $"JWT-Key not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+            return _resultFact.Result(JWTKey, !string.IsNullOrWhiteSpace(JWTKey), string.IsNullOrWhiteSpace(JWTKey) ? "JWT-Key was NOT found in Global Config !" : "");
         }
 
 
@@ -191,8 +191,7 @@ namespace Business.Management.Services
         {
             var rabbitMQ = _config_global_Repo.RabbitMQ.Data;
 
-            return _resultFact.Result(rabbitMQ, rabbitMQ != null, rabbitMQ == null
-                ? $"RabbitMQ data were not found in Global Config ! n\\ Possible solution: Reload Global Config from Management service." : "");
+            return _resultFact.Result(rabbitMQ, rabbitMQ != null, rabbitMQ == null ? $"RabbitMQ config was not found in Global Config !" : "");
         }
 
 
@@ -206,7 +205,7 @@ namespace Business.Management.Services
         // HTTP
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<Config_Global_AS_MODEL>> ReLoadGlobalConfig_FromRemote()
+        public async Task<IServiceResult<Config_Global_AS_MODEL>> DownloadGlobalConfig()
         {
             var httpResult = await _httpManagementService.GetGlobalConfig();
 
@@ -223,7 +222,7 @@ namespace Business.Management.Services
         // HTTP
         // For ALL services !
         // UPDATE Remote Services models by GET response from Management service:
-        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> ReLoadRemoteServicesModels_FromRemote()
+        public async Task<IServiceResult<IEnumerable<RemoteService_AS_MODEL>>> DownloadRemoteServicesModels()
         {
             var httpResult = await _httpManagementService.GetAllRemoteServices();
 
@@ -253,7 +252,7 @@ namespace Business.Management.Services
 
             _config_global_Repo.Initialize(config);
 
-            _cw.Message("Global Config update", "Global Config Provider", "", TypeOfInfo.SUCCESS, "Global Config Updated.");
+            _cw.Message("Global Config", "Global Config Provider", "Update", TypeOfInfo.INFO, "Global Config Updated.");
 
             return _resultFact.Result(config, true);
         }
@@ -289,7 +288,7 @@ namespace Business.Management.Services
 
             _config_global_Repo.RemoteServices.Initialize(servicesModels.ToList());
 
-            _cw.Message("Global Config", "Remote Services", "Update", TypeOfInfo.INFO, "Completed.");
+            _cw.Message("Global Config", "Global Config Provider", "Update", TypeOfInfo.INFO, "Remote Services Updated.");
 
             return _resultFact.Result(servicesModels, true);
         }

@@ -18,15 +18,15 @@ namespace Business.Management.Data
 
                 try
                 {
-                    message.Message("HTTP Get", "Management Service", "App startup - Updating Global Config.", TypeOfInfo.INFO, "Waiting for response...");
+                    message.Message("HTTP Get", "Global Config Seed", "App startup - Updating Global Config.", TypeOfInfo.INFO, "Waiting for response from Management API service...");
 
-                    var result = await service.ReLoadGlobalConfig_FromRemote();
+                    var result = await service.DownloadGlobalConfig();
 
-                    message.Message("HTTP Response", "Management Service", "Global Config update was not received !", TypeOfInfo.WARNING, $"{(result.Status ? "" : result.Message)}");
+                    message.Message("HTTP Response", "Global Config Seed", "Global Config update was not received !", TypeOfInfo.WARNING, $"{(result.Status ? "" : result.Message)}");
                 }
                 catch (HttpRequestException ex)
                 {
-                    message.Message("HTTP Response: ", "Management Service ", "Global Config update was not received ! ", TypeOfInfo.FAIL, $"{ex.StatusCode}, {ex.Message}");
+                    message.Message("HTTP Response: ", "Global Config Seed", "Global Config update was not received ! ", TypeOfInfo.FAIL, $"{ex.StatusCode}, {ex.Message}");
                 }
             }
 

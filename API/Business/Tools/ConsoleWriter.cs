@@ -65,7 +65,7 @@ namespace Business.Tools
             Console.ForegroundColor = _type switch
             {
                 TypeOfInfo.FAIL => ConsoleColor.Red,
-                TypeOfInfo.SUCCESS => ConsoleColor.Blue,
+                TypeOfInfo.SUCCESS => ConsoleColor.DarkYellow,
                 TypeOfInfo.INFO => ConsoleColor.Green,
                 TypeOfInfo.WARNING => ConsoleColor.DarkMagenta,
                 _ => ConsoleColor.White

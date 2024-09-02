@@ -9,8 +9,7 @@ using Business.Management.Http.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
-
-
+using System.Net;
 
 namespace Business.Management.Http.Services
 {
@@ -39,7 +38,14 @@ namespace Business.Management.Http.Services
 
         protected async override Task<HttpResponseMessage> Send()
         {
+            try
+            {
                 return await _httpAppClient.SendAsync(_requestMessage);
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {
+                return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Respoonse from '{_remoteServiceName}'. Message: {ex.Message}", ex);
+            }
         }
 
 
@@ -56,7 +62,7 @@ namespace Business.Management.Http.Services
             if (apiKeyResult.Status)
                 _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
 
-            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request '{_remoteServiceName}/{_remoteServicePathName}': {apiKeyResult.Message}");
+            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, apiKeyResult.Message);
         }
 
 

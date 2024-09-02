@@ -80,45 +80,31 @@ namespace Business.Http.Services
             var createReqResponse = await CreateRequest();
 
             if (!createReqResponse.Status)
-                return _resultFact.Result(default(T), false, $"HTTP request for remote service '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
+                return _resultFact.Result(default(T), false, $"HTTP request to '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
 
 
             // send HTTP reequest:
 
-            try
+            var sendResponse = await Send();
+            
+            
+            if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
             {
-                var sendResponse = await Send();
-
-
-                if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
-                {
-
-                    // HTTP request to update local Global Config Failed:
-
-                    var response = _resultFact.Result(default(T), false, $"{(sendResponse.ReasonPhrase == "OK" ? "Fail" : sendResponse.ReasonPhrase)}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
-
-                    _cm.Message("HTTP Response", _remoteServiceName, $"{sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}", TypeOfInfo.WARNING, sendResponse.StatusCode + " - " + sendResponse.ReasonPhrase);
-
-                    return response;
-                }
-
-                var content = sendResponse.Content.ReadAsStringAsync().Result;
-
-                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? null!;
-
-                return result;
-
-            }
-            catch (Exception ex) when (_exId.Http_503(ex))
-            {
-                // HTTP request SECOND attempt Failed:
-
-                var response = _resultFact.Result(default(T), false, $"Http requiest to '{_remoteServiceName}' failed. Reason: {ex.Message}");
-
-                _cm.Message("HTTP Response", _remoteServiceName, "", TypeOfInfo.FAIL, ex.Message);
-
+            
+                // HTTP request to update local Global Config Failed:
+            
+                var response = _resultFact.Result(default(T), false, $"{sendResponse.ReasonPhrase}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
+            
+                _cm.Message("HTTP Response", _remoteServiceName, $"{sendResponse.RequestMessage?.Method} {sendResponse.RequestMessage?.RequestUri}", TypeOfInfo.WARNING, sendResponse.StatusCode + " - " + sendResponse.ReasonPhrase);
+            
                 return response;
             }
+            
+            var content = sendResponse.Content.ReadAsStringAsync().Result;
+            
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? null!;
+            
+            return result;
 
         }
 
@@ -145,26 +131,32 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await DownloadGloalConfig_FromRemoteService();
+                var servicesModelsResult = await DownloadGloalConfig();
 
                 if (!servicesModelsResult.Status)
-                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Request to remote service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to download Global Config from 'Management' API service FAILED ! \\n Message: {servicesModelsResult.Message}", ex);
-
+                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Request to API service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to download Global Config from 'Management' API service FAILED ! \\n Message: {servicesModelsResult.Message}", ex);
 
 
                 _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
 
                 if (string.IsNullOrWhiteSpace(_requestURL))
-                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"Failed to get '{_remoteServiceName}' URL from local Global Config !", ex);
+                    return _requestMessage.CreateErrorResponse(HttpStatusCode.InternalServerError, $"URL for '{_remoteServiceName}' was not fdound in local Global Config !", ex);
             }
 
 
+            try
+            {
+                // SECOND attempt:
 
-            // SECOND attempt:
+                // re-build HTTRP request with new URL:
+                CreateHttpRequestMessage();
 
-            CreateHttpRequestMessage();
-
-            return await _httpAppClient.SendAsync(_requestMessage);
+                return await _httpAppClient.SendAsync(_requestMessage);
+            }
+            catch (Exception ex) when (_exId.Http_503(ex))
+            {                
+                return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Respoonse from '{_remoteServiceName}'. Message: {ex.Message}", ex);
+            }
 
         }
 
@@ -187,10 +179,10 @@ namespace Business.Http.Services
 
 
                 // Update local Global Config data from remote API source (Management Service):
-                var GCResult = await DownloadGloalConfig_FromRemoteService();
+                var GCResult = await DownloadGloalConfig();
 
                 if (!GCResult.Status)
-                    return _resultFact.Result(false, false, $"Failed to download Global Config from Management API service. Message: {GCResult.Message}");
+                    return _resultFact.Result(false, false, $"URL for service '{_remoteServiceName}' is not available, because attempt to download Global Config from Management API service FAILED! Message: {GCResult.Message}");
 
                 // Load service model from local Global Config again:
                 modelResult = GetServiceModel_FromLocalGlobalConfig();
@@ -266,7 +258,7 @@ namespace Business.Http.Services
             if (apiKeyResult.Status)
                 _requestHeaders.Add("x-api-key", apiKeyResult.Data ?? "");
 
-            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, $"HTTP Request '{_remoteServiceName}/{_remoteServicePathName}': {apiKeyResult.Message}");
+            return _resultFact.Result(apiKeyResult.Status, apiKeyResult.Status, apiKeyResult.Message);
         }
 
 
@@ -277,12 +269,12 @@ namespace Business.Http.Services
         }
 
 
-        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> DownloadGloalConfig_FromRemoteService()
+        protected virtual async Task<IServiceResult<Config_Global_AS_MODEL>> DownloadGloalConfig()
         {
-            var GCResult = await _globalConfig_Provider.ReLoadGlobalConfig_FromRemote();
+            var GCResult = await _globalConfig_Provider.DownloadGlobalConfig();
 
             if (!GCResult.Status)
-                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Failed to fetch Global Config from Management service !");
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, GCResult.Message);
 
             return GCResult;
         }

@@ -64,6 +64,10 @@
 
                                           3. run Order service observe whether request reached this service !!!!! ---> doesn't upodate GC !!!
 
+                                          4. metrics data in header indexed inproperly
+
+                                          5. activate Metrics and observe
+
 
 
 
@@ -74,7 +78,8 @@
                                                     MW will not catch EX but checking for service result with FALSE status
 
 
-                                          To Do: fix project filesystem - doesn't match it's structure in VS
+
+                                    FIX: httpBaseService - Send() --- > check flow, resuilt messages and add console messages. If Management is called do onlyu 1 attempt (skip first one)
                                         
                                         
                                         

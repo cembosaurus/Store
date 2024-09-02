@@ -58,10 +58,8 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            catch (Exception ex)
+            catch
             {
-                _consoleMessages.Message("Http Response", "HttpClient", $"response from {_sendToService}", Enums.TypeOfInfo.FAIL, ex.Message);
-
                 throw;
             }
             finally 
