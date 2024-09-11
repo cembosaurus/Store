@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
-
-
+using System.Web.Http;
 
 namespace Business.Metrics.Http.Clients
 {
@@ -18,7 +17,6 @@ namespace Business.Metrics.Http.Clients
         private HttpResponseMessage? _responseMessage;
         private IHttpContextAccessor _accessor;
         private readonly string _thisService;
-        private readonly ConsoleWriter _consoleMessages;
         private string? _sendToService;
         private bool _metricsDataSender;
         private readonly Guid _appId;
@@ -33,7 +31,6 @@ namespace Business.Metrics.Http.Clients
             _appId = Metrics_MW.AppId_Model.AppId;
             _thisService = config.GetSection("Metrics:Name").Value;
             _thisService = !string.IsNullOrWhiteSpace(_thisService) ? _thisService : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
-            _consoleMessages = consoleMessages;
         }
 
 
@@ -44,35 +41,22 @@ namespace Business.Metrics.Http.Clients
         {
             _requestMessage = requestMessage;
 
-            _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
-            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
-            _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
-
-
 
             MetricsEnd();
 
-
-            // Handle Ex to add Metrics data, then re-throw:
             try
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            catch
+            catch (HttpRequestException ex)
             {
+                // for testing
                 throw;
             }
-            finally 
+            finally
             {
-                _responseMessage = _responseMessage ?? new HttpResponseMessage();
-
-                _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
-
-                MetricsStart(); 
+                MetricsStart();
             }
-
-
-            MetricsStart();
 
 
             return _responseMessage;
@@ -89,6 +73,10 @@ namespace Business.Metrics.Http.Clients
         {
             // request out:
 
+            _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
+            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
+            _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
+
             _requestMessage?.Headers.Add("Metrics.Index", (++_index).ToString());
 
             if (_metricsDataSender)
@@ -102,10 +90,14 @@ namespace Business.Metrics.Http.Clients
                 );
         }
 
+
+
         private void MetricsStart()
         {
             // response in:
 
+            _responseMessage = _responseMessage ?? new HttpResponseMessage();
+            _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
             _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
 
             var responseMetrics = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
@@ -135,6 +127,8 @@ namespace Business.Metrics.Http.Clients
                 $"{_index}.RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
+
+
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Business.Enums;
 using Business.Http.Services.Interfaces;
 using Business.Management.Appsettings.Interfaces;
+using Business.Management.Services.Interfaces;
 using Business.Tools;
 
 namespace Management.Services
@@ -61,21 +62,24 @@ namespace Management.Services
         {
             _cm.Message("Http Post", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sending to all relevant API services ...");
 
+
             using (var scope = _serviceFactory.CreateScope())
             {           
+
                 var appsettings_Provider = scope.ServiceProvider.GetService<IAppsettings_PROVIDER>();
-                var congigGlobal_Repo = scope.ServiceProvider.GetService<IConfig_Global_REPO>();
+                var globalConfig_Provider = scope.ServiceProvider.GetService<IGlobalConfig_PROVIDER>();
                 var httpAllServices = scope.ServiceProvider.GetService<IHttpAllServices>();
 
+
                 if (appsettings_Provider != null
-                    && congigGlobal_Repo != null
+                    && globalConfig_Provider != null
                     && httpAllServices != null)
                 {
                     var appsettingsResult = appsettings_Provider.GetGlobalConfig();
 
-                    if (appsettingsResult.Status)
+                    if (appsettingsResult.Status && appsettingsResult.Data != null)
                     {
-                        congigGlobal_Repo.Initialize(appsettingsResult.Data ?? null!);
+                        globalConfig_Provider.Update(appsettingsResult.Data);
 
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
 
@@ -96,8 +100,15 @@ namespace Management.Services
                     }
                 }
                 else {
-                    _cm.Message("Create Service Scope", "Management Worker", "Unable to send 'Global Config Update' HTTP request to relevant API services!", TypeOfInfo.FAIL, "Some of necessary DI services were not instantiated!");
+                    _cm.Message("Create Service Scope", 
+                        "Management Worker", 
+                        "Unable to send 'Global Config Update' HTTP request to relevant API services!", TypeOfInfo.WARNING, $"Failed to create scope for services: " +
+                        $"{(appsettings_Provider == null ? "'Appsettings Provider', " : "")}" +
+                        $"{(globalConfig_Provider == null ? "'GlobalConfig Provider', " : "")}" +
+                        $"{(httpAllServices == null ? "'HttpAllServices Provider', " : "")}" +
+                        $"");
                 }
+
             }
 
         }

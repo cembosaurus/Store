@@ -32,10 +32,10 @@
 
 
 
-          WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING
+          WARNING:  http://localhost:5000/order/all GetAllOrders() --> extra call to identity for TESTING. Delete after TESTING (Ordering API --> OrderService.GetAllOrders())
                                         
                                         To Do: identify original request sender (if MW didn't add false bool isSender into httpcontext of incoming request the it is sender), he will send data to metrics!!!! 
-                                                f.e: FE -> API_Gateway -> Ordering -> Identity ------ API_Gateway is sender
+                                                f.e: FE -> API_Gateway -> Ordering. -> Identity ------ API_Gateway is sender
                                                 f.e: Ordering -> Scheduler ------ Ordering is sender
 
 
@@ -56,9 +56,8 @@
                                                 ***************************************************************** IMPORTANT ********************************************
 
 
-                         To Do: TEST ---> 1. run api_gateway - do http://localhost:5000/order/all, observe Metrics service not rerached !!!! ---> EX unhandled !!!!
+                         To Do: TEST ---> 1. run api_gateway - do http://localhost:5000/order/all, observe Metrics service not rerached !!!! ---> EX unhandled !!!! ---------------------------------------------------------> FIXED !
                                                 API_Gateway to Metrics have to call Management (to fetch Metrics URL) where (unlike HttpBaseService) Management.Send() is UNHANDLED!!!!!!!!!!!
-                                                CHECK: HttpBaseService line: 112
 
                                           2. run Management service observe whether5 API_Gateway updates GlobalConfig !!!!!! ---> GC updated but Management says API_Gasteway not updated ?????
 
@@ -70,16 +69,11 @@
 
 
 
-
-                                          To Do: catch EX in HttpBaseService -> HTTP_Request_Handler(), wrap Send() into try block, attach serviceResult for Ex MW to add that result with specification and message into HTTP Response.
-
-                                                    OR
-
-                                                    MW will not catch EX but checking for service result with FALSE status
+                        To Do: console messages for http response - global config update are funny --- fix it
 
 
+                        To Do: http://localhost:5000/order/all whern Identity is OFF returns duplicate metrics data indexes. Reason : if Identity is not accessible Ordering app send request to Management service and then to Identity again. IDs of metyrics data are not increased in Http Service (only in Metrics MW or Http Client)
 
-                                    FIX: httpBaseService - Send() --- > check flow, resuilt messages and add console messages. If Management is called do onlyu 1 attempt (skip first one)
                                         
                                         
                                         

@@ -70,9 +70,9 @@ namespace Business.Tools
                 TypeOfInfo.WARNING => ConsoleColor.DarkMagenta,
                 _ => ConsoleColor.White
             };
-            Console.Write($" {(string.IsNullOrWhiteSpace(_message) ? "" : " " + _type)}.");
+            Console.Write($" {_type}:");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($" '{_message}'");
+            Console.WriteLine(string.IsNullOrWhiteSpace(_message) ? "" : $" '{_message}'");
             Console.ResetColor();
         }
 

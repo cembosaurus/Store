@@ -95,8 +95,6 @@ namespace Business.Http.Services
             
                 var response = _resultFact.Result(default(T), false, $"{sendResponse.ReasonPhrase}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
             
-                _cm.Message("HTTP Response", _remoteServiceName, $"{sendResponse.RequestMessage?.Method} {sendResponse.RequestMessage?.RequestUri}", TypeOfInfo.WARNING, sendResponse.StatusCode + " - " + sendResponse.ReasonPhrase);
-            
                 return response;
             }
             

@@ -20,7 +20,6 @@ namespace Business.Middlewares
         private bool _metricsDataSender;
         private int _index;
         private IHttpMetricsService _httpMetricsService;
-        private DateTime _timeIn;
 
 
 
@@ -44,6 +43,8 @@ namespace Business.Middlewares
             await RequestHandler(context);
 
             await _next(context);
+
+            Console.WriteLine($"------ OUT 2: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
@@ -52,13 +53,13 @@ namespace Business.Middlewares
         private async Task RequestHandler(HttpContext context)
         {
 
-            MetricsIn(context);
+            Metrics_Start(context);
 
 
             context.Response.OnStarting(async () =>
             {
 
-                MetricsOut(context);
+                Metrics_End(context);
 
 
 
@@ -115,18 +116,19 @@ namespace Business.Middlewares
 
 
 
-
+                Console.WriteLine($"------ OUT 1: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
                 return;// Task.CompletedTask;
             });
 
+
+            Console.WriteLine($"------ OUT 2: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
-        private void MetricsIn(HttpContext context)
-        {
-            _timeIn = DateTime.UtcNow;
 
+        private void Metrics_Start(HttpContext context)
+        {
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
             _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
@@ -134,10 +136,12 @@ namespace Business.Middlewares
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
             context.Request.Headers.Append("Metrics.Reporter", $"{_metricsDataSender}");
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
-        private void MetricsOut(HttpContext context)
+
+
+        private void Metrics_End(HttpContext context)
         {
             // increase index if HTTP response was not received:
             if (context.Response.StatusCode == 503)
@@ -147,7 +151,7 @@ namespace Business.Middlewares
 
             context.Response.Headers.Remove("Metrics.Index");
             context.Response.Headers.Add("Metrics.Index", _index.ToString());
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{_timeIn.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 

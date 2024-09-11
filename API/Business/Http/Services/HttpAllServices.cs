@@ -13,10 +13,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
+
+
 namespace Business.Http.Services
 {
     // sends HTTP messages to ALL (specific) API services
-    // API URLs source: Global Config
+    // API services URLs source: Global Config
 
     public class HttpAllServices : HttpBaseService, IHttpAllServices
     {
@@ -103,7 +105,7 @@ namespace Business.Http.Services
 
                         var requestResult = await PostGlobalConfig(globalConfig_DTO);
 
-                        _cm.Message("HTTP Response", _remoteServiceName, "Global Config update", requestResult.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.WARNING, $"{(requestResult.Status ? "Response received." : requestResult.Message)}");
+                        _cm.Message("HTTP Response", _remoteServiceName, "Global Config update", requestResult.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.FAIL, $"{(requestResult.Status ? "Response received." : requestResult.Message)}");
 
                         result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, requestResult.Status));
                     }
