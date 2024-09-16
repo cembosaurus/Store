@@ -31,7 +31,7 @@ namespace Business.Management.Controllers
         public ActionResult UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_AS_MODEL> models)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Incoming HTTP Post to update Remote Services ... ");
+            Console.WriteLine("HTTP Post (incoming) to update Remote Services ... ");
             Console.ResetColor();
 
             var result = _globalConfig_Provider.UpdateRemoteServiceModels(models);
@@ -45,7 +45,7 @@ namespace Business.Management.Controllers
         public ActionResult Update([FromBody] Config_Global_AS_MODEL globalConfig)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Incoming HTTP Post to update Global Config ... ");
+            Console.WriteLine("HTTP Post (incoming) to update Global Config ... ");
             Console.ResetColor();
 
             var result = _globalConfig_Provider.Update(globalConfig);

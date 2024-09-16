@@ -77,7 +77,7 @@ namespace Business.Http.Services
         {
             // create HTTP request:
 
-            var createReqResponse = await CreateRequest();
+            var createReqResponse = await Prepare_HTTPRequest();
 
             if (!createReqResponse.Status)
                 return _resultFact.Result(default(T), false, $"HTTP request to '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
@@ -129,10 +129,10 @@ namespace Business.Http.Services
                 // Try HTTP request again:
 
 
-                var servicesModelsResult = await DownloadGloalConfig();
+                var GCResult = await DownloadGloalConfig();
 
-                if (!servicesModelsResult.Status)
-                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Request to API service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to download Global Config from 'Management' API service FAILED ! \\n Message: {servicesModelsResult.Message}", ex);
+                if (!GCResult.Status)
+                    return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Request to API service '{_remoteServiceName}' could NOT be completed due to incorrect URL. Attempt to download Global Config with correct URL from 'Management' API service FAILED ! \\n Message: {GCResult.Message}", ex);
 
 
                 _requestURL = _service_model.GetUrlWithPath(TypeOfService.REST, _remoteServicePathName, _isProdEnv);
@@ -146,8 +146,7 @@ namespace Business.Http.Services
             {
                 // SECOND attempt:
 
-                // re-build HTTRP request with new URL:
-                CreateHttpRequestMessage();
+                Create_HttpRequestMessage();
 
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
@@ -160,7 +159,7 @@ namespace Business.Http.Services
 
 
 
-        protected async virtual Task<IServiceResult<bool>> CreateRequest()
+        protected async virtual Task<IServiceResult<bool>> Prepare_HTTPRequest()
         {
 
             if (string.IsNullOrWhiteSpace(_remoteServiceName))
@@ -180,7 +179,7 @@ namespace Business.Http.Services
                 var GCResult = await DownloadGloalConfig();
 
                 if (!GCResult.Status)
-                    return _resultFact.Result(false, false, $"URL for service '{_remoteServiceName}' is not available, because attempt to download Global Config from Management API service FAILED! Message: {GCResult.Message}");
+                    return _resultFact.Result(false, false, $"URL for service '{_remoteServiceName}' is not available, because attempt to download Global Config with correct URL from Management API service FAILED! Message: {GCResult.Message}");
 
                 // Load service model from local Global Config again:
                 modelResult = GetServiceModel_FromLocalGlobalConfig();
@@ -214,9 +213,9 @@ namespace Business.Http.Services
             }
 
 
-            // create HTTP request message:
+            // create HTTP request message, insert headers:
 
-            CreateHttpRequestMessage();
+            Create_HttpRequestMessage();
 
 
             return _resultFact.Result(true, true);
@@ -224,7 +223,7 @@ namespace Business.Http.Services
 
 
 
-        protected void CreateHttpRequestMessage()
+        protected void Create_HttpRequestMessage()
         {
             _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestURL + (string.IsNullOrWhiteSpace(_requestQuery) ? "" : "/" + _requestQuery)) };
             _requestMessage.Method = _method;

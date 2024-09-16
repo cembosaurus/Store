@@ -101,11 +101,11 @@ namespace Business.Http.Services
 
                     try
                     {
-                        _cm.Message("HTTP Post", _remoteServiceName, "Global Config update", TypeOfInfo.INFO, "Sending...");
+                        _cm.Message("HTTP Post (outgoing)", _remoteServiceName, "Global Config update", TypeOfInfo.INFO, "Sending...");
 
                         var requestResult = await PostGlobalConfig(globalConfig_DTO);
 
-                        _cm.Message("HTTP Response", _remoteServiceName, "Global Config update", requestResult.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.FAIL, $"{(requestResult.Status ? "Response received." : requestResult.Message)}");
+                        _cm.Message("HTTP Response (incoming)", _remoteServiceName, "Global Config update", requestResult.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.FAIL, $"{(requestResult.Status ? "Response received." : requestResult.Message)}");
 
                         result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, requestResult.Status));
                     }
@@ -113,7 +113,7 @@ namespace Business.Http.Services
                     {
                         result.Add(new KeyValuePair<RemoteService_AS_MODEL, bool>(model, false));
 
-                        _cm.Message("HTTP Response", _remoteServiceName, _requestURL + "/" + _requestQuery, TypeOfInfo.FAIL, ex.Message);
+                        _cm.Message("HTTP Response (incoming)", _remoteServiceName, _requestURL + "/" + _requestQuery, TypeOfInfo.FAIL, ex.Message);
                     }
                 }
             }

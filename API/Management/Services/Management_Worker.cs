@@ -60,7 +60,7 @@ namespace Management.Services
         // Send update to all relevant API services (K8 multiple replicas will NOT be reached, only the one selected by Loadbalancer):
         private async void PostGlobalConfigToAPIServices()
         {
-            _cm.Message("Http Post", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sending to all relevant API services ...");
+            _cm.Message("Http Post (outgoing)", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sending to all relevant API services ...");
 
 
             using (var scope = _serviceFactory.CreateScope())
@@ -83,7 +83,7 @@ namespace Management.Services
 
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
 
-                        _cm.Message("Http Response", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sent to API services:");
+                        _cm.Message("Http Response (incoming)", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sent to API services:");
 
                         foreach (var service in httpUpdateResult.Data ?? null!)
                         {

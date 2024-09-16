@@ -17,7 +17,7 @@ namespace Business.Middlewares
         private RequestDelegate _next;
         private readonly string _thisService;
         private StringValues _requestFrom;
-        private bool _metricsDataSender;
+        private bool _metricsReporter;
         private int _index;
         private IHttpMetricsService _httpMetricsService;
 
@@ -53,13 +53,13 @@ namespace Business.Middlewares
         private async Task RequestHandler(HttpContext context)
         {
 
-            Metrics_Start(context);
+            Request_IN(context);
 
 
             context.Response.OnStarting(async () =>
             {
 
-                Metrics_End(context);
+                Response_OUT(context);
 
 
 
@@ -67,7 +67,7 @@ namespace Business.Middlewares
                 //---------------------------------------------------------------------------------------------- To Do:
 
                 // send data collected from whole chain of HTTP requests to Metrics API serevice:
-                if (_metricsDataSender)
+                if (_metricsReporter)
                 {
                     context.Response.Headers.Remove("Metrics.Index");
 
@@ -127,21 +127,21 @@ namespace Business.Middlewares
 
 
 
-        private void Metrics_Start(HttpContext context)
+        private void Request_IN(HttpContext context)
         {
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
-            _metricsDataSender = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
+            _metricsReporter = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
 
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
-            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsDataSender}");
+            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsReporter}");
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
 
-        private void Metrics_End(HttpContext context)
+        private void Response_OUT(HttpContext context)
         {
             // increase index if HTTP response was not received:
             if (context.Response.StatusCode == 503)

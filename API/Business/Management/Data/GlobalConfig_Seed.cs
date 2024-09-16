@@ -18,15 +18,15 @@ namespace Business.Management.Data
 
                 try
                 {
-                    cw.Message("HTTP Get", "Global Config Seed", "App startup - Updating Global Config.", TypeOfInfo.INFO, "Waiting for response from Management API service...");
+                    cw.Message("HTTP Get (outgoing)", "Global Config Seed", "App startup - Updating Global Config.", TypeOfInfo.INFO, "Waiting for response from Management API service...");
 
                     var result = await service.DownloadGlobalConfig();
 
-                    cw.Message("HTTP Response", "Global Config Seed", "Global Config update.", result.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.WARNING, $"{(result.Status ? "" : result.Message)}");
+                    cw.Message("HTTP Response (incoming)", "Global Config Seed", "Global Config update.", result.Status ? TypeOfInfo.SUCCESS : TypeOfInfo.WARNING, $"{(result.Status ? "" : result.Message)}");
                 }
                 catch (HttpRequestException ex)
                 {
-                    cw.Message("HTTP Response: ", "Global Config Seed", "Global Config update.", TypeOfInfo.FAIL, $"{ex.StatusCode}, {ex.Message}");
+                    cw.Message("HTTP Response (incoming) ", "Global Config Seed", "Global Config update.", TypeOfInfo.FAIL, $"{ex.StatusCode}, {ex.Message}");
                 }
             }
 

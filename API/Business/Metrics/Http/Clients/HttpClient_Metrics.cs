@@ -42,7 +42,7 @@ namespace Business.Metrics.Http.Clients
             _requestMessage = requestMessage;
 
 
-            MetricsEnd();
+            Request_OUT();
 
             try
             {
@@ -55,7 +55,7 @@ namespace Business.Metrics.Http.Clients
             }
             finally
             {
-                MetricsStart();
+                Response_IN();
             }
 
 
@@ -69,10 +69,8 @@ namespace Business.Metrics.Http.Clients
 
 
 
-        private void MetricsEnd()
+        private void Request_OUT()
         {
-            // request out:
-
             _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
             _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
             _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
@@ -92,10 +90,8 @@ namespace Business.Metrics.Http.Clients
 
 
 
-        private void MetricsStart()
+        private void Response_IN()
         {
-            // response in:
-
             _responseMessage = _responseMessage ?? new HttpResponseMessage();
             _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
             _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
