@@ -24,7 +24,7 @@ namespace Business.Metrics.Http.Clients
 
 
 
-        public HttpClient_Metrics(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config, ConsoleWriter consoleMessages)
+        public HttpClient_Metrics(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config)
         {
             _httpClient = httpClient;
             _accessor = accessor;
@@ -40,6 +40,7 @@ namespace Business.Metrics.Http.Clients
         public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
         {
             _requestMessage = requestMessage;
+            _responseMessage = default;
 
 
             Request_OUT();
@@ -48,16 +49,10 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            catch (HttpRequestException ex)
-            {
-                // for testing
-                throw;
-            }
-            finally
-            {
+            finally 
+            { 
                 Response_IN();
             }
-
 
             return _responseMessage;
         }
@@ -71,6 +66,8 @@ namespace Business.Metrics.Http.Clients
 
         private void Request_OUT()
         {
+            // metrics END:
+
             _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
             _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
             _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
@@ -92,6 +89,8 @@ namespace Business.Metrics.Http.Clients
 
         private void Response_IN()
         {
+            // metrics START:
+
             _responseMessage = _responseMessage ?? new HttpResponseMessage();
             _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
             _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;

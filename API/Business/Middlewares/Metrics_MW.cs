@@ -129,6 +129,8 @@ namespace Business.Middlewares
 
         private void Request_IN(HttpContext context)
         {
+            // metrics START:
+
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
             _metricsReporter = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
@@ -143,6 +145,8 @@ namespace Business.Middlewares
 
         private void Response_OUT(HttpContext context)
         {
+            // metrics END:
+
             // increase index if HTTP response was not received:
             if (context.Response.StatusCode == 503)
                 _index++;
