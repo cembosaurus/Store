@@ -87,7 +87,16 @@ namespace Identity.Services
 
         public async Task<IServiceResult<string>> Login(UserToLoginDTO user)
         {
-            var userFromRepo = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == user.Name.ToLower());
+            AppUser userFromRepo;
+
+            try
+            {
+                userFromRepo = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == user.Name.ToLower());
+            }
+            catch (Exception ex)
+            {
+                return _resultFact.Result<string>(null, false, ex.Message);
+            }
 
             if (userFromRepo == null)
                 return _resultFact.Result<string>(null, false , $"User '{user.Name}' NOT found !");

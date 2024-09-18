@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
+using System.Net;
 using System.Web.Http;
 
 namespace Business.Metrics.Http.Clients
@@ -18,10 +19,9 @@ namespace Business.Metrics.Http.Clients
         private IHttpContextAccessor _accessor;
         private readonly string _thisService;
         private string? _sendToService;
-        private bool _metricsDataSender;
+        private bool _isMetricsReporter;
         private readonly Guid _appId;
         private int _index;
-
 
 
         public HttpClient_Metrics(HttpClient httpClient, IHttpContextAccessor accessor, IConfiguration config)
@@ -39,6 +39,10 @@ namespace Business.Metrics.Http.Clients
 
         public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
         {
+            Console.WriteLine($"*********************************************************************************************** {_index} ******************************************************************************************");
+
+
+
             _requestMessage = requestMessage;
             _responseMessage = default;
 
@@ -49,8 +53,12 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            finally 
-            { 
+            //catch (HttpRequestException ex)
+            //{
+            //    _index++;
+            //}
+            finally
+            {
                 Response_IN();
             }
 
@@ -68,14 +76,21 @@ namespace Business.Metrics.Http.Clients
         {
             // metrics END:
 
+            // read Index. If doesn't exist then 0.
+            // Index REMAINS 1 if app makes multiple requests !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
-            _metricsDataSender = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
+            _accessor.HttpContext?.Request.Headers.Remove("Metrics.Index");
+            _accessor.HttpContext?.Request.Headers.Add("Metrics.Index", _index.ToString());
+
+            _isMetricsReporter = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
             _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
 
+            // increase Index and add to Request Message:
             _requestMessage?.Headers.Add("Metrics.Index", (++_index).ToString());
 
-            if (_metricsDataSender)
-                _requestMessage?.Headers.Add("Metrics.Reporter", _metricsDataSender.ToString());
+            if (_isMetricsReporter)
+                _requestMessage?.Headers.Add("Metrics.Reporter", _isMetricsReporter.ToString());
 
             _requestMessage?.Headers.Add("Metrics.RequestFrom", _thisService);
 
@@ -91,13 +106,28 @@ namespace Business.Metrics.Http.Clients
         {
             // metrics START:
 
-            _responseMessage = _responseMessage ?? new HttpResponseMessage();
-            _responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
-            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
+            _responseMessage = _responseMessage ?? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+
+
+
+
+            // increase Index and add to header:
+            //_responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
+            //_index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
+
+            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : _index) : ++_index;
+            _responseMessage?.Headers.Add("Metrics.Index", (_index).ToString());
+
+
+
+
 
             var responseMetrics = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
             var responseAppID = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
 
+
+
+            // ADD metrics data into HttpContext for MW:
             if (responseMetrics != null)
             {
                 foreach (var header in responseMetrics)
@@ -113,9 +143,6 @@ namespace Business.Metrics.Http.Clients
                     _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }
             }
-
-            _accessor.HttpContext?.Response.Headers.Remove("Metrics.Index");
-            _accessor.HttpContext?.Response.Headers.Add("Metrics.Index", _index.ToString());
 
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_thisService}.{_appId}",
