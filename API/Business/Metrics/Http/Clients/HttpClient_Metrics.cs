@@ -87,6 +87,7 @@ namespace Business.Metrics.Http.Clients
             _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
 
             // increase Index and add to Request Message:
+            _requestMessage?.Headers.Remove("Metrics.Index");
             _requestMessage?.Headers.Add("Metrics.Index", (++_index).ToString());
 
             if (_isMetricsReporter)
@@ -108,23 +109,15 @@ namespace Business.Metrics.Http.Clients
 
             _responseMessage = _responseMessage ?? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
 
-
-
-
             // increase Index and add to header:
-            //_responseMessage?.Headers.Add("Metrics.Index", (_index++).ToString());
-            //_index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
-
             _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : _index) : ++_index;
+            _responseMessage?.Headers.Remove("Metrics.Index");
             _responseMessage?.Headers.Add("Metrics.Index", (_index).ToString());
-
-
-
-
+            _accessor.HttpContext?.Request.Headers.Remove("Metrics.Index");
+            _accessor.HttpContext?.Request.Headers.Add("Metrics.Index", (_index).ToString());
 
             var responseMetrics = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
             var responseAppID = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
-
 
 
             // ADD metrics data into HttpContext for MW:

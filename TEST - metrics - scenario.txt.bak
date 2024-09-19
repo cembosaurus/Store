@@ -44,15 +44,52 @@ TEST:
 			
 		Sorted by time:
 		
-			API_Gateway				1. REQ.		IN.		client_app.			05.784
-			API_Gateway				2. REQ.		OUT.	OrderingService.	05.915
-			API_Gateway				3. RESP.	IN.		OrderingService.	10.025
-			API_Gateway				2. REQ.		OUT.	ManagementService.	10.071
+			API_Gateway				1. REQ.		IN.		client_app.			05.784		// index 1 because FE sent 0
+			API_Gateway				2. REQ.		OUT.	OrderingService.	05.915		// index 2 because MW passed 1
+			API_Gateway				3. RESP.	IN.		OrderingService.	10.025		// index 3 because Http_Client increased 2 (Ordering OFF - didn't pass increased index) 
+			API_Gateway				2. REQ.		OUT.	ManagementService.	10.071		// index 2 because MW passed 1
 			
-			ManagementService		3. REQ.		IN.		API_Gateway.		10.080
-			ManagementService		4. RESP.	OUT.	API_Gateway.		10.087
+			ManagementService		3. REQ.		IN.		API_Gateway.		10.080		// index 3 because API_Gateway sent 2
+			ManagementService		4. RESP.	OUT.	API_Gateway.		10.087		// index 4 because MW increased 3
 			
-			API_Gateway				5. RESP.	IN.		ManagementService.	10.094
-			API_Gateway				2. REQ.		OUT.	OrderingService.	10.094
-			API_Gateway				3. RESP.	IN.		OrderingService.	14.204
-			API_Gateway				4. RESP.	OUT.	client_app.			14.308
+			API_Gateway				5. RESP.	IN.		ManagementService.	10.094		// index 5 because Management passed 4
+			API_Gateway				2. REQ.		OUT.	OrderingService.	10.094		// index 2 because MW passed 1  (repeating request from step 2)
+			API_Gateway				3. RESP.	IN.		OrderingService.	14.204		// index 3 because Http_Client increased 2 (Ordering OFF - didn't pass increased index) 
+			API_Gateway				4. RESP.	OUT.	client_app.			14.308		// index 4 because Http_Client passed 3
+			
+			
+			
+			
+	Request SUCCESS, When all serevices are ON:
+	
+		
+			Header (Metrics):
+			
+				API_Gateway			1.	REQ.	IN.		client_app.			30.862
+				API_Gateway			2.	REQ.	OUT.	OrderingService.	30.997
+				API_Gateway			8.	RESP.	IN.		OrderingService.	33.093
+				API_Gateway			8.	RESP.	OUT.	client_app.			33.099
+				OrderingService		3.	REQ.	IN.		API_Gateway.		31.065
+				OrderingService		4.	REQ.	OUT.	IdentityService.		31.404
+				OrderingService		7.	RESP.	IN.		IdentityService.	31.791
+				OrderingService		7.	RESP.	OUT.	API_Gateway.		33.078
+				IdentityService		5.	REQ.	IN.		OrderingService.	31.476
+				IdentityService		6.	RESP.	OUT.	OrderingService.	31.775
+	
+
+			Sorted by time:
+			
+				API_Gateway			1.	REQ.	IN.		client_app.			30.862
+				API_Gateway			2.	REQ.	OUT.	OrderingService.	30.997
+				
+				OrderingService		3.	REQ.	IN.		API_Gateway.		31.065
+				OrderingService		4.	REQ.	OUT.	IdentityService.		31.404
+				
+				IdentityService		5.	REQ.	IN.		OrderingService.	31.476
+				IdentityService		6.	RESP.	OUT.	OrderingService.	31.775
+
+				OrderingService		7.	RESP.	IN.		IdentityService.	31.791
+				OrderingService		7.	RESP.	OUT.	API_Gateway.		33.078
+
+				API_Gateway			8.	RESP.	IN.		OrderingService.	33.093
+				API_Gateway			8.	RESP.	OUT.	client_app.			33.099

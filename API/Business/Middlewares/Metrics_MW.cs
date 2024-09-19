@@ -61,69 +61,18 @@ namespace Business.Middlewares
 
                 Response_OUT(context);
 
+                //ReportMetrics(context);
 
 
-
-                //---------------------------------------------------------------------------------------------- To Do:
-
-                // send data collected from whole chain of HTTP requests to Metrics API serevice:
-                if (_metricsReporter)
-                {
-                    context.Response.Headers.Remove("Metrics.Index");
-
-                    var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
-
-                    if (_thisService == "MetricsService")
-                    {
-                        //// To Do: write data into DB --> Metrics API Service can't send data to itself via HTTP request !!!!
-
-                        //Console.ForegroundColor = ConsoleColor.Cyan;
-                        //Console.WriteLine($"{_thisService}: Updating metrics data localy... ");
-                        //Console.ResetColor();
-                    }
-                    else 
-                    {
-                        //Console.ForegroundColor = ConsoleColor.Cyan;
-                        //Console.Write("HTTP Post: ");
-                        //Console.ForegroundColor = ConsoleColor.Yellow;
-                        //Console.Write("Sending metrics data to ");
-                        //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        //Console.Write("Metrics ");
-                        //Console.ForegroundColor = ConsoleColor.Yellow;
-                        //Console.WriteLine("API service...");
-                        //Console.ResetColor();
-
-                        //var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                        //Console.ForegroundColor = ConsoleColor.Cyan;
-                        //Console.Write("HTTP Response: ");
-                        //Console.ForegroundColor = ConsoleColor.Yellow;
-                        //Console.Write("from ");
-                        //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                        //Console.Write("Metrics ");
-                        //Console.ForegroundColor = ConsoleColor.Yellow;
-                        //Console.Write("collector service ");
-                        //Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                        //Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
-                        //Console.ForegroundColor = ConsoleColor.Yellow;
-                        //Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
-                        //Console.ResetColor();
-                    }
-
-                }
-                //-------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-                Console.WriteLine($"------ OUT 1: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+                Console.WriteLine($"--- TEST ------ OUT 1: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
                 return;// Task.CompletedTask;
             });
 
 
-            Console.WriteLine($"------ OUT 2: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            Console.WriteLine($"--- TEST ------ OUT 2: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
+
 
 
 
@@ -143,6 +92,7 @@ namespace Business.Middlewares
 
 
 
+
         private void Response_OUT(HttpContext context)
         {
             // metrics END:
@@ -157,6 +107,62 @@ namespace Business.Middlewares
             context.Response.Headers.Add("Metrics.Index", _index.ToString());
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
+
+
+
+        // async void (instead async task) - not waiting to complete:
+        private async void ReportMetrics(HttpContext context)
+        {
+            //---------------------------------------------------------------------------------------------- To Do:
+
+            // send data collected from whole chain of HTTP requests to Metrics API serevice:
+            if (_metricsReporter)
+            {
+                context.Response.Headers.Remove("Metrics.Index");
+
+                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
+
+                if (_thisService == "MetricsService")
+                {
+                    //// To Do: write data into DB --> Metrics API Service can't send data to itself via HTTP request !!!!
+
+                    //Console.ForegroundColor = ConsoleColor.Cyan;
+                    //Console.WriteLine($"{_thisService}: Updating metrics data localy... ");
+                    //Console.ResetColor();
+                }
+                else
+                {
+                    //Console.ForegroundColor = ConsoleColor.Cyan;
+                    //Console.Write("HTTP Post: ");
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.Write("Sending metrics data to ");
+                    //Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    //Console.Write("Metrics ");
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.WriteLine("API service...");
+                    //Console.ResetColor();
+
+                    //var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                    //Console.ForegroundColor = ConsoleColor.Cyan;
+                    //Console.Write("HTTP Response: ");
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.Write("from ");
+                    //Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    //Console.Write("Metrics ");
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.Write("collector service ");
+                    //Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                    //Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+                    //Console.ResetColor();
+                }
+
+            }
+            //-------------------------------------------------------------------------------------------------------------------------------------------------
+        }
+
 
 
 
