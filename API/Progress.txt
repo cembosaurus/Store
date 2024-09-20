@@ -69,11 +69,8 @@
 
 
 
-                        To Do: console messages for http response - global config update are funny --- fix it
 
-
-                        To Do: http://localhost:5000/order/all whern Identity is OFF returns duplicate metrics data indexes. Reason : if Identity is not accessible Ordering app send request to Management service and then to Identity again. IDs of metyrics data are not increased in Http Service (only in Metrics MW or Http Client)
-
+                    To Do: sending metrics data in MW should be independent, sent and forget
                                         
                                         
                                         

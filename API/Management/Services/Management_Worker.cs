@@ -83,7 +83,7 @@ namespace Management.Services
 
                         var httpUpdateResult = await httpAllServices.PostGlobalConfigToMultipleServices(false);
 
-                        _cm.Message("Http Response (incoming)", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sent to API services:");
+                        _cm.Message("HTTP Response (incoming)", "Multiple API Services", "Global Config Update", TypeOfInfo.INFO,"Sent to API services:");
 
                         foreach (var service in httpUpdateResult.Data ?? null!)
                         {

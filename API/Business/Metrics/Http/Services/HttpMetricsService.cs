@@ -45,13 +45,7 @@ namespace Business.Metrics.Http.Services
             _requestQuery = $"";
             _content = new StringContent(JsonConvert.SerializeObject("******** TEST ********"), _encoding, _mediaType);
 
-
-
-            var res = await HTTP_Request_Handler<string>();
-
-
-
-            return res;
+            return await HTTP_Request_Handler<string>();
         }
 
 

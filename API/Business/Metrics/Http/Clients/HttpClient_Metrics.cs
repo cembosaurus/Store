@@ -39,10 +39,6 @@ namespace Business.Metrics.Http.Clients
 
         public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
         {
-            Console.WriteLine($"*********************************************************************************************** {_index} ******************************************************************************************");
-
-
-
             _requestMessage = requestMessage;
             _responseMessage = default;
 
@@ -53,10 +49,6 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            //catch (HttpRequestException ex)
-            //{
-            //    _index++;
-            //}
             finally
             {
                 Response_IN();
@@ -75,9 +67,6 @@ namespace Business.Metrics.Http.Clients
         private void Request_OUT()
         {
             // metrics END:
-
-            // read Index. If doesn't exist then 0.
-            // Index REMAINS 1 if app makes multiple requests !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
             _accessor.HttpContext?.Request.Headers.Remove("Metrics.Index");
