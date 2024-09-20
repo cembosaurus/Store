@@ -120,11 +120,15 @@ namespace Business.Metrics.Http.Clients
             var responseAppID = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
 
 
-            // ADD metrics data into HttpContext for MW:
+            // ADD received OLD records:
             if (responseMetrics != null)
             {
                 foreach (var header in responseMetrics)
                 {
+                    // DELETE old Index (avoid array of indexes),
+                    // OR pick the last index in MiddleWare
+                    // which means transporting array of Indexes instead of one Index in HTTP requests:
+                    _accessor.HttpContext?.Response.Headers.Remove("Metrics.Index");
                     _accessor.HttpContext?.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }
             }
@@ -137,6 +141,7 @@ namespace Business.Metrics.Http.Clients
                 }
             }
 
+            // ADD this event NEW record:
             _accessor.HttpContext?.Response.Headers.Append(
                 $"Metrics.{_thisService}.{_appId}",
                 $"{_index}.RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
