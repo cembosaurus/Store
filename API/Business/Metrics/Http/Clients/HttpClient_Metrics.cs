@@ -41,9 +41,11 @@ namespace Business.Metrics.Http.Clients
         {
             _requestMessage = requestMessage;
             _responseMessage = default;
+            _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
 
 
-            Request_OUT();
+            if (_sendToService != "MetricsService")
+                Request_OUT();
 
             try
             {
@@ -51,7 +53,8 @@ namespace Business.Metrics.Http.Clients
             }
             finally
             {
-                Response_IN();
+                if (_sendToService != "MetricsService")
+                    Response_IN();
             }
 
             return _responseMessage;
@@ -68,12 +71,11 @@ namespace Business.Metrics.Http.Clients
         {
             // metrics END:
 
-            _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : 0) : 0;
+            _index = _accessor.HttpContext?.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ?? false ? (int.TryParse(indexStrArr[0], out int indexInt) ? indexInt : _index) : _index;
             _accessor.HttpContext?.Request.Headers.Remove("Metrics.Index");
             _accessor.HttpContext?.Request.Headers.Add("Metrics.Index", _index.ToString());
 
             _isMetricsReporter = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
-            _sendToService = _requestMessage.Options.TryGetValue(new HttpRequestOptionsKey<string>("RequestTo"), out _sendToService) ? _sendToService : "not_specified";
 
             // increase Index and add to Request Message:
             _requestMessage?.Headers.Remove("Metrics.Index");

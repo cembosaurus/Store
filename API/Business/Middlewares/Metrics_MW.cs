@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
 
 
@@ -19,7 +20,7 @@ namespace Business.Middlewares
         private StringValues _requestFrom;
         private bool _metricsReporter;
         private int _index;
-        private IHttpMetricsService _httpMetricsService;
+        private IHttpMetricsService? _httpMetricsService;
 
 
 
@@ -35,16 +36,14 @@ namespace Business.Middlewares
 
         public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService)
         {
-
             _httpMetricsService = httpMetricsService;
 
             await AppId(context);
 
-            await RequestHandler(context);
+            if (_thisService != "MetricsService")
+                await RequestHandler(context);
 
             await _next(context);
-
-            Console.WriteLine($"------ OUT 2: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
@@ -52,22 +51,16 @@ namespace Business.Middlewares
 
         private async Task RequestHandler(HttpContext context)
         {
-
             Request_IN(context);
-
 
             context.Response.OnStarting(async () =>
             {
-
                 Response_OUT(context);
-
+            
                 await ReportMetrics(context);
 
-                return;// Task.CompletedTask;
+                return;
             });
-
-
-            //ReportMetrics(context);
         }
 
 
@@ -107,7 +100,6 @@ namespace Business.Middlewares
 
 
 
-        // async void (instead async task) - not waiting to complete:
         private async Task ReportMetrics(HttpContext context)
         {
 
@@ -116,46 +108,35 @@ namespace Business.Middlewares
             {
                 context.Response.Headers.Remove("Metrics.Index");
 
-                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
+                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).Select(rh => { rh.Value.ToList<string>(); return rh; }).ToList();
 
-                if (_thisService == "MetricsService")
-                {
-                    // To Do: write data into DB --> Metrics API Service can't send data to itself via HTTP request !!!!
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("HTTP Post (outgoing): "); 
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"{_thisService} request from: {_requestFrom}");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(" Sending metrics data to ");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write(" Metrics ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(" API service...");
+                Console.ResetColor();
 
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{_thisService}: Updating metrics data localy... ");
-                    Console.ResetColor();
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("HTTP Post: "); 
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write($"{_thisService} request from: {_requestFrom}");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(" Sending metrics data to ");
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write(" Metrics ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(" API service...");
-                    Console.ResetColor();
+                var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                    var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("HTTP Response: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("from ");
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.Write("Metrics ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("collector service ");
-                    Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                    Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
-                    Console.ResetColor();
-                }
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("HTTP Response (incoming): ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("from ");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write("Metrics ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("collector service ");
+                Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
+                Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+                Console.ResetColor();
 
             }
         }

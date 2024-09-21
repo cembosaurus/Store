@@ -70,7 +70,8 @@ builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 

@@ -3,6 +3,8 @@ using Business.Libraries.ServiceResult;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
+
+
 namespace Metrics.Controllers.Business
 {
 
@@ -23,52 +25,39 @@ namespace Metrics.Controllers.Business
 
 
 
-        //[ApiKeyAuth]
-        //[HttpPost()]
-        //public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, StringValues>> metricsData)
-        //{
-
-        //    var data = metricsData.ToList();
-
-
-        //    Console.BackgroundColor = ConsoleColor.Red;
-        //    Console.WriteLine($"------------------- {data} -------------------------- SENDING METRICS ");
-        //    Console.ResetColor();
-
-
-        //    return Ok();
-        //}
         [ApiKeyAuth]
         [HttpPost()]
-        public ActionResult AddMetricsData([FromBody] string metricsData)
+        public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, StringValues>> metricsData)
         {
 
             var data = metricsData.ToList();
 
 
             Console.BackgroundColor = ConsoleColor.Red;
-            Console.WriteLine($"------------------- {metricsData} -------------------------- GETTING METRICS FROM API SERVICE ");
+            Console.WriteLine($"------------------- {data} -------------------------- GETTING METRICS ");
             Console.ResetColor();
 
 
-            var a = new ServiceResultFactory();
-            var result = a.Result<string>("test", true, metricsData);
-
-
-            return Ok(result);
+            return Ok();
         }
-
-
-
         //[ApiKeyAuth]
         //[HttpPost()]
-        //public ActionResult TEST()
+        //public ActionResult AddMetricsData([FromBody] string metricsData)
         //{
 
-        //    Console.WriteLine("test");
+        //    var data = metricsData.ToList();
 
 
-        //    return Ok();
+        //    Console.BackgroundColor = ConsoleColor.Red;
+        //    Console.WriteLine($"------------------- {metricsData} -------------------------- GETTING METRICS FROM API SERVICE ");
+        //    Console.ResetColor();
+
+
+        //    var a = new ServiceResultFactory();
+        //    var result = a.Result<string>("test", true, metricsData);
+
+
+        //    return Ok(result);
         //}
 
 
