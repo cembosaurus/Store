@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json.Linq;
 using System.Globalization;
 
 
@@ -108,7 +107,7 @@ namespace Business.Middlewares
             {
                 context.Response.Headers.Remove("Metrics.Index");
 
-                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).Select(rh => { rh.Value.ToList<string>(); return rh; }).ToList();
+                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("HTTP Post (outgoing): "); 
