@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Metrics.Http.Services.Interfaces;
@@ -15,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Business.Metrics.Http.Services
 {
-    public class HttpMetricsService : HttpBaseService, IHttpMetricsService
+    public class HttpMetricsService : HttpBaseService, IHttpBaseService, IHttpMetricsService
     {
 
 
@@ -27,11 +28,11 @@ namespace Business.Metrics.Http.Services
             _remoteServicePathName = "Collector";
 
         }
+                
 
 
 
-
-        public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, StringValues>> metricsData)
+        public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, string[]>> metricsData)
         {
             _method = HttpMethod.Post;
             _requestQuery = $"";

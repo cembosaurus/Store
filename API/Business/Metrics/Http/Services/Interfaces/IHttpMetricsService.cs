@@ -1,10 +1,12 @@
-﻿using Business.Libraries.ServiceResult.Interfaces;
-using Microsoft.Extensions.Primitives;
+﻿using Business.Http.Services.Interfaces;
+using Business.Libraries.ServiceResult.Interfaces;
+
+
 
 namespace Business.Metrics.Http.Services.Interfaces
 {
-    public interface IHttpMetricsService
+    public interface IHttpMetricsService : IHttpBaseService
     {
-        Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, StringValues>> metricsData);
+        Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, string[]>> metricsData);
     }
 }

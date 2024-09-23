@@ -1,5 +1,7 @@
 ﻿using Business.Metrics.Http.Services.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
@@ -15,6 +17,7 @@ namespace Business.Middlewares
         private static readonly AppId_MODEL _appId_Model = new AppId_MODEL { AppId = _appId, Deployed = _deployed };
 
         private RequestDelegate _next;
+        private readonly ConsoleWriter _cw;
         private readonly string _thisService;
         private StringValues _requestFrom;
         private bool _metricsReporter;
@@ -23,8 +26,9 @@ namespace Business.Middlewares
 
 
 
-        public Metrics_MW(RequestDelegate next, IConfiguration config)
+        public Metrics_MW(RequestDelegate next, IConfiguration config, ConsoleWriter cw)
         {
+            _cw = cw;
             _thisService = config.GetSection("Metrics:Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
             _next = next;
         }
@@ -107,35 +111,13 @@ namespace Business.Middlewares
             {
                 context.Response.Headers.Remove("Metrics.Index");
 
-                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).ToList();
+                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray())).ToList();
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("HTTP Post (outgoing): "); 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write($"{_thisService} request from: {_requestFrom}");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(" Sending metrics data to ");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write(" Metrics ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(" API service...");
-                Console.ResetColor();
+                _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName + "" +  _httpMetricsService.GetRequestURL, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Reported request: {_thisService} {context.Request.Host}{context.Request.Path}");
 
-                var metricsHttpResult = await _httpMetricsService.Update(metricsData);//****************************************************** TRY to send data as string !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("HTTP Response (incoming): ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("from ");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write("Metrics ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("collector service ");
-                Console.ForegroundColor = metricsHttpResult != null || metricsHttpResult.Status ? ConsoleColor.Cyan : ConsoleColor.Red;
-                Console.Write(metricsHttpResult != null || metricsHttpResult.Status ? "Success: " : "Fail: ");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
-                Console.ResetColor();
+                var metricsHttpResult = await _httpMetricsService.Update(metricsData);
+                
+                _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, _httpMetricsService.GetRemoteServiceName, metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
 
             }
         }

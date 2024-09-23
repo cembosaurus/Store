@@ -27,7 +27,7 @@ namespace Metrics.Controllers.Business
 
         [ApiKeyAuth]
         [HttpPost()]
-        public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, StringValues>> metricsData)
+        public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, string[]>> metricsData)
         {
 
             var data = metricsData.ToList();

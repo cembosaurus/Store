@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Inventory.DTOs.Item;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
@@ -9,9 +10,11 @@ using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
+
+
 namespace Business.Inventory.Http.Services
 {
-    public class HttpItemService : HttpBaseService, IHttpItemService
+    public class HttpItemService : HttpBaseService, IHttpBaseService, IHttpItemService
     {
 
 

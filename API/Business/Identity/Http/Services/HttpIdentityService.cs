@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Business.Identity.Http.Services
 {
-    public class HttpIdentityService : HttpBaseService, IHttpIdentityService
+    public class HttpIdentityService : HttpBaseService, IHttpBaseService, IHttpIdentityService
     {
 
         public HttpIdentityService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)

@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.DTOs;
 using Business.Management.Appsettings.Interfaces;
@@ -16,7 +17,7 @@ namespace Business.Management.Http.Services
     // sends HTTP messages to Management API service.
     // URL routes: source Appsettings
 
-    public class HttpManagementService : HttpBaseService, IHttpManagementService
+    public class HttpManagementService : HttpBaseService, IHttpBaseService , IHttpManagementService
     {
 
         private readonly IHttpAppClient _httpAppClient;

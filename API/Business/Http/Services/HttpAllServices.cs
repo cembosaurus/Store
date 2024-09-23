@@ -20,7 +20,7 @@ namespace Business.Http.Services
     // sends HTTP messages to ALL (specific) API services
     // API services URLs source: Global Config
 
-    public class HttpAllServices : HttpBaseService, IHttpAllServices
+    public class HttpAllServices : HttpBaseService, IHttpBaseService, IHttpAllServices
     {
 
         private readonly IHttpAppClient _httpAppClient;

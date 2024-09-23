@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Inventory.DTOs.CatalogueItem;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
@@ -14,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace Business.Inventory.Http.Services
 {
-    public class HttpCatalogueItemService : HttpBaseService, IHttpCatalogueItemService
+    public class HttpCatalogueItemService : HttpBaseService, IHttpBaseService, IHttpCatalogueItemService
     {
 
         public HttpCatalogueItemService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER remoteServices_Provider, IServiceResultFactory resultFact, ConsoleWriter cm) 

@@ -1,6 +1,6 @@
-﻿using Business.Enums;
-using Business.Exceptions.Interfaces;
+﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
+using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Appsettings.Models;
@@ -20,7 +20,7 @@ using System.Text;
 
 namespace Business.Http.Services
 {
-    public class HttpBaseService
+    public class HttpBaseService : IHttpBaseService
     {
 
         private static IHttpContextAccessor _accessor;
@@ -100,7 +100,7 @@ namespace Business.Http.Services
             
             var content = sendResponse.Content.ReadAsStringAsync().Result;
             
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? null!;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? _resultFact.Result<T>(default, sendResponse.IsSuccessStatusCode, sendResponse.ReasonPhrase ?? "");
             
             return result;
 
@@ -275,5 +275,12 @@ namespace Business.Http.Services
 
             return GCResult;
         }
+
+
+
+
+        public string GetRequestURL { get { return _requestMessage.RequestUri?.ToString() ; } }
+
+        public string GetRemoteServiceName { get { return _remoteServiceName; } }
     }
 }

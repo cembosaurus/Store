@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Identity.Models;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Business.Identity.Http.Services
 {
-    public class HttpAddressService : HttpBaseService, IHttpAddressService
+    public class HttpAddressService : HttpBaseService, IHttpBaseService, IHttpAddressService
     {
 
 

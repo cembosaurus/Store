@@ -1,6 +1,7 @@
 ﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Ordering.DTOs;
@@ -9,9 +10,11 @@ using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
+
+
 namespace Business.Ordering.Http.Services
 {
-    public class HttpOrderService : HttpBaseService, IHttpOrderService
+    public class HttpOrderService : HttpBaseService, IHttpBaseService, IHttpOrderService
     {
 
 
