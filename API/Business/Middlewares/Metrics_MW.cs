@@ -1,8 +1,8 @@
 ﻿using Business.Metrics.Http.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
 
@@ -12,6 +12,7 @@ namespace Business.Middlewares
 {
     public class Metrics_MW
     {
+        // AppId - identifies instance (K8 replica) of service:
         private static readonly Guid _appId = Guid.NewGuid();
         private static readonly DateTime _deployed = DateTime.UtcNow;
         private static readonly AppId_MODEL _appId_Model = new AppId_MODEL { AppId = _appId, Deployed = _deployed };
@@ -20,7 +21,7 @@ namespace Business.Middlewares
         private readonly ConsoleWriter _cw;
         private readonly string _thisService;
         private StringValues _requestFrom;
-        private bool _metricsReporter;
+        private bool _isMetricsReporter;
         private int _index;
         private IHttpMetricsService? _httpMetricsService;
 
@@ -39,7 +40,7 @@ namespace Business.Middlewares
 
         public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService)
         {
-            _httpMetricsService = httpMetricsService;
+          _httpMetricsService = httpMetricsService;
 
             await AppId(context);
 
@@ -58,6 +59,8 @@ namespace Business.Middlewares
 
             context.Response.OnStarting(async () =>
             {
+                _isMetricsReporter = _index == 1;
+
                 Response_OUT(context);
             
                 await ReportMetrics(context);
@@ -74,13 +77,11 @@ namespace Business.Middlewares
             // metrics START:
 
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
-            _metricsReporter = !context.Request.Headers.TryGetValue("Metrics.Reporter", out StringValues result);
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
 
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
-            context.Request.Headers.Append("Metrics.Reporter", $"{_metricsReporter}");
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{RequestURL(context)}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
@@ -107,19 +108,21 @@ namespace Business.Middlewares
         {
 
             // send data collected from whole chain of HTTP requests to Metrics API serevice:
-            if (_metricsReporter)
+            if (_isMetricsReporter)
             {
                 context.Response.Headers.Remove("Metrics.Index");
 
                 var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray())).ToList();
 
-                _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName + "" +  _httpMetricsService.GetRequestURL, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Reported request: {_thisService} {context.Request.Host}{context.Request.Path}");
+                _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
 
                 var metricsHttpResult = await _httpMetricsService.Update(metricsData);
                 
-                _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, _httpMetricsService.GetRemoteServiceName, metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+                _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
 
             }
+
+            _isMetricsReporter = default;
         }
 
 
@@ -130,6 +133,12 @@ namespace Business.Middlewares
             if (context.Request.Path == "/appid")
                 context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
 
+        }
+
+
+        private string RequestURL(HttpContext context)
+        {
+            return $"{context.Request.Method ?? ""}.{context.Request.Host.Host ?? ""}.{context.Request.Host.Port}.{context.Request.Path.Value ?? ""}";
         }
 
 

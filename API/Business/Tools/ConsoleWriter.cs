@@ -72,7 +72,7 @@ namespace Business.Tools
             };
             Console.Write($" {_type}:");
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(string.IsNullOrWhiteSpace(_message) ? "" : $" '{_message}'");
+            Console.WriteLine(string.IsNullOrWhiteSpace(_message) ? "" : $" {_message}");
             Console.ResetColor();
         }
 

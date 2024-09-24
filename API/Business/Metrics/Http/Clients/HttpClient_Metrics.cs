@@ -19,7 +19,6 @@ namespace Business.Metrics.Http.Clients
         private IHttpContextAccessor _accessor;
         private readonly string _thisService;
         private string? _sendToService;
-        private bool _isMetricsReporter;
         private readonly Guid _appId;
         private int _index;
 
@@ -75,14 +74,9 @@ namespace Business.Metrics.Http.Clients
             _accessor.HttpContext?.Request.Headers.Remove("Metrics.Index");
             _accessor.HttpContext?.Request.Headers.Add("Metrics.Index", _index.ToString());
 
-            _isMetricsReporter = _accessor.HttpContext?.Request.Headers.Any(rh => rh.Key == "Metrics.Reporter") ?? false;
-
             // increase Index and add to Request Message:
             _requestMessage?.Headers.Remove("Metrics.Index");
             _requestMessage?.Headers.Add("Metrics.Index", (++_index).ToString());
-
-            if (_isMetricsReporter)
-                _requestMessage?.Headers.Add("Metrics.Reporter", _isMetricsReporter.ToString());
 
             _requestMessage?.Headers.Add("Metrics.RequestFrom", _thisService);
 

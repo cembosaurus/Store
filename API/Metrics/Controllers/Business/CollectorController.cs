@@ -32,6 +32,12 @@ namespace Metrics.Controllers.Business
 
             var data = metricsData.ToList();
 
+            //var a = DateTime.ParseExact("2024-09-24 03:53:16.100", "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+            //var b = DateTime.ParseExact("2024-09-24 04:55:19.223", "yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+            //var v = b - a;
+            //var c = $"{v.Hours}, {v.Minutes}, {v.Seconds}, {v.Milliseconds}";
+
+
 
             Console.BackgroundColor = ConsoleColor.Red;
             Console.WriteLine($"------------------- {data} -------------------------- GETTING METRICS ");
@@ -40,25 +46,7 @@ namespace Metrics.Controllers.Business
 
             return Ok();
         }
-        //[ApiKeyAuth]
-        //[HttpPost()]
-        //public ActionResult AddMetricsData([FromBody] string metricsData)
-        //{
 
-        //    var data = metricsData.ToList();
-
-
-        //    Console.BackgroundColor = ConsoleColor.Red;
-        //    Console.WriteLine($"------------------- {metricsData} -------------------------- GETTING METRICS FROM API SERVICE ");
-        //    Console.ResetColor();
-
-
-        //    var a = new ServiceResultFactory();
-        //    var result = a.Result<string>("test", true, metricsData);
-
-
-        //    return Ok(result);
-        //}
 
 
     }
