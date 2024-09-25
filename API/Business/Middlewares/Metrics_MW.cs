@@ -77,7 +77,7 @@ namespace Business.Middlewares
             // metrics START:
 
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
-            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client_app";
+            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
 
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
