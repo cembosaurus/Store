@@ -17,7 +17,7 @@ namespace Business.Middlewares
         private static readonly DateTime _deployed = DateTime.UtcNow;
         private static readonly AppId_MODEL _appId_Model = new AppId_MODEL { AppId = _appId, Deployed = _deployed };
 
-        private RequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly ConsoleWriter _cw;
         private readonly string _thisService;
         private StringValues _requestFrom;
@@ -136,7 +136,7 @@ namespace Business.Middlewares
         }
 
 
-        private string RequestURL(HttpContext context)
+        private static string RequestURL(HttpContext context)
         {
             return $"{context.Request.Method ?? ""}.{context.Request.Host.Host ?? ""}.{context.Request.Host.Port}.{context.Request.Path.Value ?? ""}";
         }

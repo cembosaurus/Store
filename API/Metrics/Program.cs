@@ -14,6 +14,9 @@ using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Tools;
+using Metrics.Data;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +34,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
+builder.Services.AddDbContext<MetricsContext>();
 
 builder.Services.AddTransient<ConsoleWriter>();
 

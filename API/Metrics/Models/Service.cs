@@ -10,6 +10,6 @@
         public DateTime Deployed { get; set; }
         public DateTime Terminated { get; set; }
 
-
+        public ICollection<Request> Requests { get; set; }
     }
 }

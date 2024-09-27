@@ -6,7 +6,7 @@ namespace Services.Inventory.Data
     public class InventoryContext: DbContext
     {
 
-        private IConfiguration _conf;
+        private readonly IConfiguration _conf;
         private readonly bool _isProdEnv;
 
 
