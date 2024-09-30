@@ -23,6 +23,7 @@ namespace Business.Middlewares
         private StringValues _requestFrom;
         private bool _isMetricsReporter;
         private int _index;
+        private int _requestId;
         private IHttpMetricsService? _httpMetricsService;
 
 
@@ -76,12 +77,17 @@ namespace Business.Middlewares
         {
             // metrics START:
 
+            _requestId = context.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues reqIdStrArr) ? (int.TryParse(reqIdStrArr[0], out int reqIdInt) ? ++reqIdInt : 1) : 1;
+
+            context.Request.Headers.Remove("Metrics.ReqId");
+            context.Request.Headers.Add("Metrics.ReqId", _requestId.ToString());
+
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
 
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{RequestURL(context)}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}.{_requestId}", $"{_index}.REQ.IN.{_requestFrom}.{RequestURL(context)}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
@@ -99,7 +105,7 @@ namespace Business.Middlewares
 
             context.Response.Headers.Remove("Metrics.Index");
             context.Response.Headers.Add("Metrics.Index", _index.ToString());
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}.{_requestId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
 
