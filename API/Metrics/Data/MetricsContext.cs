@@ -6,7 +6,7 @@ namespace Metrics.Data
     public class MetricsContext : DbContext
     {
 
-        private IConfiguration _conf;
+        private readonly IConfiguration _conf;
         private readonly bool _isProdEnv;
 
 

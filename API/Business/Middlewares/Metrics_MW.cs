@@ -15,7 +15,7 @@ namespace Business.Middlewares
         // AppId - identifies instance (K8 replica) of service:
         private static readonly Guid _appId = Guid.NewGuid();
         private static readonly DateTime _deployed = DateTime.UtcNow;
-        private static readonly AppId_MODEL _appId_Model = new AppId_MODEL { AppId = _appId, Deployed = _deployed };
+        private static readonly AppId_MODEL _appId_Model = new() { AppId = _appId, Deployed = _deployed };
 
         private readonly RequestDelegate _next;
         private readonly ConsoleWriter _cw;
@@ -77,16 +77,18 @@ namespace Business.Middlewares
         {
             // metrics START:
 
-            _requestId = context.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues reqIdStrArr) ? (int.TryParse(reqIdStrArr[0], out int reqIdInt) ? ++reqIdInt : 1) : 1;
-
-            context.Request.Headers.Remove("Metrics.ReqId");
-            context.Request.Headers.Add("Metrics.ReqId", _requestId.ToString());
-
+            _requestId = context.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues reqIdStrArr) ? (int.TryParse(reqIdStrArr[0], out int reqIdInt) ? reqIdInt : 1) : 1;
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
 
+            // pass the values into http client in context:
+            context.Request.Headers.Remove("Metrics.ReqId");
+            context.Request.Headers.Add("Metrics.ReqId", _requestId.ToString());
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
+
+            // add METRICS header into this app response.
+            // It will be passed back to calling API service on the way back:
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}.{_requestId}", $"{_index}.REQ.IN.{_requestFrom}.{RequestURL(context)}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 
@@ -101,10 +103,14 @@ namespace Business.Middlewares
             if (context.Response.StatusCode == 503)
                 _index++;
 
-            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 0) : ++_index;
+            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : ++_index) : ++_index;
 
+            // pass the values back into caller app:
             context.Response.Headers.Remove("Metrics.Index");
             context.Response.Headers.Add("Metrics.Index", _index.ToString());
+
+            // add METRICS header into this app response.
+            // It will be passed back to calling API service in http response:
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}.{_requestId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
         }
 

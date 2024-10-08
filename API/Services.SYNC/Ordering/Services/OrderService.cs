@@ -5,6 +5,7 @@ using Business.Ordering.DTOs;
 using Business.Payment.DTOs;
 using Business.Payment.Http.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using Ordering.Data.Repositories.Interfaces;
 using Ordering.Services.Interfaces;
 using Ordering.Tools.Interfaces;
@@ -26,7 +27,10 @@ namespace Ordering.Services
         private readonly IMapper _mapper;
         private readonly IOrder _orderTools;
 
-        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService)
+        // .... DELETE after testing:
+        private static string zedous;
+
+        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService, IHttpContextAccessor accessor)
         {
             _orderRepo = orderRepo;
             _cartRepo = cartRepo;
@@ -36,6 +40,9 @@ namespace Ordering.Services
             _resultFact = resultFact;
             _mapper = mapper;
             _orderTools = orderTools;
+
+            // .... DELETE after testing:
+            zedous = accessor.HttpContext.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues result) ? (int.TryParse(result[0], out int reqIdInt) ? reqIdInt.ToString() : "spatne data tam boli") : "hovno tam bolo";
         }
 
 
@@ -47,7 +54,8 @@ namespace Ordering.Services
 
             // ----------------------------------------------------- TEST
 
-            var test = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1,2,3});
+            var test = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
+            //var test2 = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
 
             //------------------------------------------------------------------------------------
 

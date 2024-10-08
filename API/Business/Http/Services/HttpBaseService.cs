@@ -85,22 +85,22 @@ namespace Business.Http.Services
 
             // send HTTP reequest:
 
-            var sendResponse = await Send();
+            var responseMessage = await Send();
             
             
-            if (!sendResponse.IsSuccessStatusCode || sendResponse.Content.GetType().Name == "EmptyContent")
+            if (!responseMessage.IsSuccessStatusCode || responseMessage.Content.GetType().Name == "EmptyContent")
             {
             
                 // HTTP request to update local Global Config Failed:
             
-                var response = _resultFact.Result(default(T), false, $"{sendResponse.ReasonPhrase}: {sendResponse.RequestMessage?.Method}, {sendResponse.RequestMessage?.RequestUri}");
+                var response = _resultFact.Result(default(T), false, $"{responseMessage.ReasonPhrase}: {responseMessage.RequestMessage?.Method}, {responseMessage.RequestMessage?.RequestUri}");
             
                 return response;
             }
             
-            var content = sendResponse.Content.ReadAsStringAsync().Result;
+            var content = responseMessage.Content.ReadAsStringAsync().Result;
             
-            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? _resultFact.Result<T>(default, sendResponse.IsSuccessStatusCode, sendResponse.ReasonPhrase ?? "");
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? _resultFact.Result<T>(default, responseMessage.IsSuccessStatusCode, responseMessage.ReasonPhrase ?? "");
             
             return result;
 

@@ -69,8 +69,8 @@
 
 
 
-
-                    To Do: METRICS EF dbcontext -> models relations, PK, FK etc... and  migration
+                    To Do: FIX METRICS headers index and reqId when multiple call from order service to identity service !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    To Do: METRICS EF dbcontext -> models relations, PK, FK etc... and  migration -------> req id added to header to identify request in app
                                         
                                         
                                         
