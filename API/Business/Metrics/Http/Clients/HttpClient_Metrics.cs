@@ -55,12 +55,13 @@ namespace Business.Metrics.Http.Clients
             }
             finally
             {
+                // Metrics service response is not measured:
                 if (_sendToService != "MetricsService")
                     Response_IN();
             }
 
 
-            AddResponseToHeaders();
+            AppendPreviousHeadersToResponse();
 
             return _responseMessage;
         }
@@ -78,9 +79,9 @@ namespace Business.Metrics.Http.Clients
 
             // read values passed from MW in context:
             _requestId = _context.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues reqIdStrArr) ? (int.TryParse(reqIdStrArr[0], out int reqIdInt) ? reqIdInt : 1) : 1;
-            _index = _context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) 
+            _index = _context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? int.TryParse(indexStrArr[0], out int indexInt) 
                 // increase index for every request originated inside app (not passing through via Middelware):
-                ? (indexInt <= _index ? ++_index : ++indexInt) : 0) 
+                ? (indexInt <= _index ? ++_index : ++indexInt) : 0
                 : 0;
 
             // save request ID into context and send increased request ID to called API service:
@@ -108,11 +109,17 @@ namespace Business.Metrics.Http.Clients
         {
             // metrics START:
 
-            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? (int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : 0) : 0;
+            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) 
+                ? (indexInt <= _index ? ++_index : ++indexInt) : 0
+                : ++_index;
 
-            // passing Index into MW:
+            // passing increased index back into response header:
             _responseMessage.Headers.Remove("Metrics.Index");
             _responseMessage.Headers.Add("Metrics.Index", _index.ToString());
+
+            // passing Index into MW:
+            _context.Response.Headers.Remove("Metrics.Index");
+            _context.Response.Headers.Add("Metrics.Index", _index.ToString());
 
             // add METRICS header into this app response.
             // It will be accessed in MW and send back to caller in http response:
@@ -124,28 +131,30 @@ namespace Business.Metrics.Http.Clients
 
 
 
-
-        private void AddResponseToHeaders()
+        private void AppendPreviousHeadersToResponse()
         {
-            var responseMetrics = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
-            var responseAppID = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
+            // Appending Metrics headers generated in previous services in consequential main request chain to response:
 
-            // ADD received OLD records:
-            if (responseMetrics != null)
+            var previousServices_MetricsHeaders = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
+            var previousServices_AppIdHeaders = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
+
+            // ADD received headers from previous requests chain:
+            if (previousServices_MetricsHeaders != null)
             {
-                foreach (var header in responseMetrics)
+                foreach (var header in previousServices_MetricsHeaders)
                 {
-                    // DELETE old Index (avoid array of indexes),
-                    // OR pick the last index in MiddleWare
-                    // which means transporting array of Indexes instead of one Index in HTTP requests:
+                    // DELETE Indexes from porevious requets in chain to be replaced by this index (avoid array of indexes),
+                    // OR pick the last index in MiddleWare, which would mean transporting array of Indexes instead of one Index in HTTP requests:
                     _context.Response.Headers.Remove("Metrics.Index");
+
+                    // append previous Metrics headers from requests chain:
                     _context.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }
             }
 
-            if (responseAppID != null)
+            if (previousServices_AppIdHeaders != null)
             {
-                foreach (var header in responseAppID)
+                foreach (var header in previousServices_AppIdHeaders)
                 {
                     _context.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }

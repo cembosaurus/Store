@@ -56,6 +56,7 @@ namespace Ordering.Services
 
             var test = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
             //var test2 = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
+            //var test3 = await _httpPaymentService.MakePayment(new OrderPaymentCreateDTO());
 
             //------------------------------------------------------------------------------------
 

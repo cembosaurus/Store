@@ -82,8 +82,8 @@ namespace Business.Middlewares
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
 
             // pass the values into http client in context:
-            context.Request.Headers.Remove("Metrics.ReqId");
-            context.Request.Headers.Add("Metrics.ReqId", _requestId.ToString());
+            //context.Request.Headers.Remove("Metrics.ReqId");
+            //context.Request.Headers.Add("Metrics.ReqId", _requestId.ToString());
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
 
