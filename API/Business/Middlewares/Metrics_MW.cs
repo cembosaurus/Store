@@ -103,7 +103,9 @@ namespace Business.Middlewares
             if (context.Response.StatusCode == 503)
                 _index++;
 
-            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : ++_index) : ++_index;
+            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) 
+                ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : ++_index) 
+                : ++_index;
 
             // pass the values back into caller app:
             context.Response.Headers.Remove("Metrics.Index");

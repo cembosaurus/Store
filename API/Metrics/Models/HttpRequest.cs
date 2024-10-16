@@ -1,8 +1,8 @@
 ﻿namespace Metrics.Models
 {
-    public class Request
+    public class HttpRequest
     {
-        public int Id { get; set; }
+        public int TransactionId { get; set; }
         // Index - identifies sub-request (app request) in main-request (client request):
         public int Index { get; set; }
         public string Method { get; set; }
@@ -13,7 +13,7 @@
         public DateTime Timestamp { get; set; }
 
 
-        public Service Service { get; set; }
-        public Response Response { get; set; }
+        public APIService Service { get; set; }
+        public HttpResponse Response { get; set; }
     }
 }

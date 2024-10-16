@@ -45,8 +45,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// add validation filter in front of controller:
 builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ValidationFilter>();

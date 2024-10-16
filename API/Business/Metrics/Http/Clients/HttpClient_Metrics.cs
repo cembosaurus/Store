@@ -60,7 +60,6 @@ namespace Business.Metrics.Http.Clients
                     Response_IN();
             }
 
-
             AppendPreviousHeadersToResponse();
 
             return _responseMessage;
@@ -143,10 +142,6 @@ namespace Business.Metrics.Http.Clients
             {
                 foreach (var header in previousServices_MetricsHeaders)
                 {
-                    // DELETE Indexes from porevious requets in chain to be replaced by this index (avoid array of indexes),
-                    // OR pick the last index in MiddleWare, which would mean transporting array of Indexes instead of one Index in HTTP requests:
-                    _context.Response.Headers.Remove("Metrics.Index");
-
                     // append previous Metrics headers from requests chain:
                     _context.Response.Headers.Append(header.Key, header.Value.ToArray());
                 }

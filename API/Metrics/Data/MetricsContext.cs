@@ -17,9 +17,9 @@ namespace Metrics.Data
         }
 
 
-        public DbSet<Service> Services { get; set; }
-        public DbSet<Request> Requests { get; set; }
-        public DbSet<Response> Responses { get; set; }
+        public DbSet<APIService> Services { get; set; }
+        public DbSet<Models.HttpRequest> Requests { get; set; }
+        public DbSet<Models.HttpResponse> Responses { get; set; }
 
 
 
@@ -33,15 +33,15 @@ namespace Metrics.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<Service>()
+            modelBuilder.Entity<APIService>()
                 .HasKey(i => i.Id);
 
 
 
-            modelBuilder.Entity<Request>()
-                .HasKey(r => new { r.Id, r.Index });
+            modelBuilder.Entity<Models.HttpRequest>()
+                .HasKey(r => new { r.TransactionId, r.Index });
 
-            modelBuilder.Entity<Request>()
+            modelBuilder.Entity<Models.HttpRequest>()
                 .HasOne(r => r.Service)
                 .WithMany(s => s.Requests)
                 .HasPrincipalKey(s => s.Id)
@@ -49,13 +49,13 @@ namespace Metrics.Data
 
 
 
-            modelBuilder.Entity<Response>()
-                .HasKey(r => new { r.RequestId, r.Index });
+            modelBuilder.Entity<Models.HttpResponse>()
+                .HasKey(r => new { r.TransactionId, r.Index });
             // ???????? revisit the structure. Response should be redesigned
-            modelBuilder.Entity<Response>()
+            modelBuilder.Entity<Models.HttpResponse>()
                 .HasOne(res => res.Request)
                 .WithOne(req => req.Response)
-                .HasPrincipalKey<Request>(req => req.Id)
+                .HasPrincipalKey<Models.HttpRequest>(req => req.TransactionId)
                 .IsRequired();
 
 
