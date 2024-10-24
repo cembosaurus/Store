@@ -21,7 +21,6 @@ namespace Business.Metrics.Http.Clients
         private string? _sendToService;
         private readonly Guid _appId;
         private int _index;
-        private int _requestId;
 
 
 
@@ -33,7 +32,6 @@ namespace Business.Metrics.Http.Clients
             _thisService = config.GetSection("Metrics:Name").Value;
             _thisService = !string.IsNullOrWhiteSpace(_thisService) ? _thisService : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
             _requestMessage = new HttpRequestMessage();
-            _responseMessage = new HttpResponseMessage();
         }
 
 
@@ -51,13 +49,19 @@ namespace Business.Metrics.Http.Clients
 
             try
             {
-                _responseMessage = await _httpClient.SendAsync(requestMessage) ?? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+                _responseMessage = await _httpClient.SendAsync(requestMessage);
+            }
+            catch(HttpRequestException httpReqEx)
+            {
+                _responseMessage = new HttpResponseMessage(httpReqEx.StatusCode ?? HttpStatusCode.ServiceUnavailable);
+
+                throw;
             }
             finally
             {
                 // Metrics service response is not measured:
                 if (_sendToService != "MetricsService")
-                    Response_IN();
+                    Response_IN(_responseMessage.StatusCode);
             }
 
             AppendPreviousHeadersToResponse();
@@ -73,19 +77,13 @@ namespace Business.Metrics.Http.Clients
 
         private void Request_OUT() 
         {
-
             // metrics END:
 
             // read values passed from MW in context:
-            _requestId = _context.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues reqIdStrArr) ? (int.TryParse(reqIdStrArr[0], out int reqIdInt) ? reqIdInt : 1) : 1;
             _index = _context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? int.TryParse(indexStrArr[0], out int indexInt) 
                 // increase index for every request originated inside app (not passing through via Middelware):
                 ? (indexInt <= _index ? ++_index : ++indexInt) : 0
                 : 0;
-
-            // save request ID into context and send increased request ID to called API service:
-            _context.Request.Headers.Remove("Metrics.ReqId");
-            _context.Request.Headers.Add("Metrics.ReqId", (_requestId + 1).ToString());
 
             // update the values in outgoing http request.
             // message headers will be accessed by receiver as http context.Request headers:
@@ -97,14 +95,14 @@ namespace Business.Metrics.Http.Clients
             // add METRICS header into this app response.
             // It will be passed to MW after response from called API sevice, and back to caller:
             _context.Response.Headers.Append(
-                $"Metrics.{_thisService}.{_appId}.{_requestId}",
+                $"Metrics.{_thisService}.{_appId}",
                 $"{_index}.REQ.OUT.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 
 
 
-        private void Response_IN()
+        private void Response_IN(HttpStatusCode statusCode = HttpStatusCode.ServiceUnavailable)
         {
             // metrics START:
 
@@ -123,8 +121,8 @@ namespace Business.Metrics.Http.Clients
             // add METRICS header into this app response.
             // It will be accessed in MW and send back to caller in http response:
             _context.Response.Headers.Append(
-                $"Metrics.{_thisService}.{_appId}.{_requestId}",
-                $"{_index}.RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"Metrics.{_thisService}.{_appId}",
+                $"{_index}.RESP.IN.{_sendToService}.{(int)statusCode}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
                 );
         }
 
