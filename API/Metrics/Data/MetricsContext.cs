@@ -38,9 +38,10 @@ namespace Metrics.Data
 
 
 
-            modelBuilder.Entity<Models.HttpRequest>()
-                .HasKey(r => new { r.TransactionId, r.Index });
+            //modelBuilder.Entity<Models.HttpRequest>()
+            //    .HasKey(r => new { r.TransactionId, r.Index });
 
+            // request processed by service:
             modelBuilder.Entity<Models.HttpRequest>()
                 .HasOne(r => r.Service)
                 .WithMany(s => s.Requests)
@@ -49,13 +50,15 @@ namespace Metrics.Data
 
 
 
+            //modelBuilder.Entity<Models.HttpResponse>()
+            //    .HasKey(r => new { r.TransactionId, r.Index });
+
+
+            // response processed by service:
             modelBuilder.Entity<Models.HttpResponse>()
-                .HasKey(r => new { r.TransactionId, r.Index });
-            // ???????? revisit the structure. Response should be redesigned
-            modelBuilder.Entity<Models.HttpResponse>()
-                .HasOne(res => res.Request)
-                .WithOne(req => req.Response)
-                .HasPrincipalKey<Models.HttpRequest>(req => req.TransactionId)
+                .HasOne(res => res.Service)
+                .WithMany(s => s.Responses)
+                .HasPrincipalKey(s => s.Id)
                 .IsRequired();
 
 

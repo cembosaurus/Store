@@ -11,5 +11,6 @@
         public DateTime Terminated { get; set; }
 
         public ICollection<HttpRequest> Requests { get; set; }
+        public ICollection<HttpResponse> Responses { get; set; }
     }
 }
