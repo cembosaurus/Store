@@ -18,8 +18,8 @@ namespace Metrics.Data
 
 
         public DbSet<APIService> Services { get; set; }
-        public DbSet<Models.HttpRequest> Requests { get; set; }
-        public DbSet<Models.HttpResponse> Responses { get; set; }
+        public DbSet<Models.Request> Requests { get; set; }
+        public DbSet<Models.Response> Responses { get; set; }
 
 
 
@@ -33,33 +33,49 @@ namespace Metrics.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
+            modelBuilder.Entity<HttpTransaction>()
+                .Property(t => t.Id)
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<HttpTransaction>()
+                .HasKey(t => t.Id);
+
+
             modelBuilder.Entity<APIService>()
                 .HasKey(i => i.Id);
 
 
-
-            //modelBuilder.Entity<Models.HttpRequest>()
-            //    .HasKey(r => new { r.TransactionId, r.Index });
-
-            // request processed by service:
-            modelBuilder.Entity<Models.HttpRequest>()
-                .HasOne(r => r.Service)
+            modelBuilder.Entity<Request>()
+                .HasKey(r => new {r.TransactionId, r.Index });
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.HttpTransaction)
+                .WithMany(ht => ht.Requests)
+                .HasPrincipalKey(ht => ht.Id)
+                .IsRequired();
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.APIService)
                 .WithMany(s => s.Requests)
-                .HasPrincipalKey(s => s.Id)
+                .HasForeignKey(r => r.ServiceId)
                 .IsRequired();
+            modelBuilder.Entity<Request>()
+                .Property(r => r.Method)
+                .HasConversion<string>();
 
 
-
-            //modelBuilder.Entity<Models.HttpResponse>()
-            //    .HasKey(r => new { r.TransactionId, r.Index });
-
-
-            // response processed by service:
-            modelBuilder.Entity<Models.HttpResponse>()
-                .HasOne(res => res.Service)
+            modelBuilder.Entity<Response>()
+                .HasKey(r => new { r.TransactionId, r.Index });
+            modelBuilder.Entity<Response>()
+                .HasOne(r => r.HttpTransaction)
+                .WithMany(ht => ht.Responses)
+                .HasPrincipalKey(ht => ht.Id)
+                .IsRequired();
+            modelBuilder.Entity<Response>()
+                .HasOne(r => r.APIService)
                 .WithMany(s => s.Responses)
-                .HasPrincipalKey(s => s.Id)
+                .HasForeignKey(r => r.ServiceId)
                 .IsRequired();
+            modelBuilder.Entity<Response>()
+                .Property(r => r.Method)
+                .HasConversion<string>();
 
 
 

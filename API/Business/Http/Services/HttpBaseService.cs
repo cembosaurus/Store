@@ -28,7 +28,7 @@ namespace Business.Http.Services
         private readonly bool _isProdEnv;
 
         protected readonly IServiceResultFactory _resultFact;
-        private readonly ConsoleWriter _cm;
+        private readonly ConsoleWriter _cw;
         protected IGlobalConfig_PROVIDER _globalConfig_Provider;
         protected readonly IExId _exId;
 
@@ -49,7 +49,7 @@ namespace Business.Http.Services
 
 
         // any Http service (except 'HTTPManagementService'):
-        public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact, ConsoleWriter cm)
+        public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact, ConsoleWriter cw)
         {
             _accessor = accessor;
             _isProdEnv = env.IsProduction();
@@ -57,7 +57,7 @@ namespace Business.Http.Services
             _httpAppClient = httpAppClient;
             _globalConfig_Provider = globalConfig_Provider;
             _resultFact = resultFact;
-            _cm = cm;
+            _cw = cw;
         }
         // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER:
         public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, ConsoleWriter cm)
@@ -66,7 +66,7 @@ namespace Business.Http.Services
             _exId = exId;
             _httpAppClient = httpAppClient;
             _resultFact = resultFact;
-            _cm = cm;
+            _cw = cm;
         }
 
 
