@@ -122,7 +122,7 @@ namespace Business.Metrics.Http.Clients
             // It will be accessed in MW and send back to caller in http response:
             _context.Response.Headers.Append(
                 $"Metrics.{_thisService}.{_appId}",
-                $"{_index}.RESP.IN.{_sendToService}.{(int)statusCode}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+                $"{_index}.RESP.IN.{_sendToService}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{statusCode}.{(int)statusCode}"
                 );
         }
 

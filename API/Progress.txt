@@ -70,10 +70,9 @@
 
 
                     To Do: refactor AppendPreviousHeadersToResponse() and Response_IN() in client -----> also metrics.index is no tpassed to ApiGateway MW on way back to client if: ApiGateway -> Ordering -> Payment -ex-> Ordering -> Management -> Ordering -> Payment -ex-> and back
-                    To Do: METRICS EF dbcontext -> models relations, PK, FK etc... and  migration -------> req id added to header to identify request in app
-
 
                     To Do: HEADERS VALUE --> GUID instead hostname f.e. localhost:8000/ --- for direct write into domain DB classes. HEADER KEY should contain GUID and NAME (as it still does) in case service has been rtestarted with different GUID
+
                     To Do: create class (protocol structure) to generatee header to prevent missing data. F.e: "3.REQ.IN.API_Gateway.GET.localhost.8000./order/all.2024-10-28 01:08:28.019"
                         - REQ, RES --> bool, f.e: 0 = ".." (no data between dots), 1 = ".?." (some data between dots) --- OR: enum REQ.IN, REQ.OUT, RESP.IN, RESP.OUT (1,2,3,4)
                         - IN, OUT --> bool, f.e: 0 = ".." (no data between dots), 1 = ".?." (some data between dots) --- OR: enum REQ.IN, REQ.OUT, RESP.IN, RESP.OUT (1,2,3,4)
