@@ -1,5 +1,9 @@
 ﻿using Metrics.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using System;
 
 namespace Metrics.Data
 {
@@ -57,7 +61,11 @@ namespace Metrics.Data
                 .HasForeignKey(r => r.ServiceId)
                 .IsRequired();
             modelBuilder.Entity<Request>()
-                .Property(r => r.Method)
+                .HasOne(r => r.Method)
+                .WithMany(m => m.Requests)
+                .HasForeignKey(r => r.HttpMethodName);
+            modelBuilder.Entity<Request>()
+                .Property(r => r.HttpMethodName)
                 .HasConversion<string>();
 
 
@@ -74,10 +82,32 @@ namespace Metrics.Data
                 .HasForeignKey(r => r.ServiceId)
                 .IsRequired();
             modelBuilder.Entity<Response>()
-                .Property(r => r.Method)
+                .HasOne(r => r.Method)
+                .WithMany(m => m.Responses)
+                .HasForeignKey(r => r.HttpMethodName);
+            modelBuilder.Entity<Response>()
+                .Property(r => r.HttpMethodName)
                 .HasConversion<string>();
 
 
+            modelBuilder.Entity<Method>()
+                .HasKey(m => m.Name);
+            modelBuilder.Entity<Method>(m => { 
+                m.Property(p => p.Name).IsRequired();
+                m.HasData(
+                    new Method { Name = "CONNECT" },
+                    new Method { Name = "DELETE"},
+                    new Method { Name = "GET"},
+                    new Method { Name = "HEAD"},
+                    new Method { Name = "OPTIONS"},
+                    new Method { Name = "PATCH"},
+                    new Method { Name = "POST"},
+                    new Method { Name = "PUT"},
+                    new Method { Name = "TRACE"}
+                    );
+            });
+
+           
 
             base.OnModelCreating(modelBuilder);
         }
