@@ -8,10 +8,10 @@ using Inventory.Models;
 
 namespace Services.Inventory.Profiles
 {
-    public class InventoryMapperProfile : Profile
+    public class MapperProfile : Profile
     {
 
-        public InventoryMapperProfile()
+        public MapperProfile()
         {
             // Item:
             CreateMap<ItemCreateDTO, Item>();

@@ -4,10 +4,10 @@ using Scheduler.Models;
 
 namespace Scheduler.Profiles
 {
-    public class SchedulerMapperProfile : Profile
+    public class MapperProfile : Profile
     {
 
-        public SchedulerMapperProfile()
+        public MapperProfile()
         {
 
             CreateMap<CartItemsLockCreateDTO, CartItemLock>();

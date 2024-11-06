@@ -11,12 +11,8 @@ namespace Scheduler.Data.Repositories
     public class CartItemLockRepository : BaseRepository<SchedulerDBContext>, ICartItemLockRepository
     {
 
-        private readonly SchedulerDBContext _context;
-
-
         public CartItemLockRepository(SchedulerDBContext context) : base(context)
         {
-            _context = context;
         }
 
 

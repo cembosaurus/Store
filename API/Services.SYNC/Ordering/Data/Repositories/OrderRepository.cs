@@ -4,18 +4,15 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Ordering.Data.Repositories.Interfaces;
 using Services.Ordering.Models;
 
+
+
 namespace Ordering.Data.Repositories
 {
     public class OrderRepository : BaseRepository<OrderingContext>, IOrderRepository
     {
 
-        private readonly OrderingContext _context;
-
-
-
         public OrderRepository(OrderingContext context) : base(context)
         {
-            _context = context;
         }
 
 

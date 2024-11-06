@@ -8,12 +8,9 @@ namespace Services.Inventory.Data
     public class ItemRepository : BaseRepository<InventoryContext>, IItemRepository
     {
 
-        private readonly InventoryContext _context;
-
 
         public ItemRepository(InventoryContext context): base(context)
         {
-            _context = context;
         }
 
 

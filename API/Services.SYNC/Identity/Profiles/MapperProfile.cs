@@ -1,13 +1,16 @@
-﻿using AutoMapper;
+﻿
+
+
+using AutoMapper;
 using Business.Identity.DTOs;
 using Services.Identity.Models;
 
 namespace Services.Identity.Profiles
 {
-    public class IdentityMapperProfile : Profile
+    public class MapperProfile : Profile
     {
 
-        public IdentityMapperProfile()
+        public MapperProfile()
         {
             // User:
             CreateMap<UserToRegisterDTO, AppUser>()

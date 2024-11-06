@@ -1,21 +1,17 @@
 ﻿using Business.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Ordering.Data.Repositories.Interfaces;
 using Services.Ordering.Models;
+
+
 
 namespace Ordering.Data.Repositories
 {
     public class ArchiveRepository : BaseRepository<OrderingContext>, IArchiveRepository
     {
 
-        private readonly OrderingContext _context;
-
-
-
         public ArchiveRepository(OrderingContext context) : base(context)
         {
-            _context = context;
         }
 
 

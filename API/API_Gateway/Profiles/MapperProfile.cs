@@ -1,12 +1,16 @@
-﻿using AutoMapper;
+﻿
+
+
+
+using AutoMapper;
 using Business.Identity.DTOs;
 
 namespace API_Gateway.Profiles
 {
-    public class InventoryMapperProfile : Profile
+    public class MapperProfile : Profile
     {
 
-        public InventoryMapperProfile()
+        public MapperProfile()
         {
             // User:
             CreateMap<UserToRegisterDTO, UserReadDTO>();

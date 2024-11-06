@@ -4,16 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Services.Identity.Data;
 using Services.Identity.Models;
 
+
+
 namespace Identity.Data.Repositories
 {
     public class UserRepository : BaseRepository<IdentityContext>, IUserRepository
     {
 
-        private readonly IdentityContext _context;
-
         public UserRepository(IdentityContext context) : base(context)
         {
-            _context = context;
         }
 
 

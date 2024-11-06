@@ -4,18 +4,16 @@ using Inventory.Models;
 using Microsoft.EntityFrameworkCore;
 using Services.Inventory.Data.Repositories.Interfaces;
 
+
+
 namespace Services.Inventory.Data
 {
 
     public class CatalogueItemRepository : BaseRepository<InventoryContext>, ICatalogueItemRepository
     {
 
-        private readonly InventoryContext _context;
-
-
         public CatalogueItemRepository(InventoryContext context, IMapper mapper) : base(context)
         {
-            _context = context;
         }
 
 

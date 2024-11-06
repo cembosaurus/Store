@@ -2,10 +2,10 @@
 using Business.Identity.Models;
 using Identity.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Services.Identity.Data;
-using Services.Identity.Data.Repositories;
 using Services.Identity.Models;
+
+
 
 namespace Identity.Data.Repositories
 {
@@ -13,12 +13,8 @@ namespace Identity.Data.Repositories
     {
 
 
-        private readonly IdentityContext _context;
-
-
         public AddressRepository(IdentityContext context) : base(context)
         {
-            _context = context;
         }
 
 

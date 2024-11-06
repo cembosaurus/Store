@@ -9,10 +9,10 @@ using Services.Ordering.Models;
 
 namespace Ordering.Profiles
 {
-    public class CartMapperProfile : Profile
+    public class MapperProfile : Profile
     {
 
-        public CartMapperProfile()
+        public MapperProfile()
         {
             // Cart:
 

@@ -1,8 +1,10 @@
 ﻿using Business.Filters.Identity;
-using Business.Libraries.ServiceResult;
+using Business.Metrics.DTOs;
+using Metrics.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using System.Globalization;
+
+
 
 namespace Metrics.Controllers.Business
 {
@@ -11,12 +13,11 @@ namespace Metrics.Controllers.Business
     [ApiController]
     public class CollectorController : ControllerBase
     {
+        private readonly ICollectorService _collectorService;
 
-
-
-        public CollectorController()
+        public CollectorController(ICollectorService collectorService)
         {
-
+            _collectorService = collectorService;
         }
 
 
@@ -26,10 +27,13 @@ namespace Metrics.Controllers.Business
 
         [ApiKeyAuth]
         [HttpPost()]
-        public ActionResult AddMetricsData([FromBody] IEnumerable<KeyValuePair<string, string[]>> metricsData)
+        public ActionResult AddMetricsData(MetricsCreateDTO metricsData)
         {
+            var addRecordResult = _collectorService.AddHttpTransactionRecord(metricsData);
 
-            var data = metricsData.ToList();
+
+
+            var data = metricsData.Data.ToList();
 
 
             //************************************** test *******************************************************************

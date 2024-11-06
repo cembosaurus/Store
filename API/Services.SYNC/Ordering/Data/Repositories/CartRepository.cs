@@ -3,19 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Ordering.Data.Repositories.Interfaces;
 using Services.Ordering.Models;
-using System.Linq;
+
+
 
 namespace Ordering.Data.Repositories
 {
     public class CartRepository : BaseRepository<OrderingContext>, ICartRepository
     {
 
-        private readonly OrderingContext _context;
-
-
         public CartRepository(OrderingContext context) : base(context)
         {
-            _context = context;
         }
 
 

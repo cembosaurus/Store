@@ -3,15 +3,15 @@ using Inventory.Models;
 using Microsoft.EntityFrameworkCore;
 using Services.Inventory.Data.Repositories.Interfaces;
 
+
+
 namespace Services.Inventory.Data
 {
     public class ItemPriceRepository : BaseRepository<InventoryContext>, IItemPriceRepository
     {
-        private readonly InventoryContext _context;
 
         public ItemPriceRepository(InventoryContext context): base(context)
         {
-            _context = context;
         }
 
 

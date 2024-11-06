@@ -3,17 +3,15 @@ using Inventory.Consumer.Data.Repositories.Interfaces;
 using Inventory.Consumer.Models;
 using Microsoft.EntityFrameworkCore;
 
+
+
 namespace Inventory.Consumer.Data.Repositories
 {
     public class ItemRepository : BaseRepository<InventoryContext>, IItemRepository
     {
 
-        private readonly InventoryContext _context;
-
-
         public ItemRepository(InventoryContext context) : base(context)
         {
-            _context = context;
         }
 
 

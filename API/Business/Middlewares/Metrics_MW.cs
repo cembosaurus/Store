@@ -1,4 +1,5 @@
-﻿using Business.Metrics.Http.Services.Interfaces;
+﻿using Business.Metrics.DTOs;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -119,11 +120,14 @@ namespace Business.Middlewares
             {
                 context.Response.Headers.Remove("Metrics.Index");
 
-                var metricsData = context.Response.Headers.Where(rh => rh.Key.StartsWith("Metrics.")).Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray())).ToList();
+                var metricsData = context.Response.Headers
+                    .Where(rh => rh.Key.StartsWith("Metrics."))
+                    .Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray()))
+                    .ToList();
 
                 _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
 
-                var metricsHttpResult = await _httpMetricsService.Update(metricsData);
+                var metricsHttpResult = await _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
                 
                 _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
 

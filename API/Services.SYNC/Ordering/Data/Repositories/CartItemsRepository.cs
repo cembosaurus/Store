@@ -4,17 +4,15 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Ordering.Data.Repositories.Interfaces;
 using Services.Ordering.Models;
 
+
+
 namespace Ordering.Data.Repositories
 {
     public class CartItemsRepository : BaseRepository<OrderingContext>, ICartItemsRepository
     {
 
-        private readonly OrderingContext _context;
-
-
         public CartItemsRepository(OrderingContext context) : base(context)
         {
-            _context = context;
         }
 
 
@@ -24,7 +22,6 @@ namespace Ordering.Data.Repositories
         {
             return _context.SaveChanges();
         }
-
 
 
 

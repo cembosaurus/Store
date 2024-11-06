@@ -4,6 +4,7 @@ using Business.Http.Services;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Services.Interfaces;
+using Business.Metrics.DTOs;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +33,7 @@ namespace Business.Metrics.Http.Services
 
 
 
-        public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, string[]>> metricsData)
+        public async Task<IServiceResult<string>> Update(MetricsCreateDTO metricsData)
         {
             _method = HttpMethod.Post;
             _requestQuery = $"";
