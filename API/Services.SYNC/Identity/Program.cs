@@ -74,8 +74,11 @@ builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddScoped<IJWT_Provider, JWT_Provider>();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
 
 builder.Services.AddTransient<ConsoleWriter>();
 

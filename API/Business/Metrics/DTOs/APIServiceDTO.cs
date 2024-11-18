@@ -10,7 +10,7 @@
         public DateTime Deployed { get; set; }
         public DateTime Terminated { get; set; }
 
-        public ICollection<Request> Requests { get; set; }
-        public ICollection<Response> Responses { get; set; }
+        //public ICollection<Request> Requests { get; set; }
+        //public ICollection<Response> Responses { get; set; }
     }
 }

@@ -87,8 +87,11 @@ builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
 builder.Services.AddScoped<IHttpCatalogueItemService, HttpCatalogueItemService>();
 builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
 
 builder.Services.AddTransient<ConsoleWriter>();
 

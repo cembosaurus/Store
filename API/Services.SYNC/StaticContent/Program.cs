@@ -38,8 +38,11 @@ builder.Services.AddScoped<IImageFilesService, ImageFilesService>();
 
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
 
 builder.Services.AddHttpContextAccessor();
 

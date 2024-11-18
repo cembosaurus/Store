@@ -43,8 +43,11 @@ builder.Services.AddFluentValidation(conf => {
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });         // Allow optional argument in controller's action
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
 
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IAMQPItemService, AMQPItemService>();

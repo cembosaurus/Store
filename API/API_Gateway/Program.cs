@@ -17,21 +17,21 @@ using Business.Inventory.Http.Services;
 using Business.Inventory.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Business.Metrics.Http.Services.Interfaces;
+using Business.Management.Data;
+using Business.Management.DI;
+using Business.Metrics.Http.Clients;
+using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
 using Business.Ordering.Http.Services;
 using Business.Ordering.Http.Services.Interfaces;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
+using Business.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Business.Metrics.Http.Clients.Interfaces;
-using Business.Metrics.Http.Clients;
-using Business.Management.DI;
-using Business.Management.Data;
-using Business.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,8 +70,13 @@ builder.Services.AddScoped<IHttpCartService, HttpCartService>();
 builder.Services.AddScoped<IHttpCartItemService, HttpCartItemService>();
 builder.Services.AddScoped<IHttpOrderService, HttpOrderService>();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+
+
+
 
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 

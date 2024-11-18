@@ -1,4 +1,6 @@
-﻿namespace Business.Metrics.DTOs
+﻿using Metrics.Models;
+
+namespace Business.Metrics.DTOs
 {
     public class HttpTransactionDTO
     {

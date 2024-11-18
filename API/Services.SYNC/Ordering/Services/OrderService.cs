@@ -27,10 +27,8 @@ namespace Ordering.Services
         private readonly IMapper _mapper;
         private readonly IOrder _orderTools;
 
-        // .... DELETE after testing:
-        private static string zedous;
 
-        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService, IHttpContextAccessor accessor)
+        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService)
         {
             _orderRepo = orderRepo;
             _cartRepo = cartRepo;
@@ -40,9 +38,6 @@ namespace Ordering.Services
             _resultFact = resultFact;
             _mapper = mapper;
             _orderTools = orderTools;
-
-            // .... DELETE after testing:
-            zedous = accessor.HttpContext.Request.Headers.TryGetValue("Metrics.ReqId", out StringValues result) ? (int.TryParse(result[0], out int reqIdInt) ? reqIdInt.ToString() : "spatne data tam boli") : "hovno tam bolo";
         }
 
 

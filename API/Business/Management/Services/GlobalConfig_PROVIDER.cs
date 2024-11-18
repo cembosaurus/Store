@@ -7,7 +7,6 @@ using Business.Management.Enums;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Tools;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;

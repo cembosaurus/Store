@@ -13,7 +13,7 @@ namespace Business.Http.Clients
 
         // to implement Metrics into project replace call to HttpClient by HttpMetricsClient:
 
-        public HttpAppClient(IHttpClient_Metrics httpMetricsClient) 
+        public HttpAppClient(IHttpClient_Metrics httpMetricsClient)
         {
             _httpMetricsClient = httpMetricsClient;
         }

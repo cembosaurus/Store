@@ -22,7 +22,6 @@ namespace Business.Middlewares
         private readonly ConsoleWriter _cw;
         private readonly string _thisService;
         private StringValues _requestFrom;
-        private bool _isMetricsReporter;
         private int _index;
         private IHttpMetricsService? _httpMetricsService;
 
@@ -60,8 +59,6 @@ namespace Business.Middlewares
 
             context.Response.OnStarting(async () =>
             {
-                _isMetricsReporter = _index == 1;
-
                 Response_OUT(context);
             
                 await ReportMetrics(context);
@@ -84,6 +81,11 @@ namespace Business.Middlewares
             context.Request.Headers.Remove("Metrics.Index");
             context.Request.Headers.Add("Metrics.Index", _index.ToString());
 
+
+            Console.WriteLine($"XXXXXXXXXXXXXXXXXXXXXXXXXXX MW - in XXXXXXXXXXXXXXXXXXXXXXXXXX {_index} XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
+
+
             // add METRICS header into this app response.
             // It will be passed back to calling API service on the way back:
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{RequestURL(context)}");
@@ -105,6 +107,11 @@ namespace Business.Middlewares
             if(_requestFrom != "client")
                 context.Response.Headers.Add("Metrics.Index", _index.ToString());
 
+
+            Console.WriteLine($"XXXXXXXXXXXXXXXXXXXXXXXXXXXX MW - out XXXXXXXXXXXXXXXXXXXXXXXXX {_index} XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
+
+
             // add METRICS header into this app response.
             // It will be passed back to calling API service in http response:
             context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
@@ -115,25 +122,23 @@ namespace Business.Middlewares
         private async Task ReportMetrics(HttpContext context)
         {
 
-            // send data collected from whole chain of HTTP requests to Metrics API serevice:
-            if (_isMetricsReporter)
-            {
-                context.Response.Headers.Remove("Metrics.Index");
+            //// send data collected from whole chain of HTTP requests to Metrics API serevice:
+            //if (_requestFrom == "client")
+            //{
+            //    context.Response.Headers.Remove("Metrics.Index");
 
-                var metricsData = context.Response.Headers
-                    .Where(rh => rh.Key.StartsWith("Metrics."))
-                    .Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray()))
-                    .ToList();
+            //    var metricsData = context.Response.Headers
+            //        .Where(rh => rh.Key.StartsWith("Metrics."))
+            //        .Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value.ToArray()))
+            //        .ToList();
 
-                _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
+            //    _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
 
-                var metricsHttpResult = await _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
+            //    var metricsHttpResult = await _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
                 
-                _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+            //    _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
 
-            }
-
-            _isMetricsReporter = default;
+            //}
         }
 
 

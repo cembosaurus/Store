@@ -12,6 +12,8 @@ using Business.Metrics.Http.Clients;
 using Business.Metrics.Http.Clients.Interfaces;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Tools;
+using Business.Metrics.Tools.Interfaces;
 using Business.Middlewares;
 using Business.Tools;
 using Metrics.Data;
@@ -19,8 +21,8 @@ using Metrics.Data.Repositories;
 using Metrics.Data.Repositories.Interfaces;
 using Metrics.Services;
 using Metrics.Services.Interfaces;
-using Metrics.Services.ServicesTools;
-using Metrics.Services.ServicesTools.Interfaces;
+using Metrics.Services.Tools;
+using Metrics.Services.Tools.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,13 +38,16 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>(); 
+//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
+//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
+builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
 builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
-builder.Services.AddDbContext<MetricsContext>();
 
+builder.Services.AddDbContext<MetricsContext>();
+builder.Services.AddScoped<IMetricsDataHandler, MetricsDataHandler>();
 builder.Services.AddScoped<ICollectorService, CollectorService>();
-builder.Services.AddScoped<IMetricsDataProcessor, MetricsDataProcessor>();
+builder.Services.AddScoped<IMetricsDataTool, MetricsDataTool>();
 builder.Services.AddScoped<IMetricsRepository, MetricsRepository>();
 
 builder.Services.AddTransient<ConsoleWriter>();

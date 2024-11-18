@@ -51,7 +51,7 @@ namespace Business.Metrics.Http.Clients
             {
                 _responseMessage = await _httpClient.SendAsync(requestMessage);
             }
-            catch(HttpRequestException httpReqEx)
+            catch (HttpRequestException httpReqEx)
             {
                 _responseMessage = new HttpResponseMessage(httpReqEx.StatusCode ?? HttpStatusCode.ServiceUnavailable);
 
@@ -75,12 +75,12 @@ namespace Business.Metrics.Http.Clients
 
 
 
-        private void Request_OUT() 
+        private void Request_OUT()
         {
             // metrics END:
 
             // read values passed from MW in context:
-            _index = _context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? int.TryParse(indexStrArr[0], out int indexInt) 
+            _index = _context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? int.TryParse(indexStrArr[0], out int indexInt)
                 // increase index for every request originated inside app (not passing through via Middelware):
                 ? (indexInt <= _index ? ++_index : ++indexInt) : 0
                 : 0;
@@ -106,7 +106,7 @@ namespace Business.Metrics.Http.Clients
         {
             // metrics START:
 
-            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) 
+            _index = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) ? int.TryParse(indexStrArr?.ElementAt(0), out int indexInt)
                 ? (indexInt <= _index ? ++_index : ++indexInt) : 0
                 : ++_index;
 

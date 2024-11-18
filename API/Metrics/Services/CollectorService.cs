@@ -9,15 +9,15 @@ namespace Metrics.Services
 
     public class CollectorService : ICollectorService
     {
-        private readonly IMetricsDataHandler _processor;
+        private readonly IMetricsDataHandler _handler;
         private readonly IMetricsRepository _repo;
         private readonly IServiceResultFactory _resultFact;
 
 
 
-        public CollectorService(IMetricsDataHandler processor, IMetricsRepository repo, IServiceResultFactory resultFact)
+        public CollectorService(IMetricsDataHandler handler, IMetricsRepository repo, IServiceResultFactory resultFact)
         {
-            _processor = processor;
+            _handler = handler;
             _repo = repo;
             _resultFact = resultFact;
         }
@@ -30,7 +30,7 @@ namespace Metrics.Services
         {
             if (metricsData.Data != null)
             {
-                var processorRersult = _processor.Inspect(metricsData.Data);
+                var processorRersult = _handler.Inspect(metricsData.Data);
             }
 
             //if (await _repo.ExistsByName(itemCreateDTO.Name))
