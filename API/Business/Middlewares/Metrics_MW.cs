@@ -1,4 +1,5 @@
-﻿using Business.Metrics.Http.Services.Interfaces;
+﻿using Business.Metrics.DTOs;
+using Business.Metrics.Http.Services.Interfaces;
 using Business.Metrics.Services;
 using Business.Metrics.Services.Interfaces;
 using Business.Tools;
@@ -99,11 +100,14 @@ namespace Business.Middlewares
             _index = ++_metricsData.Index;
 
             // passing this app name back into caller app:
-            context.Response.Headers.Remove("Metrics.Index");
-            context.Response.Headers.Add("Metrics.Index", _index.ToString());
+            if (_requestFrom != "client")
+            { 
+                context.Response.Headers.Remove("Metrics.Index");
+                context.Response.Headers.Add("Metrics.Index", _index.ToString());
 
-            context.Response.Headers.Remove("Metrics.ResponseFrom");
-            context.Response.Headers.Add("Metrics.ResponseFrom", _thisService);
+                context.Response.Headers.Remove("Metrics.ResponseFrom");
+                context.Response.Headers.Add("Metrics.ResponseFrom", _thisService);            
+            }
 
             _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
@@ -132,7 +136,7 @@ namespace Business.Middlewares
             //    _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
 
             //    var metricsHttpResult = await _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
-                
+
             //    _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
 
             //}
@@ -171,7 +175,6 @@ namespace Business.Middlewares
             public DateTime Deployed;
 
         }
-
 
     }
 

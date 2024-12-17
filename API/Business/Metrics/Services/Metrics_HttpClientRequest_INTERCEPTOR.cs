@@ -90,12 +90,12 @@ public class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
 
         // if no index is returned from service response (503 or any 5xx ex) then copy indexOUT into indexIN and increase it by 1 to maintain continuity:
         _indexIN = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) 
-            ? 
-            int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : _indexOUT + 1
-            : 
-            _indexOUT + 1;
+            ? int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : _indexOUT + 1
+            : _indexOUT + 1;
+        _responseMessage.Headers.Remove("Metrics.Index");
 
         _requestTo = _responseMessage.Headers.TryGetValues("Metrics.ResponseFrom", out IEnumerable<string>? responseFrom) ? responseFrom.ElementAt(0) : _requestMessage.RequestUri?.Authority ?? "";
+        _responseMessage.Headers.Remove("Metrics.ResponseFrom");
 
         // passing Index back into MW:
         _metricsData.Index = _indexIN;
