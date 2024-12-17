@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
@@ -19,10 +19,10 @@
 
   <ItemGroup>
     <Folder Include="API_Gateway\" />
-    <Folder Include="Services\Identity\Filters\" />
-    <Folder Include="Services\StaticContent\" />
-    <Folder Include="Services\Scheduler\" />
-    <Folder Include="Services\Payment\" />
+    <Folder Include="Services.SYNC\Identity\Filters\" />
+    <Folder Include="Services.SYNC\StaticContent\" />
+    <Folder Include="Services.SYNC\Scheduler\" />
+    <Folder Include="Services.SYNC\Payment\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,9 +30,6 @@
     <ProjectReference Include="..\Services.SYNC\Identity\Identity.csproj" />
     <ProjectReference Include="..\Services.SYNC\Inventory\Inventory.csproj" />
     <ProjectReference Include="..\Services.SYNC\Ordering\Ordering.csproj" />
-    <ProjectReference Include="..\Services\Identity\Identity.csproj" />
-    <ProjectReference Include="..\Services\Inventory\Inventory.csproj" />
-    <ProjectReference Include="..\Services\Ordering\Ordering.csproj" />
   </ItemGroup>
 
 </Project>

@@ -27,7 +27,7 @@ namespace Business.Management.Appsettings
 
         public bool IsEmpty()
         {
-            return _db.Data.RemoteServices.IsNullOrEmpty();
+            return !_db.Data.RemoteServices.Any();
         }
 
         public ICollection<RemoteService_AS_MODEL> GetAll()
@@ -65,7 +65,7 @@ namespace Business.Management.Appsettings
 
         public ICollection<string> GetURLsWithPath(TypeOfService type, string pathName, bool isProdEnv)
         {
-            return _db.Data.RemoteServices.FindAll(m => m.GetPathByName(type, pathName).IsNullOrEmpty() == false).Select(m => m.GetUrlWithPath(type, pathName, isProdEnv)).ToList();
+            return _db.Data.RemoteServices.FindAll(m => m.GetPathByName(type, pathName).Any()).Select(m => m.GetUrlWithPath(type, pathName, isProdEnv)).ToList();
         }
 
 
@@ -147,7 +147,7 @@ namespace Business.Management.Appsettings
 
         public bool Initialize(ICollection<RemoteService_AS_MODEL> data)
         {
-            if (data.IsNullOrEmpty())
+            if (!data.Any())
                 return false;
 
             _db.Data.RemoteServices.Clear();

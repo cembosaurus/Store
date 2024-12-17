@@ -67,7 +67,7 @@ namespace Business.Tools
                 TypeOfInfo.FAIL => ConsoleColor.Red,
                 TypeOfInfo.SUCCESS => ConsoleColor.DarkYellow,
                 TypeOfInfo.INFO => ConsoleColor.Green,
-                TypeOfInfo.WARNING => ConsoleColor.DarkMagenta,
+                TypeOfInfo.WARNING => ConsoleColor.Magenta,
                 _ => ConsoleColor.White
             };
             Console.Write($" {_type}:");

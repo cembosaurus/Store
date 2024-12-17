@@ -1,4 +1,5 @@
-﻿using Business.Exceptions.Interfaces;
+﻿using Azure.Core;
+using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
@@ -26,6 +27,7 @@ namespace Business.Http.Services
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
         private readonly bool _isProdEnv;
+        private readonly string _appName;
 
         protected readonly IServiceResultFactory _resultFact;
         private readonly ConsoleWriter _cw;
@@ -52,6 +54,7 @@ namespace Business.Http.Services
         public HttpBaseService(IHttpContextAccessor accessor, IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IGlobalConfig_PROVIDER globalConfig_Provider, IServiceResultFactory resultFact, ConsoleWriter cw)
         {
             _accessor = accessor;
+            _appName = env.ApplicationName;
             _isProdEnv = env.IsProduction();
             _exId = exId;
             _httpAppClient = httpAppClient;
@@ -62,6 +65,7 @@ namespace Business.Http.Services
         // 'HTTPManagementService': to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER:
         public HttpBaseService(IWebHostEnvironment env, IExId exId, IHttpAppClient httpAppClient, IServiceResultFactory resultFact, ConsoleWriter cm)
         {
+            _appName = env.ApplicationName;
             _isProdEnv = env.IsProduction();
             _exId = exId;
             _httpAppClient = httpAppClient;
@@ -80,7 +84,7 @@ namespace Business.Http.Services
             var createReqResponse = await Prepare_HTTPRequest();
 
             if (!createReqResponse.Status)
-                return _resultFact.Result(default(T), false, $"HTTP request to '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
+                return _resultFact.Result(default(T), false, $"HTTP request from '{_appName}' to '{_remoteServiceName}' was NOT created ! Reason: {createReqResponse.Message}");
 
 
             // send HTTP reequest:
@@ -228,7 +232,6 @@ namespace Business.Http.Services
             _requestMessage = new HttpRequestMessage { RequestUri = new Uri(_requestURL + (string.IsNullOrWhiteSpace(_requestQuery) ? "" : "/" + _requestQuery)) };
             _requestMessage.Method = _method;
             _requestMessage.Content = _content;
-            _requestMessage.Options.Set(new HttpRequestOptionsKey<string>("RequestTo"), _remoteServiceName);
 
             // Headers:
             _requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediaType));
@@ -236,7 +239,7 @@ namespace Business.Http.Services
             if (!string.IsNullOrWhiteSpace(_token) && !_useApiKey)
                 _requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-            if (!_requestHeaders.IsNullOrEmpty())
+            if (_requestHeaders.Any())
             {
                 foreach (var h in _requestHeaders)
                 {

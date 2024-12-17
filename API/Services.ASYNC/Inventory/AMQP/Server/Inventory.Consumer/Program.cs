@@ -6,8 +6,7 @@ using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Data;
 using Business.Management.DI;
-using Business.Metrics.Http.Clients;
-using Business.Metrics.Http.Clients.Interfaces;
+using Business.Metrics.DI;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -32,6 +31,10 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
+ManagementService_DI.Register(builder);
+MetricsService_DI.Register(builder);
+
+
 // Add RABBIT_MQ listener / subscriber:
 // ... register MessageBusSubscriber as Singleton for DI access:
 builder.Services.AddSingleton<MessageBusSubscriber>();
@@ -44,11 +47,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 ManagementService_DI.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
-//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
-//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
-builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
 
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
 
 builder.Services.AddSingleton<IItemRepository, ItemRepository>();
 builder.Services.AddSingleton<IItemService, ItemService>();

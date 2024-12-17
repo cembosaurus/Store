@@ -100,7 +100,7 @@ namespace Business.Management.Appsettings.Models
 
         public string GetUrlWithPath(TypeOfService typeName, string pathName, bool isProdEnv)
         {
-            if (string.IsNullOrWhiteSpace(pathName) && GetPaths(typeName).IsNullOrEmpty())
+            if (string.IsNullOrWhiteSpace(pathName) && !GetPaths(typeName).Any())
                 return "";
 
                 var url = GetBaseUrl(typeName, isProdEnv);

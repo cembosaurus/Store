@@ -1,5 +1,6 @@
 ﻿using Business.Http.Clients.Interfaces;
-using Business.Metrics.Http.Clients.Interfaces;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 
 
@@ -8,28 +9,30 @@ namespace Business.Http.Clients
     public class HttpAppClient : IHttpAppClient
     {
 
-        private IHttpClient_Metrics _httpMetricsClient;
+        private HttpClient _httpClient;
 
 
-        // to implement Metrics into project replace call to HttpClient by HttpMetricsClient:
-
-        public HttpAppClient(IHttpClient_Metrics httpMetricsClient)
+        public HttpAppClient(HttpClient httpClient, IWebHostEnvironment env)
         {
-            _httpMetricsClient = httpMetricsClient;
+            _httpClient = httpClient;
+            SetDebugTimeout(env.IsProduction());
         }
 
 
 
 
 
-        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, bool bypassMetrics = default)
+        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
         {
-            return await (bypassMetrics ?
-                _httpMetricsClient.HtpClient.SendAsync(requestMessage) :
-                _httpMetricsClient.SendAsync(requestMessage));
+            return await _httpClient.SendAsync(requestMessage);
         }
 
 
+        private void SetDebugTimeout(bool prodEnv)
+        { 
+            if(!prodEnv)
+                _httpClient.Timeout = TimeSpan.FromMinutes(3);
+        }
 
 
 

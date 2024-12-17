@@ -22,7 +22,9 @@ namespace Identity.JWT
 
         public JWT_Provider(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
         {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Config.Global:Auth:JWTKey").Value));
+            var value = config.GetSection("Config.Global:Auth:JWTKey").Value ?? "";
+            var secretKey = Encoding.UTF8.GetBytes(value);
+            _key = new SymmetricSecurityKey(secretKey);
             _userManager = userManager;
             _resultFact = resultFact;
         }
@@ -38,18 +40,18 @@ namespace Identity.JWT
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName)
+                new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? "unknown")
             };
 
             var usersRoles = await _userManager.GetRolesAsync(user);
 
 
-            return await GenerateToken(claims, usersRoles, $"Token for user '{user.UserName}' was NOT generated !");
+            return GenerateToken(claims, usersRoles, $"Token for user '{user.UserName}' was NOT generated !");
         }
 
 
-        // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
-        public async Task<IServiceResult<string>> CreateToken_ForService()
+        // NOT USED. ApiKey (instead of JWT) is used to directly authenticate api service:
+        public IServiceResult<string> CreateToken_ForService()
         {
             var claims = new List<Claim>
             {
@@ -62,16 +64,16 @@ namespace Identity.JWT
             };
 
 
-            return await GenerateToken(claims, serviceRoles, $"Token for API Service was NOT generated !");
+            return GenerateToken(claims, serviceRoles, $"Token for API Service was NOT generated !");
         }
 
 
 
-        private async Task<IServiceResult<string>> GenerateToken(List<Claim> claims, IList<string> roles, string failMessage)
+        private IServiceResult<string> GenerateToken(List<Claim> claims, IList<string> roles, string failMessage)
         {
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -80,11 +82,11 @@ namespace Identity.JWT
                 Expires = DateTime.Now.AddDays(7)
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var handler = new JwtSecurityTokenHandler();
 
-            var tokenResult = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenResult = handler.CreateToken(tokenDescriptor);
 
-            var token = tokenHandler.WriteToken(tokenResult);
+            var token = handler.WriteToken(tokenResult);
 
             if (string.IsNullOrWhiteSpace(token))
                 return _resultFact.Result("", false, failMessage);

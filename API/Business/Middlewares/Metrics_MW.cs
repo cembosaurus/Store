@@ -1,9 +1,9 @@
-﻿using Business.Metrics.DTOs;
-using Business.Metrics.Http.Services.Interfaces;
+﻿using Business.Metrics.Http.Services.Interfaces;
+using Business.Metrics.Services;
+using Business.Metrics.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Globalization;
 
@@ -19,7 +19,8 @@ namespace Business.Middlewares
         private static readonly AppId_MODEL _appId_Model = new() { AppId = _appId, Deployed = _deployed };
 
         private readonly RequestDelegate _next;
-        private readonly ConsoleWriter _cw;
+        private IMetricsData _metricsData;
+        private ConsoleWriter _cw;
         private readonly string _thisService;
         private StringValues _requestFrom;
         private int _index;
@@ -27,9 +28,9 @@ namespace Business.Middlewares
 
 
 
-        public Metrics_MW(RequestDelegate next, IConfiguration config, ConsoleWriter cw)
+        public Metrics_MW(RequestDelegate next, IConfiguration config, IMetricsData metricsData)
         {
-            _cw = cw;
+            _metricsData = metricsData;
             _thisService = config.GetSection("Metrics:Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
             _next = next;
         }
@@ -38,9 +39,10 @@ namespace Business.Middlewares
 
 
 
-        public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService)
+        public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService, ConsoleWriter cw)
         {
-          _httpMetricsService = httpMetricsService;
+            _cw = cw;
+            _httpMetricsService = httpMetricsService;
 
             await AppId(context);
 
@@ -55,6 +57,8 @@ namespace Business.Middlewares
 
         private async Task RequestHandler(HttpContext context)
         {
+            _metricsData.Initialize();
+
             Request_IN(context);
 
             context.Response.OnStarting(async () =>
@@ -74,21 +78,14 @@ namespace Business.Middlewares
         {
             // metrics START:
 
+            // index in incoming request header, if null set to 1 else increase it by 1:
             _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
             _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
 
-            // pass index into http client via context:
-            context.Request.Headers.Remove("Metrics.Index");
-            context.Request.Headers.Add("Metrics.Index", _index.ToString());
+            // pass index into http client:
+            _metricsData.Index = _index;
 
-
-            Console.WriteLine($"XXXXXXXXXXXXXXXXXXXXXXXXXXX MW - in XXXXXXXXXXXXXXXXXXXXXXXXXX {_index} XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
-
-
-            // add METRICS header into this app response.
-            // It will be passed back to calling API service on the way back:
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{RequestURL(context)}");
+            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{RequestURL(context)}");
         }
 
 
@@ -98,23 +95,23 @@ namespace Business.Middlewares
         {
             // metrics END:
 
-            _index = context.Response.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) 
-                ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : ++_index) 
-                : ++_index;
+            // increment and read index passed from http client:
+            _index = ++_metricsData.Index;
 
-            // pass the values back into caller app:
+            // passing this app name back into caller app:
             context.Response.Headers.Remove("Metrics.Index");
-            if(_requestFrom != "client")
-                context.Response.Headers.Add("Metrics.Index", _index.ToString());
+            context.Response.Headers.Add("Metrics.Index", _index.ToString());
 
+            context.Response.Headers.Remove("Metrics.ResponseFrom");
+            context.Response.Headers.Add("Metrics.ResponseFrom", _thisService);
 
-            Console.WriteLine($"XXXXXXXXXXXXXXXXXXXXXXXXXXXX MW - out XXXXXXXXXXXXXXXXXXXXXXXXX {_index} XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
-
-
-            // add METRICS header into this app response.
-            // It will be passed back to calling API service in http response:
-            context.Response.Headers.Append($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            // append headers from incoming response in http client further down to caller app:
+            foreach (var h in _metricsData.Headers)
+            { 
+                context.Response.Headers.Append(h.Key, h.Value);
+            }
         }
 
 

@@ -150,7 +150,7 @@ namespace Business.Management.Services
 
             var serviceModels = _config_global_Repo.RemoteServices.GetByPathName("GlobalConfig");
 
-            if (serviceModels.IsNullOrEmpty())
+            if (!serviceModels.Any())
                 return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Service models with HTTP Clients were NOT found ! n\\ Possible solution: Reload models from Management service Appsettings.");
 
             return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(serviceModels, true);
@@ -225,7 +225,7 @@ namespace Business.Management.Services
         {
             var httpResult = await _httpManagementService.GetAllRemoteServices();
 
-            if (!httpResult.Status || httpResult.Data.IsNullOrEmpty())
+            if (!httpResult.Status || !httpResult.Data.Any())
                 return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Remote Services models were NOT received from Management service ! Reason: {httpResult.Message}");
 
             var result = _mapper.Map<IEnumerable<RemoteService_AS_MODEL>>(httpResult.Data);
@@ -266,7 +266,7 @@ namespace Business.Management.Services
         // Individual GET request from all replicas is prefered after handling HTTP 503 as a result of expired/changed/faulty URL.
         public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> UpdateRemoteServiceModels(IEnumerable<RemoteService_AS_MODEL> servicesModels)
         {
-            if (servicesModels.IsNullOrEmpty())
+            if (!servicesModels.Any())
                 return _resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(null, false, $"Services models for Management service were NOT provided !");
 
             var message = "WARNING ! There were missing data in provided Services models: ";
@@ -275,7 +275,7 @@ namespace Business.Management.Services
             {
                 var baseUrl = model.GetBaseUrl(TypeOfService.REST, _isProdEnv);
 
-                if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(baseUrl) || model.Type.IsNullOrEmpty())
+                if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(baseUrl) || !model.Type.Any())
                     message += $"n\\n\\- SERVICE: Name: '{model.Name}', Base URL: '{baseUrl}', Type: '{model.Type}'";
 
                 foreach (var path in model.GetPaths(TypeOfService.REST))

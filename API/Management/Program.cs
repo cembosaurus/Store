@@ -17,8 +17,7 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
-using Business.Metrics.Http.Clients;
-using Business.Metrics.Http.Clients.Interfaces;
+using Business.Metrics.DI;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
 using Business.Middlewares;
@@ -37,12 +36,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+MetricsService_DI.Register(builder);
+
 builder.Services.AddHostedService<Management_Worker>();
 
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
-builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
+builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
 
 builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
@@ -60,10 +61,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
-//builder.Services.AddScoped<Metrics_HttpRequestHandler>();
-//builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpRequestHandler>();
-builder.Services.AddHttpClient<IHttpClient_Metrics, HttpClient_Metrics>();
-builder.Services.AddScoped<IHttpAppClient, HttpAppClient>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
 
 
 builder.Services.AddTransient<ConsoleWriter>();

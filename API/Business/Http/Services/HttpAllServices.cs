@@ -80,14 +80,14 @@ namespace Business.Http.Services
 
             if (!globalConfig_Model.Status)
                 return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Global Config DB not found!");
-            if (globalConfig_Model.Data == null || globalConfig_Model.Data.RemoteServices.IsNullOrEmpty())
+            if (globalConfig_Model.Data == null || !globalConfig_Model.Data.RemoteServices.Any())
                 return _resultFact.Result<IEnumerable<KeyValuePair<RemoteService_AS_MODEL, bool>>>(null, false, "Remote Services config data were not found in Global Config DB!");
 
 
             // send Http requests to specific API services:
             foreach (var model in globalConfig_Model.Data.RemoteServices)
             {
-                if (!model.GetPathByName(TypeOfService.REST, _remoteServicePathName).IsNullOrEmpty())
+                if (!string.IsNullOrWhiteSpace(model.GetPathByName(TypeOfService.REST, _remoteServicePathName)))
                 {
                     // prevent Management service from sending HTTP request to itself:
                     if (!allowRequestToManagementAPIService && model.Name == "ManagementService")

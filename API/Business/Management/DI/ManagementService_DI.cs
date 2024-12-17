@@ -22,9 +22,9 @@ namespace Business.Management.DI
             services.AddSingleton<Config_Global_DB>();
             services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
             services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
-            services.AddScoped<IHttpManagementService, HttpManagementService>();
             services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
             services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+            services.AddScoped<IHttpManagementService, HttpManagementService>();
 
         }
     }

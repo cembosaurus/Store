@@ -41,7 +41,7 @@ namespace Business.Management.Appsettings
 
                 var remoteServices = _appsettings_monitor.CurrentValue.RemoteServices;
 
-                return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(remoteServices, !remoteServices.IsNullOrEmpty(), remoteServices.IsNullOrEmpty() 
+                return resultFact.Result<IEnumerable<RemoteService_AS_MODEL>>(remoteServices, remoteServices.Any(), !remoteServices.Any() 
                     ? $"Remote Service models were NOT found in Global Appsettings !" : "");
             }
         }
@@ -55,7 +55,7 @@ namespace Business.Management.Appsettings
 
                 var remoteServices = _appsettings_monitor.CurrentValue.RemoteServices;
 
-                if (remoteServices.IsNullOrEmpty())
+                if (!remoteServices.Any())
                     return resultFact.Result<RemoteService_AS_MODEL>(null, false, $"Global config data were NOT found in Appsettings !");
 
                 var model = remoteServices.FirstOrDefault(s => s.Name == name);
