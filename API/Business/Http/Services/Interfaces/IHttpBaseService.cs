@@ -2,7 +2,7 @@
 {
     public interface IHttpBaseService
     {
-        //string GetRequestURL { get; }
-        //string GetRemoteServiceName { get; }
+        string GetRequestURL { get; }
+        string GetRemoteServiceName { get; }
     }
 }

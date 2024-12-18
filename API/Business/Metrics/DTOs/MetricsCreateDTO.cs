@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.Extensions.Primitives;
+
 namespace Business.Metrics.DTOs
 {
     public class MetricsCreateDTO

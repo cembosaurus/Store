@@ -2,6 +2,7 @@
 using Business.Metrics.DTOs;
 using Metrics.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Globalization;
 
 
@@ -29,6 +30,20 @@ namespace Metrics.Controllers.Business
         [HttpPost()]
         public ActionResult AddMetricsData(MetricsCreateDTO metricsData)
         {
+
+
+            foreach (var d in metricsData.Data)
+            {
+                foreach (var md in d.Value)
+                    Console.WriteLine($"\n---> {d.Key} -- {md}");
+            }
+
+
+
+
+
+
+
             var addRecordResult = _collectorService.AddHttpTransactionRecord(metricsData);
 
 
@@ -51,12 +66,6 @@ namespace Metrics.Controllers.Business
             int ms = (int)span.TotalMilliseconds;
             Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxx {ms} xxxxx {span.Minutes} - {span.Seconds} - {span.Milliseconds}");
             //*****************************************************************************************************************
-
-
-
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.WriteLine($"------------------- {data} -------------------------- GETTING METRICS ");
-            Console.ResetColor();
 
 
             return Ok();

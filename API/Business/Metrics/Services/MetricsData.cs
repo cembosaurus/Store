@@ -66,8 +66,6 @@ namespace Business.Metrics.Services
 
 
 
-
-
         public void Initialize()
         {
             _headers.Clear();
