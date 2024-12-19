@@ -45,10 +45,10 @@ namespace Business.Middlewares
             _cw = cw;
             _httpMetricsService = httpMetricsService;
 
-            await AppId(context);
+            AppId(context);
 
             if (_thisService != "MetricsService")
-                await RequestHandler(context);
+                RequestHandler(context);
 
             await _next(context);
         }
@@ -56,7 +56,7 @@ namespace Business.Middlewares
 
 
 
-        private async Task RequestHandler(HttpContext context)
+        private void RequestHandler(HttpContext context)
         {
             _metricsData.Initialize();
 
@@ -67,7 +67,7 @@ namespace Business.Middlewares
                 Response_OUT(context);
 
                 if (_requestFrom == "client")
-                    await ReportMetrics(context);
+                    ReportMetrics(context);
 
                 return;
             });
@@ -122,7 +122,8 @@ namespace Business.Middlewares
 
 
 
-        private async Task ReportMetrics(HttpContext context)
+        // void - fire and foreget (does not wait for response), send metrics repport:
+        private void ReportMetrics(HttpContext context)
         {
             // send data collected from whole chain of HTTP requests to Metrics API serevice:
         
@@ -135,19 +136,18 @@ namespace Business.Middlewares
         
             _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
         
-            var metricsHttpResult = await _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
-        
-            _cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+            _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
+
+            //_cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
         }
 
 
 
 
-        private async Task AppId(HttpContext context)
+        private void AppId(HttpContext context)
         {
             if (context.Request.Path == "/appid")
                 context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
-
         }
 
 
