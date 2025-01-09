@@ -65,9 +65,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<ErrorHandler_MW>();
-
 app.UseMiddleware<Metrics_MW>();
+
+app.UseMiddleware<ErrorHandler_MW>();
 
 
 // Configure the HTTP request pipeline.

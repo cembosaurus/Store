@@ -109,9 +109,10 @@ public class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
             $"{_indexOUT}.REQ.OUT.{_requestTo}.{_timeOUT.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
             );
 
+        // append only 503 Service Unavailable code:
         _metricsData.AddHeader(
             $"Metrics.{_thisService}.{_appId}",
-            $"{_indexIN}.RESP.IN.{_requestTo}.{_timeIN.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{_responseMessage.StatusCode}.{(int)_responseMessage.StatusCode}"
+            $"{_indexIN}.RESP.IN.{_requestTo}.{_timeIN.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{((int)_responseMessage.StatusCode == 503 ? _requestTo + "." + _responseMessage.StatusCode + "." + (int)_responseMessage.StatusCode : "")}"
             );
     }
 

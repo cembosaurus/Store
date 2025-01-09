@@ -1,7 +1,10 @@
 ﻿using Business.Exceptions.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 
@@ -11,6 +14,8 @@ namespace Business.Middlewares
     {
 
         private readonly RequestDelegate _next;
+        private HttpResponse response;
+        private string result;
         private readonly IExId _exId;
 
 
@@ -29,10 +34,26 @@ namespace Business.Middlewares
             {
                 await _next(context);
             }
+            catch (SqlException sqlError)
+            {
+                response = context.Response;
+
+                response.ContentType = "application/json";
+
+                switch (sqlError.ErrorCode)
+                {
+                    case -2146232060:
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        break;
+                }
+
+                await CreateMessage(sqlError.Source!, context.Response.StatusCode, sqlError.Message);
+
+                await response.WriteAsync(result);
+            }
             catch (Exception error)
             {
-                var response = context.Response;
-                string result;
+                response = context.Response;
 
                 response.ContentType = "application/json";
 
@@ -40,7 +61,7 @@ namespace Business.Middlewares
                 {
                     case HttpRequestException ex:
 
-                        context.Response.StatusCode = _exId.Http_503(error) 
+                        context.Response.StatusCode = _exId.Http_503(error)
                             ? (int)HttpStatusCode.ServiceUnavailable
                             : response.StatusCode;
 
@@ -64,15 +85,26 @@ namespace Business.Middlewares
                     ? (int)HttpStatusCode.BadRequest
                     : context.Response.StatusCode;
 
-                result = JsonSerializer.Serialize(new { message = 
-                    $"{error?.Source} / " +
-                    $"{context.Response.StatusCode} / " +
-                    $"{error?.Message}" });
 
-                Console.WriteLine($"--> {result}");
+                await CreateMessage(error.Source!, context.Response.StatusCode, error.Message);
+
 
                 await response.WriteAsync(result);
             }
+        }
+
+
+
+        private async Task CreateMessage(string source = "", int statusCode = 0, string message = "")
+        {
+            result = JsonSerializer.Serialize(new{
+                message =
+                $"{source} / " +
+                $"{statusCode} / " +
+                $"{message}"
+            });
+
+            Console.WriteLine($"--> {result}");
         }
 
     }

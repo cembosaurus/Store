@@ -145,9 +145,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<ErrorHandler_MW>();
-
 app.UseMiddleware<Metrics_MW>();
+
+app.UseMiddleware<ErrorHandler_MW>();
 
 app.UseMiddleware<Scheduler_DbGuard_MW>();
 

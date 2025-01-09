@@ -1,6 +1,5 @@
 ﻿using Business.Metrics.DTOs;
 using Business.Metrics.Http.Services.Interfaces;
-using Business.Metrics.Services;
 using Business.Metrics.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Http;
@@ -111,7 +110,7 @@ namespace Business.Middlewares
                 context.Response.Headers.TryAdd("Metrics.ResponseFrom", _thisService);            
             }
 
-            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{(context.Response.StatusCode == 200 ? "" : "HTTP:" + context.Response.StatusCode)}");
 
             // append headers from incoming response in http client further down to caller app:
             foreach (var h in _metricsData.Headers)
@@ -119,6 +118,7 @@ namespace Business.Middlewares
                 context.Response.Headers.Append(h.Key, h.Value);
             }
         }
+
 
 
 
