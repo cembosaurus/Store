@@ -5,7 +5,7 @@ namespace Business.Exceptions
 {
     public class ExId : IExId
     {
-        public bool Http_503(Exception error)
+        public bool IsHttp_503(Exception error)
         {
             var w32ex = error as Win32Exception;
 

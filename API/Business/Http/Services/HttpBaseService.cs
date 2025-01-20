@@ -90,20 +90,20 @@ namespace Business.Http.Services
             // send HTTP reequest:
 
             var responseMessage = await Send();
-            
-            
+
+
+            var content = responseMessage.Content.ReadAsStringAsync().Result;
+
             if (!responseMessage.IsSuccessStatusCode || responseMessage.Content.GetType().Name == "EmptyContent")
             {
-            
+
                 // HTTP request to update local Global Config Failed:
-            
-                var response = _resultFact.Result(default(T), false, $"{responseMessage.ReasonPhrase}: {responseMessage.RequestMessage?.Method}, {responseMessage.RequestMessage?.RequestUri}");
-            
+
+                var response = _resultFact.Result(default(T), false, $"{responseMessage.ReasonPhrase}: {responseMessage.RequestMessage?.Method}/{responseMessage.RequestMessage?.RequestUri}.   Error: '{content}'");
+
                 return response;
             }
-            
-            var content = responseMessage.Content.ReadAsStringAsync().Result;
-            
+                        
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<ServiceResult<T>>(content) ?? _resultFact.Result<T>(default, responseMessage.IsSuccessStatusCode, responseMessage.ReasonPhrase ?? "");
             
             return result;
@@ -124,7 +124,7 @@ namespace Business.Http.Services
             {
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
-            catch (Exception ex) when (_exId.Http_503(ex))
+            catch (Exception ex) when (_exId.IsHttp_503(ex))
             {
 
                 // Catch ex 503: if HTTP Request URL provided by global settings is not up-to-date or wrong, request will fail ! ...
@@ -154,9 +154,10 @@ namespace Business.Http.Services
 
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
-            catch (Exception ex) when (_exId.Http_503(ex))
-            {                
-                return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Respoonse from '{_remoteServiceName}'. Message: {ex.Message}", ex);
+            catch (Exception ex) when (_exId.IsHttp_503(ex))
+            {
+                // add service name into error message:
+                return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Response from '{_remoteServiceName}' not received! {ex.Message}", ex);
             }
 
         }

@@ -1,8 +1,11 @@
 ﻿using API_Gateway.Services.Business.Ordering.Interfaces;
+using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+
+
 
 namespace API_Gateway.Controllers.Business.Ordering
 {
@@ -28,11 +31,11 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()//;./  returns data instead actionresult
         {
             var result = await _orderService.GetAllOrders();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;//.Status ? Ok(result) : StatusCode(500, result);
         }
 
 

@@ -53,6 +53,8 @@ namespace Ordering.Services
             //var test2 = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
             //var test3 = await _httpPaymentService.MakePayment(new OrderPaymentCreateDTO());
 
+            //throw new ApplicationException("------- TEST: Exception in Ordering API -> OrderService.cs ---------------");
+
             //------------------------------------------------------------------------------------
 
 

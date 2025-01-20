@@ -11,7 +11,9 @@ public class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
     private IMetricsData _metricsData;
     private HttpRequestMessage _requestMessage;
     private HttpResponseMessage _responseMessage;
+    // read from local appsettings: metrics data - service name
     private readonly string _thisService;
+    // read from response <- appsettings in remote service: metrics data - service name
     private string _requestTo;
     private readonly Guid _appId;
     private int _indexOUT;
@@ -112,7 +114,8 @@ public class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
         // append only 503 Service Unavailable code:
         _metricsData.AddHeader(
             $"Metrics.{_thisService}.{_appId}",
-            $"{_indexIN}.RESP.IN.{_requestTo}.{_timeIN.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{((int)_responseMessage.StatusCode == 503 ? _requestTo + "." + _responseMessage.StatusCode + "." + (int)_responseMessage.StatusCode : "")}"
+            $"{_indexIN}.RESP.IN.{_requestTo}.{_timeIN.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
+            $"{((int)_responseMessage.StatusCode == 503 ? ".HTTP:" + (int)_responseMessage.StatusCode : "")}"
             );
     }
 

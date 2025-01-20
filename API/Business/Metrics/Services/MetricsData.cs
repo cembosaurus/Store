@@ -76,7 +76,9 @@ namespace Business.Metrics.Services
 
         public IEnumerable<KeyValuePair<string, StringValues>> Headers
         {
-            get { return _headers; }
+            get {
+                return _headers;
+            }
         }
 
 

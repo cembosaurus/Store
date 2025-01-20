@@ -13,7 +13,7 @@ namespace Business.Middlewares
 {
     public class Metrics_MW
     {
-        // AppId - identifies instance (K8 replica) of service:
+        // AppId - identifies instance (one of K8 replicas) of service:
         private static readonly Guid _appId = Guid.NewGuid();
         private static readonly DateTime _deployed = DateTime.UtcNow;
         private static readonly AppId_MODEL _appId_Model = new() { AppId = _appId, Deployed = _deployed };
@@ -110,10 +110,11 @@ namespace Business.Middlewares
                 context.Response.Headers.TryAdd("Metrics.ResponseFrom", _thisService);            
             }
 
-            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{(context.Response.StatusCode == 200 ? "" : "HTTP:" + context.Response.StatusCode)}");
+            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
+                $"{(context.Response.StatusCode == 200 ? "" : ".HTTP:" + context.Response.StatusCode)}");
 
             // append headers from incoming response in http client further down to caller app:
-            foreach (var h in _metricsData.Headers)
+            foreach (var h in _metricsData.Headers.ToList())
             { 
                 context.Response.Headers.Append(h.Key, h.Value);
             }

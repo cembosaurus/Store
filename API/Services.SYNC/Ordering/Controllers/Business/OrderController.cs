@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using Business.Libraries.ServiceResult.Interfaces;
+using Business.Ordering.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.CQRS.Commands.Order;
@@ -30,11 +32,11 @@ namespace Ordering.Controllers.Business
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllOrders([FromRoute] GetAllOrders_Q query)
+        public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders([FromRoute] GetAllOrders_Q query)
         {
             var result = await _mediator.Send(query);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;//.Status ? Ok(result) : BadRequest(result);
         }
 
 

@@ -1,10 +1,8 @@
 ﻿using Business.Exceptions.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 
@@ -36,6 +34,12 @@ namespace Business.Middlewares
             }
             catch (SqlException sqlError)
             {
+
+
+                // catch error in BaseRepository on Save() !!!!!!!!!!!!!!!!!!!!!!!!!!! make base.Save() fully implemented and not abstract !!!!!!
+
+
+
                 response = context.Response;
 
                 response.ContentType = "application/json";
@@ -54,14 +58,13 @@ namespace Business.Middlewares
             catch (Exception error)
             {
                 response = context.Response;
-
                 response.ContentType = "application/json";
 
                 switch (error)
                 {
                     case HttpRequestException ex:
 
-                        context.Response.StatusCode = _exId.Http_503(error)
+                        context.Response.StatusCode = _exId.IsHttp_503(error)
                             ? (int)HttpStatusCode.ServiceUnavailable
                             : response.StatusCode;
 
@@ -87,7 +90,6 @@ namespace Business.Middlewares
 
 
                 await CreateMessage(error.Source!, context.Response.StatusCode, error.Message);
-
 
                 await response.WriteAsync(result);
             }

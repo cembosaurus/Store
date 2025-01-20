@@ -1,5 +1,6 @@
 ﻿using API_Gateway.Services.Business.Inventory.Interfaces;
 using Business.Inventory.DTOs.Item;
+using Business.Libraries.ServiceResult.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,11 +27,11 @@ namespace API_Gateway.Controllers.Business.Inventory
 
         [Authorize(Policy = "Everyone")]
         [HttpGet("all")]
-        public async Task<ActionResult> GetAllItems()
+        public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetAllItems()
         {
             var result = await _itemService.GetItems();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;//.Status ? Ok(result) : BadRequest(result);
         }
 
 

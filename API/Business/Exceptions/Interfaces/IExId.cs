@@ -2,6 +2,6 @@
 {
     public interface IExId
     {
-        bool Http_503(Exception error);
+        bool IsHttp_503(Exception error);
     }
 }

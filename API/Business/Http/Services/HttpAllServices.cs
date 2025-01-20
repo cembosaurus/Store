@@ -48,7 +48,7 @@ namespace Business.Http.Services
             {
                 return await _httpAppClient.SendAsync(_requestMessage);
             }
-            catch (Exception ex) when (_exId.Http_503(ex))
+            catch (Exception ex) when (_exId.IsHttp_503(ex))
             {
                 return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Respoonse from '{_remoteServiceName}'. Message: {ex.Message}", ex);
             }
