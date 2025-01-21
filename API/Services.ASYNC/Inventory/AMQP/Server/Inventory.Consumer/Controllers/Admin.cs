@@ -21,14 +21,14 @@ namespace Inventory.Consumer.Controllers
 
         [Authorize(Policy = "Everyone")]
         [HttpGet("amqp/start")]
-        public async Task<ActionResult> ConnectToRabbitMQServer(CancellationToken token)
+        public async Task<object> ConnectToRabbitMQServer(CancellationToken token)
         {
             if (_messageBusSubscriber.IsConnectedToRabbitMQServer)
                 return Ok("RabbitMQ server is already connected !");
 
             var result = await _messageBusSubscriber.Connect(token);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
     }
 }

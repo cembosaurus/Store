@@ -26,7 +26,7 @@ namespace Identity.Controllers.Business
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserToRegisterDTO userToRegister)
+        public async Task<object> Register(UserToRegisterDTO userToRegister)
         {
             var result = await _identityService.Register(userToRegister);
 
@@ -36,7 +36,7 @@ namespace Identity.Controllers.Business
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserToLoginDTO user)
+        public async Task<object> Login(UserToLoginDTO user)
         {
             var result = await _identityService.Login(user);
 

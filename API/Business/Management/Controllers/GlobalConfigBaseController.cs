@@ -1,6 +1,5 @@
 ﻿using Business.Filters.Identity;
 using Business.Management.Appsettings.Models;
-using Business.Management.Controllers.Interfaces;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,7 @@ namespace Business.Management.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public partial class GlobalConfigBaseController : ControllerBase, IHttpBroadcastController
+    public partial class GlobalConfigBaseController : ControllerBase
     {
         private IGlobalConfig_PROVIDER _globalConfig_Provider;
 
@@ -28,7 +27,7 @@ namespace Business.Management.Controllers
 
         [ApiKeyAuth]
         [HttpPut("remoteservices")]
-        public ActionResult UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_AS_MODEL> models)
+        public async Task<object> UpdateRemoteServiceModels([FromBody] IEnumerable<RemoteService_AS_MODEL> models)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("HTTP Post (incoming) to update Remote Services ... ");
@@ -36,13 +35,13 @@ namespace Business.Management.Controllers
 
             var result = _globalConfig_Provider.UpdateRemoteServiceModels(models);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
         [ApiKeyAuth]
         [HttpPost()]
-        public ActionResult Update([FromBody] Config_Global_AS_MODEL globalConfig)
+        public async Task<object> Update([FromBody] Config_Global_AS_MODEL globalConfig)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("HTTP Post (incoming) to update Global Config ... ");
@@ -50,7 +49,7 @@ namespace Business.Management.Controllers
 
             var result = _globalConfig_Provider.Update(globalConfig);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
     }

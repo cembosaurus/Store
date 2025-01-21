@@ -25,13 +25,13 @@ namespace Payment.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpPost]
-        public async Task<ActionResult> MakePayment(OrderPaymentCreateDTO order)
+        public async Task<object> MakePayment(OrderPaymentCreateDTO order)
         {
             // To Do: implement real service
 
             var result = _resultFact.Result(order, true, "Payment successful.");
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 

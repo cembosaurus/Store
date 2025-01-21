@@ -31,55 +31,55 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("all")]
-        public async Task<IServiceResult<IEnumerable<OrderReadDTO>>> GetAllOrders()//;./  returns data instead actionresult
+        public async Task<object> GetAllOrders()//;./  returns data instead actionresult
         {
             var result = await _orderService.GetAllOrders();
 
-            return result;//.Status ? Ok(result) : StatusCode(500, result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpGet]
-        public async Task<IActionResult> GetOrderByUserId()
+        public async Task<object> GetOrderByUserId()
         {
             var result = await _orderService.GetOrderByUserId(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUsersOrderByUserId(int userId)
+        public async Task<object> GetUsersOrderByUserId(int userId)
         {
             var result = await _orderService.GetOrderByUserId(userId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("cart/{cartId}")]
-        public async Task<IActionResult> GetOrderByCartId(Guid cartId)
+        public async Task<object> GetOrderByCartId(Guid cartId)
         {
             var result = await _orderService.GetOrderByCartId(cartId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpGet("ordercode")]
-        public async Task<IActionResult> GetOrderByOrderCode(string orderCode)
+        public async Task<object> GetOrderByOrderCode(string orderCode)
         {
             var result = await _orderService.GetOrderByOrderCode(orderCode);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -87,22 +87,22 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDTO orderCreateDTO)
+        public async Task<object> CreateOrder([FromBody] OrderCreateDTO orderCreateDTO)
         {
             var result = await _orderService.CreateOrder(_principalId, orderCreateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpPost("{userId}")]
-        public async Task<IActionResult> CreateUsersOrder([FromRoute] int userId, [FromBody] OrderCreateDTO orderCreateDTO)
+        public async Task<object> CreateUsersOrder([FromRoute] int userId, [FromBody] OrderCreateDTO orderCreateDTO)
         {
             var result = await _orderService.CreateOrder(userId, orderCreateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -110,11 +110,11 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]        // Customer
         [HttpPut]
-        public async Task<IActionResult> UpdateOrder([FromBody] OrderUpdateDTO orderUpdateDTO)
+        public async Task<object> UpdateOrder([FromBody] OrderUpdateDTO orderUpdateDTO)
         {
             var result = await _orderService.UpdateOrder(_principalId, orderUpdateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -122,11 +122,11 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]        // Management
         [HttpPut("{userId}")]
-        public async Task<IActionResult> UpdateUsersOrder([FromRoute] int userId, [FromBody] OrderUpdateDTO orderUpdateDTO)
+        public async Task<object> UpdateUsersOrder([FromRoute] int userId, [FromBody] OrderUpdateDTO orderUpdateDTO)
         {
             var result = await _orderService.UpdateOrder(userId, orderUpdateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -134,44 +134,44 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpPut("complete")]
-        public async Task<IActionResult> CompleteOrder()
+        public async Task<object> CompleteOrder()
         {
             var result = await _orderService.CompleteOrder(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpPut("{userId}/complete")]
-        public async Task<IActionResult> CompleteUsersOrder(int userId)
+        public async Task<object> CompleteUsersOrder(int userId)
         {
             var result = await _orderService.CompleteOrder(userId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Customer
         [HttpDelete]
-        public async Task<IActionResult> DeleteOrder()
+        public async Task<object> DeleteOrder()
         {
             var result = await _orderService.DeleteOrder(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // Management
         [HttpDelete("user/{userId}")]
-        public async Task<IActionResult> DeleteUsersOrder(int userId)
+        public async Task<object> DeleteUsersOrder(int userId)
         {
             var result = await _orderService.DeleteOrder(userId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
     }
 }

@@ -23,7 +23,7 @@ namespace StaticContent.Controllers.Business
 
 
         [HttpGet("items/{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<object> GetById(string id)
         {
             var image = _imageFilesService.GetById(id);
 

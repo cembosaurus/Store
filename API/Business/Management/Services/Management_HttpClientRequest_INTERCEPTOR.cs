@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Business.Management.Services
+﻿namespace Business.Management.Services
 {
-    public class Management_HttpRequestHandler : DelegatingHandler
+    public class Management_HttpClientRequest_INTERCEPTOR : DelegatingHandler
     {
 
         private HttpResponseMessage _responseMessage;
@@ -16,6 +10,13 @@ namespace Business.Management.Services
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
+
+
+            // To Do: move 503 re-call logic here from HttpBaseServicve !!!!!!
+
+
+
+
             _responseMessage = await base.SendAsync(requestMessage, cancellationToken);
 
             return _responseMessage;

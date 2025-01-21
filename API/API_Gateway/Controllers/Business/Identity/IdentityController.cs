@@ -26,11 +26,11 @@ namespace API_Gateway.Controllers.Business.Identity
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserToRegisterDTO user)
+        public async Task<object> Register(UserToRegisterDTO user)
         {
             var result = await _identityService.Register(user);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -38,11 +38,11 @@ namespace API_Gateway.Controllers.Business.Identity
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserToLoginDTO user)
+        public async Task<object> Login(UserToLoginDTO user)
         {
             var result = await _identityService.Login(user);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -50,11 +50,11 @@ namespace API_Gateway.Controllers.Business.Identity
         // NOT USED. ApiKey is used to directly authenticate api service. No JWT necessary:
         [AllowAnonymous]
         [HttpPost("service/authenticate")]
-        public async Task<IActionResult> AuthenticateService(string apiKey)
+        public async Task<object> AuthenticateService(string apiKey)
         {
             var result = await _identityService.AuthenticateService(apiKey);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
     }
 }

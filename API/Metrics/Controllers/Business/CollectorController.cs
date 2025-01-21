@@ -28,7 +28,7 @@ namespace Metrics.Controllers.Business
 
         [ApiKeyAuth]
         [HttpPost()]
-        public ActionResult AddMetricsData(MetricsCreateDTO metricsData)
+        public async Task<object> AddMetricsData(MetricsCreateDTO metricsData)
         {
 
 

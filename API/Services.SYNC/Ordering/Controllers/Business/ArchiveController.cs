@@ -26,46 +26,46 @@ namespace Ordering.Controllers.Business
 
         //[Authorize(Policy = "Everyone")]
         [HttpGet]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<object> GetAllOrders()
         {
             var result = await _mediator.Send(new GetAllOrders_Q());
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         //[Authorize(Policy = "Everyone")]
         [HttpGet("user/{UserId}")]
-        public async Task<IActionResult> GetOrderByUserId([FromRoute] GetOrderByUserId_Q query)
+        public async Task<object> GetOrderByUserId([FromRoute] GetOrderByUserId_Q query)
         {
             var result = await _mediator.Send(query);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         //[Authorize(Policy = "Everyone")]
         [HttpGet("cart")]
-        public async Task<IActionResult> GetOrderByCartId([FromForm] GetOrderByCartId_Q query)
+        public async Task<object> GetOrderByCartId([FromForm] GetOrderByCartId_Q query)
         {
             var result = await _mediator.Send(query);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         //[Authorize(Policy = "Everyone")]
         [HttpGet("code/{code}")]
-        public async Task<IActionResult> GetOrderByOrderCode([FromRoute] GetOrderByOrderCode_Q query)
+        public async Task<object> GetOrderByOrderCode([FromRoute] GetOrderByOrderCode_Q query)
         {
             query.Code = System.Net.WebUtility.UrlDecode(query.Code);
 
             var result = await _mediator.Send(query);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -73,11 +73,11 @@ namespace Ordering.Controllers.Business
 
         //[Authorize(Policy = "Everyone")]
         [HttpDelete("user/{UserId}")]
-        public async Task<IActionResult> DeleteOrderPermanently([FromRoute] DeleteOrderPermanently_C command)
+        public async Task<object> DeleteOrderPermanently([FromRoute] DeleteOrderPermanently_C command)
         {
             var result = await _mediator.Send(command);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 

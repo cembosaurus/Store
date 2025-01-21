@@ -27,22 +27,22 @@ namespace Management.Controllers
 
         [ApiKeyAuth]
         [HttpGet()]
-        public ActionResult GetGlobalConfig()
+        public async Task<object> GetGlobalConfig()
         {
             var result = _appsettings_Provider.GetGlobalConfig();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [ApiKeyAuth]
         [HttpGet("services")]
-        public ActionResult GetAllServiceModels()
+        public async Task<object> GetAllServiceModels()
         {
             var result = _appsettings_Provider.GetAllRemoteServicesModels();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 

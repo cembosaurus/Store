@@ -22,7 +22,7 @@ namespace API_Gateway.Controllers.Business.StaticContent
 
 
         [HttpGet("items/{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<object> GetById(string id)
         {
             var urlResult = _globalConfig_Provider.GetRemoteServiceURL_WithPath("StaticContentService", "ItemsURL");
 

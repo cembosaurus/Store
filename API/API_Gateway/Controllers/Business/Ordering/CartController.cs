@@ -35,33 +35,33 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // management
         [HttpGet("all")]
-        public async Task<IActionResult> GetCarts()
+        public async Task<object> GetCarts()
         {
             var result = await _cartService.GetCards();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]        // customer
         [HttpGet]
-        public async Task<IActionResult> GetCart()
+        public async Task<object> GetCart()
         {
             var result = await _cartService.GetCartByUserId(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]        // management
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUsersCart(int userId)
+        public async Task<object> GetUsersCart(int userId)
         {
             var result = await _cartService.GetCartByUserId(userId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -70,33 +70,33 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]       // manager
         [HttpGet("items/all")]
-        public async Task<IActionResult> GetAllCardItems()
+        public async Task<object> GetAllCardItems()
         {
             var result = await _cartIItemService.GetAllCardItems();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]        // customer
         [HttpGet("items")]
-        public async Task<IActionResult> GetCartItems()
+        public async Task<object> GetCartItems()
         {
             var result = await _cartIItemService.GetCartItems(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]        // manager
         [HttpGet("{userId}/items")]
-        public async Task<IActionResult> GetUsersCartItems(int userId)
+        public async Task<object> GetUsersCartItems(int userId)
         {
             var result = await _cartIItemService.GetCartItems(userId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -109,11 +109,11 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // only customer
         [HttpPost]
-        public async Task<IActionResult> CreateCart()
+        public async Task<object> CreateCart()
         {
             var result = await _cartService.CreateCart(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -122,22 +122,22 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // customer
         [HttpPost("items")]
-        public async Task<IActionResult> AddItemsToCart([FromBody] IEnumerable<CartItemUpdateDTO> items)
+        public async Task<object> AddItemsToCart([FromBody] IEnumerable<CartItemUpdateDTO> items)
         {
             var result = await _cartIItemService.AddItemsToCart(_principalId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // management
         [HttpPost("{userId}/items")]
-        public async Task<IActionResult> AddItemsToUsersCart(int userId, IEnumerable<CartItemUpdateDTO> items)
+        public async Task<object> AddItemsToUsersCart(int userId, IEnumerable<CartItemUpdateDTO> items)
         {
             var result = await _cartIItemService.AddItemsToCart(userId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -149,22 +149,22 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]        // customer
         [HttpPut]
-        public async Task<IActionResult> UpdateCart(CartUpdateDTO cartUpdateDTO)
+        public async Task<object> UpdateCart(CartUpdateDTO cartUpdateDTO)
         {
             var result = await _cartService.UpdateCart(_principalId, cartUpdateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]        // management
         [HttpPut("{UserId}")]
-        public async Task<IActionResult> UpdateUsersCart(int userid, CartUpdateDTO cartUpdateDTO)
+        public async Task<object> UpdateUsersCart(int userid, CartUpdateDTO cartUpdateDTO)
         {
             var result = await _cartService.UpdateCart(userid, cartUpdateDTO);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -177,22 +177,22 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // customer
         [HttpDelete]
-        public async Task<IActionResult> DeleteCart()
+        public async Task<object> DeleteCart()
         {
             var result = await _cartService.DeleteCart(_principalId);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // management
         [HttpDelete("{UserId}")]
-        public async Task<IActionResult> DeleteUsersCart(int userid)
+        public async Task<object> DeleteUsersCart(int userid)
         {
             var result = await _cartService.DeleteCart(userid);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -201,44 +201,44 @@ namespace API_Gateway.Controllers.Business.Ordering
 
         [Authorize(Policy = "Everyone")]            // customer
         [HttpDelete("items")]
-        public async Task<IActionResult> RemoveCartItems(IEnumerable<CartItemUpdateDTO> items)
+        public async Task<object> RemoveCartItems(IEnumerable<CartItemUpdateDTO> items)
         {
             var result = await _cartIItemService.RemoveCartItems(_principalId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // management
         [HttpDelete("{UserId}/items")]
-        public async Task<IActionResult> RemoveUsersCartItems(int userId, IEnumerable<CartItemUpdateDTO> items)
+        public async Task<object> RemoveUsersCartItems(int userId, IEnumerable<CartItemUpdateDTO> items)
         {
             var result = await _cartIItemService.RemoveCartItems(userId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // customer
         [HttpDelete("items/delete")]
-        public async Task<IActionResult> DeleteCartItems(IEnumerable<int> items)
+        public async Task<object> DeleteCartItems(IEnumerable<int> items)
         {
             var result = await _cartIItemService.DeleteCartItems(_principalId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
 
         [Authorize(Policy = "Everyone")]            // management
         [HttpDelete("{UserId}/items/delete")]
-        public async Task<IActionResult> DeleteUsersCartItems(int userId, IEnumerable<int> items)
+        public async Task<object> DeleteUsersCartItems(int userId, IEnumerable<int> items)
         {
             var result = await _cartIItemService.DeleteCartItems(userId, items);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 

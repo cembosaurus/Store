@@ -28,11 +28,11 @@ namespace Scheduler.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpGet("cartitem")]
-        public async Task<ActionResult> GetAll()
+        public async Task<object> GetAll()
         {
             var result = await _cartItemService.GetAllLocks();
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -40,11 +40,11 @@ namespace Scheduler.Controllers.Business
         [ApiKeyAuth]
         [AllowAnonymous]
         [HttpPost("cartitem/lock")]
-        public async Task<IActionResult> LockCartItem(CartItemsLockCreateDTO cartItemsLock)
+        public async Task<object> LockCartItem(CartItemsLockCreateDTO cartItemsLock)
         {
             var result = await _cartItemService.CartItemsLock(cartItemsLock);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 
@@ -52,11 +52,11 @@ namespace Scheduler.Controllers.Business
         [ApiKeyAuth]
         [AllowAnonymous]
         [HttpDelete("cartitem/lock")]
-        public async Task<IActionResult> UnLockCartItem(CartItemsLockDeleteDTO cartItemUnLock)
+        public async Task<object> UnLockCartItem(CartItemsLockDeleteDTO cartItemUnLock)
         {
             var result = await _cartItemService.CartItemsUnLock(cartItemUnLock);
 
-            return result.Status ? Ok(result) : BadRequest(result);
+            return result;  // ctr res
         }
 
 

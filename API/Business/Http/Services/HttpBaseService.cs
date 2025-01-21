@@ -16,6 +16,7 @@ using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Web.Http;
 
 
 
@@ -92,6 +93,8 @@ namespace Business.Http.Services
             var responseMessage = await Send();
 
 
+            // response handling:
+
             var content = responseMessage.Content.ReadAsStringAsync().Result;
 
             if (!responseMessage.IsSuccessStatusCode || responseMessage.Content.GetType().Name == "EmptyContent")
@@ -114,7 +117,7 @@ namespace Business.Http.Services
 
 
         // VIRTUAL - unlike all HTTP Services, HttpManagementService (uses its own overridden Send()) doesn't need 503 ex handling because
-        // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL from Management API service:
+        // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL by response from Management API service:
         protected async virtual Task<HttpResponseMessage> Send()
         {
 
@@ -156,6 +159,8 @@ namespace Business.Http.Services
             }
             catch (Exception ex) when (_exId.IsHttp_503(ex))
             {
+                //throw new HttpResponseException(_requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Response from '{_remoteServiceName}' not received! {ex.Message}", ex));
+
                 // add service name into error message:
                 return _requestMessage.CreateErrorResponse(HttpStatusCode.ServiceUnavailable, $"HTTP 503: Response from '{_remoteServiceName}' not received! {ex.Message}", ex);
             }
