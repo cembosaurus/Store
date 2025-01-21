@@ -48,7 +48,7 @@ ManagementService_DI.Register(builder);
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
 
 builder.Services.AddSingleton<IItemRepository, ItemRepository>();
 builder.Services.AddSingleton<IItemService, ItemService>();

@@ -8,6 +8,7 @@ using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Data;
 using Business.Management.DI;
+using Business.Management.Services;
 using Business.Metrics.DI;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
@@ -40,7 +41,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
 
 
 builder.Services.AddDbContext<MetricsContext>();

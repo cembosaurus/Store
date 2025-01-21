@@ -36,7 +36,7 @@ builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
 
 builder.Services.AddFluentValidation(conf => {
     conf.DisableDataAnnotationsValidation = true;

@@ -14,6 +14,7 @@ using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Management.Data;
 using Business.Management.DI;
+using Business.Management.Services;
 using Business.Metrics.DI;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
@@ -82,7 +83,7 @@ builder.Services.AddScoped<IHttpAddressService, HttpAddressService>();
 builder.Services.AddScoped<IHttpPaymentService, HttpPaymentService>();
 builder.Services.AddScoped<IHttpSchedulerService, HttpSchedulerService>();
 
-builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
+builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
