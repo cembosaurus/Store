@@ -30,7 +30,7 @@ namespace Identity.Controllers.Business
         {
             var result = await _identityService.Register(userToRegister);
 
-            return (ActionResult)result;
+            return result;  // ctr res
         }
 
 
@@ -40,7 +40,7 @@ namespace Identity.Controllers.Business
         {
             var result = await _identityService.Login(user);
 
-            return (ActionResult)result;
+            return result;  // ctr res
         }
 
 
