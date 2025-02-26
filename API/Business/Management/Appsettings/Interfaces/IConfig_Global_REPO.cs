@@ -6,6 +6,7 @@ namespace Business.Management.Appsettings.Interfaces
     {
         IAuth_REPO Auth { get; }
         Config_Global_AS_MODEL GlobalConfig { get; }
+        Persistence_REPO Persistence { get; }
         IRabbitMQ_REPO RabbitMQ { get; }
         IRemoteServices_REPO RemoteServices { get; }
 

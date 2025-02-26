@@ -197,6 +197,19 @@ namespace Business.Management.Services
 
 
 
+        // Persistence:
+
+        public IServiceResult<Persistence_AS_MODEL> GetPersistence()
+        {
+            var persistence = _config_global_Repo.Persistence.Data;
+
+            return _resultFact.Result(persistence, persistence != null, persistence == null ? $"Persistence config was not found in Global Config !" : "");
+        }
+
+
+
+
+
 
 
         // ------------------------------------------------------------------------------------ WRITE: ------------------------------------------------------------------------------

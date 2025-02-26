@@ -5,7 +5,6 @@
 namespace Business.Data
 {
     // singleton
-    // runtime variables, not session variables
 
     public class GlobalVariables : IGlobalVariables
     {

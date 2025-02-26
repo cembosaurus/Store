@@ -13,9 +13,9 @@ namespace Management.Services
         private readonly IServiceScopeFactory _serviceFactory;
         private FileSystemWatcher _watcher;
         private readonly ConsoleWriter _cm;
-        private bool _switch = true; // MS bug - firing event twice. Prevent it by using the switch.
-                                     // Not ideal solution as two independet events could be fired in sequence so second one will be ignored.
-                                     // But this event is fired rarely f.e: after Appsettings is updated
+        private bool _switch; // MS bug - 'FileSystemWatcher.Changed()' is firing event twice for one change! Prevent it by using the switch in 'OnAppsettingsUpdated(...)'.
+                              // Not ideal solution as two independet events could be fired in sequence so second one will be ignored.
+                              // But this event is fired rarely f.e: after Appsettings is updated
 
 
         public Management_Worker(FileSystemWatcher watcher, IServiceScopeFactory serviceFactory, ConsoleWriter cm)
@@ -36,23 +36,24 @@ namespace Management.Services
         {
             _cm.Message("App Startup", "Background Worker", "", TypeOfInfo.INFO, "Running...");
 
-            //Thread.Sleep(10000);
-
             PostGlobalConfigToAPIServices();
         }
+
 
 
         // On Appsettings Update:
         public void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
         {
-            if (_switch)
-                _cm.Message("Appsettings WRITE event", "Background Worker", "Appsettings was updated...", TypeOfInfo.INFO, $"\n - {args.ChangeType}\n - {args.Name}\n - {args.FullPath}");
+            if (_switch = !_switch)
+                return;
 
+            _cm.Message("Appsettings WRITE event", "Background Worker", "Appsettings was updated...", TypeOfInfo.INFO, $"\n - {args.ChangeType}\n - {args.Name}\n - {args.FullPath}");
+            
             PostGlobalConfigToAPIServices();
-
-
-            _switch = !_switch;
+            
+            _switch = default;
         }
+
 
 
 

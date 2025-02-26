@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Identity.DTOs;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
@@ -26,9 +27,9 @@ namespace Ordering.Services
         private readonly IServiceResultFactory _resultFact;
         private readonly IMapper _mapper;
         private readonly IOrder _orderTools;
+        private readonly IHttpContextAccessor _accessor;
 
-
-        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService)
+        public OrderService(IOrderRepository orderRepo, ICartRepository cartRepo, ICartItemsRepository cartItemsRepo, IServiceResultFactory resultFact, IMapper mapper, IHttpAddressService httpIdentityService, IOrder orderTools, IHttpPaymentService httpPaymentService, IHttpContextAccessor accessor)
         {
             _orderRepo = orderRepo;
             _cartRepo = cartRepo;
@@ -38,6 +39,8 @@ namespace Ordering.Services
             _resultFact = resultFact;
             _mapper = mapper;
             _orderTools = orderTools;
+
+            _accessor = accessor;
         }
 
 
@@ -49,11 +52,52 @@ namespace Ordering.Services
 
             // ----------------------------------------------------- TEST
 
+            var context = _accessor.HttpContext;
+
+            var pageStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "page").Value?.ToString();
+            var page = int.TryParse(pageStr, out var pageInt) ? pageInt : 9;
+
+            var sizeStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "size").Value?.ToString();
+            var size = int.TryParse(sizeStr, out var sizeInt) ? sizeInt : 3;
+
+            //var page = context.Request.Query.TryGetValue("page", out StringValues pageStrArr)
+            //    ? (int.TryParse(pageStrArr[0], out int pageInt) ? pageInt : 1)
+            //    : 1;
+            //var size = context.Request.Query.TryGetValue("size", out StringValues sizeStrArr)
+            //    ? (int.TryParse(sizeStrArr[0], out int sizeInt) ? sizeInt : 1)
+            //    : 1;
+
+
+
+
             //var test = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
             //var test2 = await _httpIdentityService.GetAddressesByAddressIds(new List<int> { 1, 2, 3 });
             //var test3 = await _httpPaymentService.MakePayment(new OrderPaymentCreateDTO());
 
             //throw new ApplicationException("------- TEST: Exception in Ordering API -> OrderService.cs ---------------");
+
+            var testTab = new List<OrderReadDTO>();
+
+            for (int i = 1; i <= 100; i++)
+            {
+                testTab.Add(
+                    new OrderReadDTO 
+                    { 
+                        CartId = Guid.NewGuid(), OrderCode = i.ToString(), Created = DateTime.UtcNow, Dispatched = DateTime.UtcNow, 
+                        OrderDetails = new OrderDetailsReadDTO 
+                        { 
+                            Name = "Order_" + i.ToString() + "_th", 
+                            Address = new AddressReadDTO 
+                            {
+                                UserId = i + 500 , AddressId = i + 600, City = "Town_" + i, Street = "Str.-" + i, Number = i + 300
+                            } 
+                        } 
+                    });
+            }
+
+            var testResult = testTab.Skip(page).Take(size).AsEnumerable();
+
+            return _resultFact.Result(testResult, true, "Success.");
 
             //------------------------------------------------------------------------------------
 

@@ -45,6 +45,28 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+
+
+
+
+
+// TEST: ----------------------------------
+builder.Services.AddHttpContextAccessor();
+
+
+
+
+
+
+
+
+
+
+
+
+
 // add validation filter in front of controller:
 builder.Services.AddControllers(opt =>
 {
@@ -151,6 +173,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+
+app.UseMiddleware<RequestHandler_MW>();
+
+
+
 
 app.UseMiddleware<Metrics_MW>();
 

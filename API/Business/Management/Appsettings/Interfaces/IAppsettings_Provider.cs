@@ -9,6 +9,7 @@ namespace Business.Management.Appsettings.Interfaces
         IServiceResult<string> GetApiKey();
         IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig();
         IServiceResult<string> GetJWTKey();
+        IServiceResult<Persistence_AS_MODEL> GetPersistence();
         IServiceResult<RabbitMQ_AS_MODEL> GetRabbitMQ();
         IServiceResult<RemoteService_AS_MODEL> GetRemoteServiceModel(string name);
     }

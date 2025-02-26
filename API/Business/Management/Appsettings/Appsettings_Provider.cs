@@ -33,6 +33,21 @@ namespace Business.Management.Appsettings
         // ------------------------------------------------------------------------------------ READ: ------------------------------------------------------------------------------
 
 
+
+        public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
+        {
+            using (var scope = _serviceFactory.CreateScope())
+            {
+                var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
+
+                var globalConfig = _appsettings_monitor.CurrentValue;
+
+                return resultFact.Result(globalConfig, globalConfig != null, globalConfig == null ? $"Global Config data were NOT found in Appsettings !" : "");
+            }
+        }
+
+
+
         public IServiceResult<IEnumerable<RemoteService_AS_MODEL>> GetAllRemoteServicesModels()
         {
             using (var scope = _serviceFactory.CreateScope())
@@ -109,18 +124,18 @@ namespace Business.Management.Appsettings
 
 
 
-        public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
+
+        public IServiceResult<Persistence_AS_MODEL> GetPersistence()
         {
             using (var scope = _serviceFactory.CreateScope())
             {
                 var resultFact = scope.ServiceProvider.GetService<IServiceResultFactory>();
 
-                var globalConfig = _appsettings_monitor.CurrentValue;
+                var persistence = _appsettings_monitor.CurrentValue.Persistence;
 
-                return resultFact.Result(globalConfig, globalConfig != null, globalConfig == null ? $"Global Config data were NOT found in Appsettings !" : "");
+                return resultFact.Result(persistence, persistence != null, persistence == null ? $"Persistence data were NOT found in Appsettings !" : "");
             }
         }
-
 
     }
 }

@@ -28,6 +28,8 @@ namespace Business.Management.Appsettings
 
         public string JWTKey => _db.Data.Auth.JWTKey;
 
+
+
         public void Initialize(Auth_AS_MODEL auth) => _db.Data.Auth = _mapper.Map<Auth_AS_MODEL>(auth);
         
 

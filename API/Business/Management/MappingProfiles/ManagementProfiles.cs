@@ -18,6 +18,9 @@ namespace Services.Inventory.Profiles
             CreateMap<Auth_AS_MODEL, Auth_AS_DTO>();
             CreateMap<Auth_AS_DTO, Auth_AS_MODEL>();
 
+            CreateMap<Persistence_AS_MODEL, Persistence_DTO>();
+            CreateMap<Persistence_DTO, Persistence_AS_MODEL>();
+
             CreateMap<RabbitMQ_AS_MODEL, RabbitMQ_AS_DTO>();
             CreateMap<RabbitMQ_AS_DTO, RabbitMQ_AS_MODEL>();
             CreateMap<Env, Env_DTO>();
