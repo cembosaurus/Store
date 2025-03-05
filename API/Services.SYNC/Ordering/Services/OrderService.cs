@@ -54,11 +54,11 @@ namespace Ordering.Services
 
             var context = _accessor.HttpContext;
 
-            var pageStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "page").Value?.ToString();
-            var page = int.TryParse(pageStr, out var pageInt) ? pageInt : 9;
+            //var pageStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "page").Value?.ToString();
+            //var page = int.TryParse(pageStr, out var pageInt) ? pageInt : 9;
 
-            var sizeStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "size").Value?.ToString();
-            var size = int.TryParse(sizeStr, out var sizeInt) ? sizeInt : 3;
+            //var sizeStr = context?.Items.FirstOrDefault(i => i.Key.ToString() == "size").Value?.ToString();
+            //var size = int.TryParse(sizeStr, out var sizeInt) ? sizeInt : 3;
 
             //var page = context.Request.Query.TryGetValue("page", out StringValues pageStrArr)
             //    ? (int.TryParse(pageStrArr[0], out int pageInt) ? pageInt : 1)
@@ -67,6 +67,8 @@ namespace Ordering.Services
             //    ? (int.TryParse(sizeStrArr[0], out int sizeInt) ? sizeInt : 1)
             //    : 1;
 
+            var page = int.Parse(context!.Request.Query["page"]!);
+            var size = int.Parse(context!.Request.Query["size"]!);
 
 
 

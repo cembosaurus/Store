@@ -55,9 +55,9 @@ namespace Business.Middlewares
 
 
             // Get pagging from request:
-            var pageStr = context.Request.Query["page"] == StringValues.Empty ? _defaultPageNumber.ToString() : context.Request.Query["page"][0];
-            var sizeStr = context.Request.Query["size"] == StringValues.Empty ? _defaultPageSize.ToString() : context.Request.Query["size"][0];
-
+            var pageStr = context.Request.Query["page"] == StringValues.Empty ? _defaultPageNumber.ToString() : context.Request.Query["page"][0]; // pageStr and sizeStr don't hold reference to context,request.query if not found, so it doesn't get writen into there at the end of this method !!!!!!
+            var sizeStr = context.Request.Query["size"] == StringValues.Empty ? _defaultPageSize.ToString() : context.Request.Query["size"][0];   // ... make pageStr and sizeStr reference to request.query !!!!!!!!!!!!!!
+            
             if (!(int.TryParse(pageStr, out var pageInt) && pageInt > 0
                 && int.TryParse(sizeStr, out var sizeInt) && sizeInt > 0))
             {
@@ -78,9 +78,11 @@ namespace Business.Middlewares
                 sizeInt = gcData!.Pagination.DefaultPageSize;
             }
 
-            context.Items.Add("page", (pageInt - 1) * sizeInt);
-            context.Items.Add("size", sizeInt);
+            //context.Items.Add("page", (pageInt - 1) * sizeInt);
+            //context.Items.Add("size", sizeInt);
 
+            pageStr = ((pageInt - 1) * sizeInt).ToString();
+            sizeStr = sizeInt.ToString();
         }
 
 
