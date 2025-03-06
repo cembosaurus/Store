@@ -2,12 +2,17 @@
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static Business.AMQP.Custom.RequestMethods;
 
 
 
@@ -51,17 +56,19 @@ namespace Business.Middlewares
 
 
 
+
+
             // To Do: catch SQL error if page number out of range
 
 
-            // Get pagging from request:
-            var pageStr = context.Request.Query["page"] == StringValues.Empty ? _defaultPageNumber.ToString() : context.Request.Query["page"][0]; // pageStr and sizeStr don't hold reference to context,request.query if not found, so it doesn't get writen into there at the end of this method !!!!!!
-            var sizeStr = context.Request.Query["size"] == StringValues.Empty ? _defaultPageSize.ToString() : context.Request.Query["size"][0];   // ... make pageStr and sizeStr reference to request.query !!!!!!!!!!!!!!
+            // Get pagination from request:
+            var pageStr = context.Request.Query["page"] == StringValues.Empty ? _defaultPageNumber.ToString() : context.Request.Query["page"][0];
+            var sizeStr = context.Request.Query["size"] == StringValues.Empty ? _defaultPageSize.ToString() : context.Request.Query["size"][0];  
             
             if (!(int.TryParse(pageStr, out var pageInt) && pageInt > 0
                 && int.TryParse(sizeStr, out var sizeInt) && sizeInt > 0))
             {
-                // If pagging not found in request, get pagging from GC:
+                // If pagination not found in request, get pagging from GC:
                 var gcResult = globalConfig_Provider.GetPersistence();
                 var gcData = gcResult.Status && gcResult.Data!.Pagination.DefaultPageNumber > 0 && gcResult.Data.Pagination.DefaultPageSize > 0
                     ? gcResult.Data
@@ -78,11 +85,15 @@ namespace Business.Middlewares
                 sizeInt = gcData!.Pagination.DefaultPageSize;
             }
 
-            //context.Items.Add("page", (pageInt - 1) * sizeInt);
-            //context.Items.Add("size", sizeInt);
+            // insert pagination into query string:
+            var queryItems = context.Request.Query.Where(i => i.Key != "page" && i.Key != "size").Select(x => { return new KeyValuePair<string, string>(x.Key, x.Value[0] ?? ""); }).ToList();
 
-            pageStr = ((pageInt - 1) * sizeInt).ToString();
-            sizeStr = sizeInt.ToString();
+            queryItems.Add(new KeyValuePair<string, string>("page", ((pageInt - 1) * sizeInt).ToString()));
+            queryItems.Add(new KeyValuePair<string, string>("size", sizeInt.ToString()));
+
+            var builder = new QueryBuilder(queryItems);
+
+            context.Request.QueryString = builder.ToQueryString();
         }
 
 
