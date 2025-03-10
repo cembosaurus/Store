@@ -6,6 +6,7 @@ namespace Business.Management.Appsettings.Models
 {
     public class Persistence_AS_MODEL
     {
+        [JsonProperty("Pagination")]
         public Pagination_AS_MODEL Pagination { get; set; } = new ();
 
 

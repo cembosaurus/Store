@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -24,8 +25,8 @@ namespace Business.Middlewares
         private readonly RequestDelegate _next;
 
 
-        private const int _defaultPageNumber = 1;
-        private const int _defaultPageSize = 20;
+        private int _pageNumber = 1;
+        private int _pageSize = 20;
 
 
         public RequestHandler_MW(RequestDelegate next)
@@ -54,46 +55,55 @@ namespace Business.Middlewares
             // !!!! order runs alobe -> default OK. After starting Management -> Order GC NOT updated!!!!!!
 
 
-
-
-
-
             // To Do: catch SQL error if page number out of range
 
-
-            // Get pagination from request:
-            var pageStr = context.Request.Query["page"] == StringValues.Empty ? _defaultPageNumber.ToString() : context.Request.Query["page"][0];
-            var sizeStr = context.Request.Query["size"] == StringValues.Empty ? _defaultPageSize.ToString() : context.Request.Query["size"][0];  
-            
-            if (!(int.TryParse(pageStr, out var pageInt) && pageInt > 0
-                && int.TryParse(sizeStr, out var sizeInt) && sizeInt > 0))
+            // check query string:
+            if (int.TryParse(context.Request.Query["page"], out int page)
+                && int.TryParse(context.Request.Query["size"], out int size))
             {
-                // If pagination not found in request, get pagging from GC:
-                var gcResult = globalConfig_Provider.GetPersistence();
-                var gcData = gcResult.Status && gcResult.Data!.Pagination.DefaultPageNumber > 0 && gcResult.Data.Pagination.DefaultPageSize > 0
-                    ? gcResult.Data
-                    : new()
-                    {
-                        Pagination = new()
-                        {
-                            DefaultPageNumber = _defaultPageNumber,
-                            DefaultPageSize = _defaultPageSize
-                        }
-                    };
+                _pageNumber = page; 
+                _pageSize = size;
 
-                pageInt = gcData!.Pagination.DefaultPageNumber;
-                sizeInt = gcData!.Pagination.DefaultPageSize;
+                AddQueryString();
+
+                return;
             }
 
-            // insert pagination into query string:
-            var queryItems = context.Request.Query.Where(i => i.Key != "page" && i.Key != "size").Select(x => { return new KeyValuePair<string, string>(x.Key, x.Value[0] ?? ""); }).ToList();
 
-            queryItems.Add(new KeyValuePair<string, string>("page", ((pageInt - 1) * sizeInt).ToString()));
-            queryItems.Add(new KeyValuePair<string, string>("size", sizeInt.ToString()));
+            // try get data from GC provider:
+            var gcResult = globalConfig_Provider.GetPersistence();
+            
+            var pg = gcResult.Status
+                ? gcResult.Data!.Pagination
+                : new()
+                {
+                    DefaultPageNumber = _pageNumber,
+                    DefaultPageSize = _pageSize
+                };
+            
+            _pageNumber = pg.DefaultPageNumber;
+            _pageSize = pg.DefaultPageSize;
 
-            var builder = new QueryBuilder(queryItems);
+            AddQueryString();
 
-            context.Request.QueryString = builder.ToQueryString();
+
+
+            void AddQueryString()
+            {
+
+                var queryItems = context.Request.Query
+                .Where(i => i.Key != "page" && i.Key != "size")
+                .Select(x => { return new KeyValuePair<string, string>(x.Key, x.Value[0] ?? ""); })
+                .ToList();
+
+                queryItems.Add(new KeyValuePair<string, string>("page", ((_pageNumber - 1) * _pageSize).ToString()));
+                queryItems.Add(new KeyValuePair<string, string>("size", _pageSize.ToString()));
+
+                var builder = new QueryBuilder(queryItems);
+
+                context.Request.QueryString = builder.ToQueryString();
+            }
+
         }
 
 

@@ -203,7 +203,9 @@ namespace Business.Management.Services
         {
             var persistence = _config_global_Repo.Persistence.Data;
 
-            return _resultFact.Result(persistence, persistence != null, persistence == null ? $"Persistence config was not found in Global Config !" : "");
+            var dataCheck = persistence.Pagination.DefaultPageSize > 0 && persistence.Pagination.DefaultPageNumber > 0;
+
+            return _resultFact.Result(persistence, dataCheck, !dataCheck ? $"Persistence config was not found in Global Config !" : "");
         }
 
 
