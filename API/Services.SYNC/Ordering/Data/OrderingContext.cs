@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Business.Data.Tools;
+using Microsoft.EntityFrameworkCore;
 using Services.Ordering.Models;
 
 namespace Ordering.Data

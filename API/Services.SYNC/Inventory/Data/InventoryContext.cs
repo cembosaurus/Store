@@ -1,4 +1,5 @@
-﻿using Inventory.Models;
+﻿using Business.Data.Tools;
+using Inventory.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services.Inventory.Data
@@ -26,7 +27,9 @@ namespace Services.Inventory.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_conf.GetSection($"Config.Local:ConnectionStrings:InventoryConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure());
+            optionsBuilder.UseSqlServer(
+                _conf.GetSection($"Config.Local:ConnectionStrings:InventoryConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure())
+                .AddInterceptors(new DbQueryComandInterceptor());
         }
 
 
