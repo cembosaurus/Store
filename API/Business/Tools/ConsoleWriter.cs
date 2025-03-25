@@ -22,7 +22,8 @@ namespace Business.Tools
             Write();
         }
 
-        public void Text(ConsoleColor backGround1, ConsoleColor foreGround1, string text1, 
+        public void Text(
+            ConsoleColor backGround1, ConsoleColor foreGround1, string text1, 
             ConsoleColor backGround2 = ConsoleColor.Black, ConsoleColor foreGround2 = ConsoleColor.White, string text2 = "", 
             ConsoleColor backGround3 = ConsoleColor.Black, ConsoleColor foreGround3 = ConsoleColor.White, string text3 = "", 
             ConsoleColor backGround4 = ConsoleColor.Black, ConsoleColor foreGround4 = ConsoleColor.White, string text4 = "", 
@@ -43,8 +44,8 @@ namespace Business.Tools
             Console.BackgroundColor = backGround5;
             Console.ForegroundColor = foreGround5;
             Console.Write(text5);
-            Console.ResetColor();
 
+            Console.ResetColor();
             Console.WriteLine();
         }
 
@@ -73,7 +74,9 @@ namespace Business.Tools
             Console.Write($" {_type}:");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(string.IsNullOrWhiteSpace(_message) ? "" : $" {_message}");
+
             Console.ResetColor();
+            Console.WriteLine();
         }
 
     }

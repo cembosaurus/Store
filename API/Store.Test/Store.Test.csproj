@@ -9,6 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="API_Gateway\**" />
+    <Compile Remove="Services.SYNC\**" />
+    <EmbeddedResource Remove="API_Gateway\**" />
+    <EmbeddedResource Remove="Services.SYNC\**" />
+    <None Remove="API_Gateway\**" />
+    <None Remove="Services.SYNC\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="NUnit" Version="3.13.3" />
@@ -18,18 +28,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API_Gateway\" />
-    <Folder Include="Services.SYNC\Identity\Filters\" />
-    <Folder Include="Services.SYNC\StaticContent\" />
-    <Folder Include="Services.SYNC\Scheduler\" />
-    <Folder Include="Services.SYNC\Payment\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\API_Gateway\API_Gateway.csproj" />
+    <ProjectReference Include="..\Business\Business.csproj" />
+    <ProjectReference Include="..\Services.ASYNC\Inventory\AMQP\Client\Inventory.Publisher\Inventory.Publisher.csproj" />
+    <ProjectReference Include="..\Services.ASYNC\Inventory\AMQP\Server\Inventory.Consumer\Inventory.Consumer.csproj" />
+    <ProjectReference Include="..\Services.SYNC\API_Gateway\API_Gateway.csproj" />
     <ProjectReference Include="..\Services.SYNC\Identity\Identity.csproj" />
     <ProjectReference Include="..\Services.SYNC\Inventory\Inventory.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Management\Management.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Metrics\Metrics.csproj" />
     <ProjectReference Include="..\Services.SYNC\Ordering\Ordering.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Payment\Payment.csproj" />
+    <ProjectReference Include="..\Services.SYNC\Scheduler\Scheduler.csproj" />
+    <ProjectReference Include="..\Services.SYNC\StaticContent\StaticContent.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Business.Exceptions.Interfaces;
+﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
@@ -11,12 +10,10 @@ using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Web.Http;
 
 
 
@@ -95,7 +92,7 @@ namespace Business.Http.Services
 
             // response handling:
 
-            var content = responseMessage.Content.ReadAsStringAsync().Result;
+            var content = await responseMessage.Content.ReadAsStringAsync();
 
             if (!responseMessage.IsSuccessStatusCode || responseMessage.Content.GetType().Name == "EmptyContent")
             {
@@ -189,7 +186,7 @@ namespace Business.Http.Services
                 var GCResult = await DownloadGloalConfig();
 
                 if (!GCResult.Status)
-                    return _resultFact.Result(false, false, $"URL for service '{_remoteServiceName}' is not available, because attempt to download Global Config with correct URL from Management API service FAILED! Message: {GCResult.Message}");
+                    return _resultFact.Result(false, false, $"URL for service '{_remoteServiceName}' is not available in '{_appName}' service, and attempt to download Global Config with correct URL from Management API service FAILED! Message: {GCResult.Message}");
 
                 // Load service model from local Global Config again:
                 modelResult = GetServiceModel_FromLocalGlobalConfig();

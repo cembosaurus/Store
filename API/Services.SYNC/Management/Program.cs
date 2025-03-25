@@ -1,18 +1,22 @@
-using Business.Data;
-using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
-using Business.Filters.Validation;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
+using Business.Http.Services;
+using Business.Http.Services.Interfaces;
 using Business.Identity.Enums;
-using Business.Inventory.Http.Services;
-using Business.Inventory.Http.Services.Interfaces;
+using Business.Identity.Http.Services;
+using Business.Identity.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
+using Business.Management.Appsettings;
+using Business.Management.Appsettings.Interfaces;
+using Business.Management.Appsettings.Models;
 using Business.Management.Data;
-using Business.Management.DI;
+using Business.Management.Http.Services;
+using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
+using Business.Management.Services.Interfaces;
 using Business.Metrics.DI;
 using Business.Metrics.Http.Services;
 using Business.Metrics.Http.Services.Interfaces;
@@ -20,28 +24,15 @@ using Business.Middlewares;
 using Business.Scheduler.JWT;
 using Business.Scheduler.JWT.Interfaces;
 using Business.Tools;
-using FluentValidation.AspNetCore;
-using Identity.Data.Repositories;
-using Identity.Data.Repositories.Interfaces;
-using Identity.JWT;
-using Identity.JWT.Interfaces;
-using Identity.Middlewares;
-using Identity.Models;
-using Identity.Services;
-using Identity.Services.Interfaces;
+using Management.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Services.Identity.Data;
-using Services.Identity.Data.Repositories;
-using Services.Identity.Data.Repositories.Interfaces;
-using Services.Identity.Models;
 using System.Text;
 
 
 
 
-namespace Identity
+namespace Management
 {
     public class Program
     {
@@ -49,60 +40,49 @@ namespace Identity
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers(opt =>
-            {
-                opt.Filters.Add<ValidationFilter>();
-            });
+            builder.Services.AddControllers();
 
-            builder.Services.AddFluentValidation(conf =>
-            {
-                conf.DisableDataAnnotationsValidation = true;
-                conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);                    // scans for validations in this poroject
-                                                                                                  //conf.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());     // scans for validations in all linked projects or libraries
-                conf.AutomaticValidationEnabled = true;
-            });
-
-            ManagementService_DI.Register(builder);
             MetricsService_DI.Register(builder);
 
+            // builder.Services.AddHostedService<Management_Worker>();
+            // OR:
+            // pass TRUE to enable POST global config to all services at startup:
+            builder.Services.AddHostedService(sp => 
+                new Management_Worker(
+                    sp.GetRequiredService<FileSystemWatcher>(), 
+                    sp.GetRequiredService<IServiceScopeFactory>(), 
+                    sp.GetRequiredService<ConsoleWriter>(), 
+                    false
+                )
+            );
+
+            builder.Services.AddSingleton<Config_Global_DB>();
+            builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
+            builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
+            builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
+            builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+
+            builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
+
             builder.Services.AddSingleton<IExId, ExId>();
-            builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
+            builder.Services.AddSingleton<FileSystemWatcher>();
+            builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
+
             builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
+
+            builder.Services.AddScoped<IHttpManagementService, HttpManagementService>();
+            builder.Services.AddScoped<IHttpIdentityService, HttpIdentityService>();
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            builder.Services.AddDbContext<IdentityContext>();
-            builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
-            builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IIdentityService, IdentityService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IAddressService, AddressService>();
-            builder.Services.AddScoped<IHttpCartService, HttpCartService>();
-            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
             builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
-            builder.Services.AddScoped<IJWT_Provider, JWT_Provider>();
 
-            builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
-
+            builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
 
 
             builder.Services.AddTransient<ConsoleWriter>();
 
 
-
-            builder.Services.AddIdentityCore<AppUser>(opt =>
-            {
-                opt.Password.RequireNonAlphanumeric = false;    // Add more options to customize password complexity.
-                opt.Password.RequireDigit = false;
-                opt.Password.RequireUppercase = false;
-            }).AddRoles<AppRole>()
-              .AddRoleManager<RoleManager<AppRole>>()
-              .AddRoleValidator<RoleValidator<AppRole>>()
-              .AddSignInManager<SignInManager<AppUser>>()
-              .AddEntityFrameworkStores<IdentityContext>();
-
-            // Middleware that authenticate request before hitting controller (endpoint):
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer(opt =>
                             {
@@ -150,8 +130,10 @@ namespace Identity
                 ));
             });
 
-            builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen();
+
+
 
             var app = builder.Build();
 
@@ -159,35 +141,17 @@ namespace Identity
 
             app.UseMiddleware<ErrorHandler_MW>();
 
-            app.UseMiddleware<Identity_DbGuard_MW>();
 
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseCors(opt =>
-            {
-                opt.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-            });
 
-            //app.UseHttpsRedirection();
-
-            // Run authentiction service:
-            app.UseAuthentication();
-
-            app.UseAuthorization();
+            //app.MapGet("/", () => "Zedous !");
 
             app.MapControllers();
-
-            Identity_DbGuard_MW.Migrate_Prep_Seed_DB(app);
-
-            GlobalConfig_Seed.Load(app);
 
             app.Run();
         }

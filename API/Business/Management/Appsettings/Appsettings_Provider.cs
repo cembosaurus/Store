@@ -30,10 +30,6 @@ namespace Business.Management.Appsettings
 
 
 
-        // ------------------------------------------------------------------------------------ READ: ------------------------------------------------------------------------------
-
-
-
         public IServiceResult<Config_Global_AS_MODEL> GetGlobalConfig()
         {
             using (var scope = _serviceFactory.CreateScope())

@@ -1,10 +1,11 @@
-﻿using Business.Inventory.DTOs.Item;
+﻿using API_Gateway.Services.Business.Inventory.Interfaces;
+using Business.Inventory.DTOs.Item;
+using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
-using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Inventory.Controllers.Business
+namespace API_Gateway.Controllers.Business.Inventory
 {
 
     [Authorize]
@@ -15,7 +16,6 @@ namespace Inventory.Controllers.Business
 
         private readonly IItemService _itemService;
 
-
         public ItemController(IItemService itemService)
         {
             _itemService = itemService;
@@ -23,14 +23,9 @@ namespace Inventory.Controllers.Business
 
 
 
-        //[Authorize(Policy = "Everyone")]
-        //[HttpGet("all")]
-        //public async Task<ActionResult<IServiceResult<IEnumerable<ItemReadDTO>>>> GetAllItems()
-        //{
-        //    var result = await _itemService.GetItems();
 
-        //    return Ok(result);  // ctr res
-        //}
+
+
         [Authorize(Policy = "Everyone")]
         [HttpGet("all")]
         public async Task<object> GetAllItems()
@@ -54,7 +49,7 @@ namespace Inventory.Controllers.Business
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpGet("{id}", Name = "GetItemById")]
+        [HttpGet("{id}")]
         public async Task<object> GetItemById(int id)
         {
             var result = await _itemService.GetItemById(id);
@@ -66,13 +61,10 @@ namespace Inventory.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpPost]
-        //public async Task<ActionResult<IServiceResult<ItemReadDTO>>> AddItem([FromBody]ItemCreateDTO itemCreateDTO)
-        public async Task<object> AddItem([FromBody] ItemCreateDTO itemCreateDTO)
+        public async Task<object> AddItem(ItemCreateDTO item)
         {
-            var result = await _itemService.AddItem(itemCreateDTO);
+            var result = await _itemService.AddItem(item);
 
-
-            // return CreatedAtRoute("GetItemById", new { id = result!.Data!.Id }, result);
             return result;  // ctr res
         }
 
@@ -80,9 +72,9 @@ namespace Inventory.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpPut("{id}")]
-        public async Task<object> UpdateItem(int id, ItemUpdateDTO itemUpdateDTO)
+        public async Task<object> UpdateItem(int id, ItemUpdateDTO item)
         {
-            var result = await _itemService.UpdateItem(id, itemUpdateDTO);
+            var result = await _itemService.UpdateItem(id, item);
 
             return result;  // ctr res
         }
@@ -91,12 +83,15 @@ namespace Inventory.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpDelete("{id}")]
-        public async Task<object> DeleteItemById(int id)
+        public async Task<object> DeleteItem(int id)
         {
             var result = await _itemService.DeleteItem(id);
 
             return result;  // ctr res
         }
+
+
+
 
 
     }

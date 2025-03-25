@@ -7,72 +7,138 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Business.Filters.Identity
 {
-    public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
+
+    // AUTHORIZATION filter:
+
+
+    public class ApiKeyAuthAttribute : Attribute, IAsyncAuthorizationFilter
     {
 
-        private string _apiKey;
 
-
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var initResult = Initialize(context);
-
-            if (!initResult.Item1)
-            {
-                context.Result = new UnauthorizedObjectResult(initResult.Item2);
-
-                return;
-            }
-
 
             if (!context.HttpContext.Request.Headers.TryGetValue("x-api-key", out var _secretApiKey))
             {
+                context.Result = new UnauthorizedObjectResult("API Key is missing !");
 
-                if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out var _JWT) && !string.IsNullOrWhiteSpace(_JWT))
-                { 
-                    context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: JWT-token authorization is not permited. Use API-Key instead !");
-                
-                    return;
-                }
-
-                context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: API-Key was not found in the request headers !");
-
-                return;
+                return Task.CompletedTask;
             }
 
 
-            if (!_apiKey.Equals(_secretApiKey))
+            var apiKeyResult = context.HttpContext.RequestServices.GetService<IAppsettings_PROVIDER>()?.GetApiKey();
+
+            if (apiKeyResult is null || !apiKeyResult.Status) 
             {
-                context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: API-Key does NOT match !");
+                context.Result = new NotFoundObjectResult("Server failed to authorize with API Key !");
 
-                return;
+                return Task.CompletedTask;
             }
 
 
-            await next();
+            if (!apiKeyResult!.Data!.Equals(_secretApiKey))
+            {
+                context.Result = new UnauthorizedObjectResult("API-Key does NOT match !");
+
+                return Task.CompletedTask;
+            }
+
+            return Task.CompletedTask;
+
         }
 
 
-        private Tuple<bool, string> Initialize(ActionExecutingContext context)
-        {
-            var appsettingsService = context.HttpContext.RequestServices.GetService<IAppsettings_PROVIDER>();
-
-            if (appsettingsService == null)
-            {
-                return Tuple.Create(false, $"API-Key-Auth Filter: service 'AppsettingsService' was NOT found in Action Context !");
-            }
-
-            var apiKeyResult = appsettingsService.GetApiKey();
-
-
-            if (!apiKeyResult.Status)
-            {
-                return Tuple.Create(false, $"API-Key-Auth Filter: Couldn't get API-Key from AppsettingsService. Reason: '{apiKeyResult.Message}'");
-            }
-
-            _apiKey = apiKeyResult.Data ?? "";
-
-            return Tuple.Create(true, "");
-        }
     }
 }
+
+
+
+
+
+
+//                               * * *   OR:
+
+
+
+// ACTION filter:
+
+
+//using Business.Management.Appsettings.Interfaces;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.AspNetCore.Mvc.Filters;
+//using Microsoft.Extensions.DependencyInjection;
+
+
+
+//namespace Business.Filters.Identity
+//{
+//    public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
+//    {
+
+//        private string _apiKey;
+
+
+//        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+//        {
+//            var initResult = Initialize(context);
+
+//            if (!initResult.Item1)
+//            {
+//                context.Result = new UnauthorizedObjectResult(initResult.Item2);
+
+//                return;
+//            }
+
+
+//            if (!context.HttpContext.Request.Headers.TryGetValue("x-api-key", out var _secretApiKey))
+//            {
+
+//                if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out var _JWT) && !string.IsNullOrWhiteSpace(_JWT))
+//                {
+//                    context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: JWT-token authorization is not permited. Use API-Key instead !");
+
+//                    return;
+//                }
+
+//                context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: API-Key was not found in the request headers !");
+
+//                return;
+//            }
+
+
+//            if (!_apiKey.Equals(_secretApiKey))
+//            {
+//                context.Result = new UnauthorizedObjectResult("API-Key-Auth Filter: API-Key does NOT match !");
+
+//                return;
+//            }
+
+
+//            await next();
+//        }
+
+
+//        private Tuple<bool, string> Initialize(ActionExecutingContext context)
+//        {
+//            var appsettingsService = context.HttpContext.RequestServices.GetService<IAppsettings_PROVIDER>();
+
+//            if (appsettingsService == null)
+//            {
+//                return Tuple.Create(false, $"API-Key-Auth Filter: service 'AppsettingsService' was NOT found in Action Context !");
+//            }
+
+//            var apiKeyResult = appsettingsService.GetApiKey();
+
+
+//            if (!apiKeyResult.Status)
+//            {
+//                return Tuple.Create(false, $"API-Key-Auth Filter: Couldn't get API-Key from AppsettingsService. Reason: '{apiKeyResult.Message}'");
+//            }
+
+//            _apiKey = apiKeyResult.Data ?? "";
+
+//            return Tuple.Create(true, "");
+//        }
+//    }
+//}
+

@@ -223,8 +223,8 @@ namespace Business.Management.Services
         {
             var httpResult = await _httpManagementService.GetGlobalConfig();
 
-            if (!httpResult.Status || httpResult.Data == null)
-                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config was NOT received from Management service ! Reason: {httpResult.Message}");
+            if (httpResult == null || !httpResult.Status || httpResult.Data == null)
+                return _resultFact.Result<Config_Global_AS_MODEL>(null, false, $"Global Config was NOT received from Management service ! Reason: {httpResult?.Message ?? "Null return from HttpManagementService"}");
 
             var result = _mapper.Map<Config_Global_AS_MODEL>(httpResult.Data);
 

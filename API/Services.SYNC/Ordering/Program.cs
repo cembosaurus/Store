@@ -181,7 +181,7 @@ app.UseMiddleware<RequestHandler_MW>();
 
 
 
-app.UseMiddleware<Metrics_MW>();
+//app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
