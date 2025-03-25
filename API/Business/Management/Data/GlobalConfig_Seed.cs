@@ -4,12 +4,19 @@ using Business.Tools;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
+
+
 namespace Business.Management.Data
 {
     public static class GlobalConfig_Seed
     {
         public static async void Load(IApplicationBuilder app)
         {
+            // set FALSE do disable HTTP GET to Management service:
+            bool downloadGC = false;
+
+            if (!downloadGC)
+                return;
 
             using (var scope = app.ApplicationServices.CreateScope())
             {

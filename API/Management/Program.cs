@@ -38,8 +38,17 @@ builder.Services.AddControllers();
 
 MetricsService_DI.Register(builder);
 
-builder.Services.AddHostedService<Management_Worker>();
-
+// builder.Services.AddHostedService<Management_Worker>();
+// OR:
+// pass TRUE to enable POST global config to all services at startup:
+builder.Services.AddHostedService(sp =>
+    new Management_Worker(
+        sp.GetRequiredService<FileSystemWatcher>(),
+        sp.GetRequiredService<IServiceScopeFactory>(),
+        sp.GetRequiredService<ConsoleWriter>(),
+        false
+    )
+);
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
