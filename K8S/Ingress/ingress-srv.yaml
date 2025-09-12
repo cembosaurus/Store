@@ -59,6 +59,20 @@ spec:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
+      - path: /api/management
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
+      - path: /api/metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service-clusterip-srv
+            port:
+              number: 80
       # - path: /api/identity
       #   pathType: Prefix
       #   backend:

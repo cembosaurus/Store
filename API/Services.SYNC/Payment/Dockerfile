@@ -6,14 +6,14 @@ ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["API/Services/Payment/Payment.csproj", "Services/Payment/"]
+COPY ["API/Services.SYNC/Payment/Payment.csproj", "Services.SYNC/Payment/"]
 COPY ["API/Business/Business.csproj", "Business/"]
-RUN dotnet restore "Services/Payment/Payment.csproj"
+RUN dotnet restore "Services.SYNC/Payment/Payment.csproj"
 COPY . .
-RUN dotnet build "API/Services/Payment/Payment.csproj" -c Release -o /app/build
+RUN dotnet build "API/Services.SYNC/Payment/Payment.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "API/Services/Payment/Payment.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "API/Services.SYNC/Payment/Payment.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

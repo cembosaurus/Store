@@ -6,14 +6,14 @@ ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["API/Inventory.Consumer/Inventory.Consumer.csproj", "Inventory.Consumer/"]
+COPY ["API/Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/Inventory.Consumer.csproj", "Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/"]
 COPY ["API/Business/Business.csproj", "Business/"]
-RUN dotnet restore "Inventory.Consumer/Inventory.Consumer.csproj"
+RUN dotnet restore "Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/Inventory.Consumer.csproj"
 COPY . .
-RUN dotnet build "API/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/build
+RUN dotnet build "API/Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "API/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "API/Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/Inventory.Consumer.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
