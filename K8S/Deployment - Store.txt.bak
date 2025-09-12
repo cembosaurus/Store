@@ -44,7 +44,6 @@ docker push cembo/store_inventory_amqp_consumer
 
 
 
-
 ----------------------- KUBERNETES --------------------------------
 
 ----------- DB:

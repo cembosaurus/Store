@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-mssql-depl
+  labels:
+    app: metrics-mssql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-mssql
+  template:
+    metadata:
+      labels:
+        app: metrics-mssql
+    spec:
+      containers:
+        - name: metrics-mssql
+          image: mcr.microsoft.com/mssql/server:2017-latest
+          ports:
+            - containerPort: 1433
+          env:
+          - name: MSSQL_PID
+            value: "Express"
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: SA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: metrics-mssql
+                key: SA_PASSWORD
+          volumeMounts:
+          - mountPath: /var/opt/mssql/data
+            name: metrics-mssqldb
+      volumes:
+      - name: metrics-mssqldb
+        persistentVolumeClaim:
+          claimName: metrics-mssql-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-mssql-clusterip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: metrics-mssql
+  ports:
+  - name: metrics-mssql
+    protocol: TCP
+    port: 1002
+    targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-mssql-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: metrics-mssql
+  ports:
+  - protocol: TCP
+    port: 1002
+    targetPort: 1433
