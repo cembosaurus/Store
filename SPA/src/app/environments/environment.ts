@@ -4,13 +4,13 @@
 
 export const environment = {
     production: false,
-    gatewayUrl: 'http://localhost:5000/',
-    IdentityServiceUrl: "http://localhost:6000/",
-    InventoryServiceUrl: "http://localhost:7000/",
-    OrderingServiceUrl: "http://localhost:8000/",
-    PaymentServiceUrl: "http://localhost:10000/",
-    SchedulerServiceUrl: "http://localhost:20000/",
-    staticContentUrl: 'http://localhost:4000/'
+    gatewayUrl: 'http://localhost:2000/',
+    IdentityServiceUrl: "http://localhost:2100/",
+    InventoryServiceUrl: "http://localhost:2200/",
+    OrderingServiceUrl: "http://localhost:2300/",
+    PaymentServiceUrl: "http://localhost:2400/",
+    SchedulerServiceUrl: "http://localhost:2500/",
+    staticContentUrl: 'http://localhost:2600/'
   };
   
   /*
