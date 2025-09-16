@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-static-content
+      app: static-content
       version: v01
   template:
     metadata:
       labels:
-        app: store-static-content
+        app: static-content
         version: v01
     spec:
       containers:
-        - name: store-static-content
+        - name: static-content
           image: cembo/store_static_content:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-static-content
+    app: static-content
   ports:
-    - name: store-static-content
+    - name: static-content
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: static-content-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: static-content
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30006

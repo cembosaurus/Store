@@ -1,6 +1,5 @@
 ﻿using API_Gateway.Services.Business.Inventory.Interfaces;
 using Business.Inventory.DTOs.Item;
-using Business.Libraries.ServiceResult.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

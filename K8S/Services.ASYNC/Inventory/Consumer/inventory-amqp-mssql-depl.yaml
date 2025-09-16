@@ -48,7 +48,7 @@ spec:
   ports:
   - name: inventory-amqp-mssql
     protocol: TCP
-    port: 1012
+    port: 1433
     targetPort: 1433
 ---
 apiVersion: v1
@@ -61,5 +61,5 @@ spec:
     app: inventory-amqp-mssql
   ports:
   - protocol: TCP
-    port: 1012
+    port: 1433
     targetPort: 1433

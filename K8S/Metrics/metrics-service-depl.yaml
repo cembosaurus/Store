@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-metrics
+      app: metrics
       version: v01
   template:
     metadata:
       labels:
-        app: store-metrics
+        app: metrics
         version: v01
     spec:
       containers:
-        - name: store-metrics
+        - name: metrics
           image: cembo/store_metrics:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-metrics
+    app: metrics
   ports:
-    - name: store-metrics
+    - name: metrics
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: metrics
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30008
