@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-inventory
+      app: inventory
       version: v01
   template:
     metadata:
       labels:
-        app: store-inventory
+        app: inventory
         version: v01
     spec:
       containers:
-        - name: store-inventory
+        - name: inventory
           image: cembo/store_inventory:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-inventory
+    app: inventory
   ports:
-    - name: store-inventory
+    - name: inventory
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: inventory
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30002

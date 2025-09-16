@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-api-gateway
+      app: api-gateway
       version: v01
   template:
     metadata:
       labels:
-        app: store-api-gateway
+        app: api-gateway
         version: v01
     spec:
       containers:
-        - name: store-api-gateway
+        - name: api-gateway
           image: cembo/store_api_gateway:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-api-gateway
+    app: api-gateway
   ports:
-    - name: store-api-gateway
+    - name: api-gateway
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: api-gateway
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30000

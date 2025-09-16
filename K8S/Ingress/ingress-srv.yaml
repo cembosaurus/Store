@@ -10,84 +10,84 @@ spec:
   - host: store.com
     http:
       paths:
-      - path: /api/identity
+      - path: /identity
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/user
+      - path: /user
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/item
+      - path: /item
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/catalogueitem
+      - path: /catalogueitem
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/itemprice
+      - path: /itemprice
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/cart
+      - path: /cart
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/order
+      - path: /order
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/management
+      - path: /management
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      - path: /api/metrics
+      - path: /metrics
         pathType: Prefix
         backend:
           service:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      # - path: /api/identity
+      # - path: /identity
       #   pathType: Prefix
       #   backend:
       #     service:
       #       name: identity-service-clusterip-srv
       #       port:
       #         number: 80
-      # - path: /api/address
+      # - path: /address
       #   pathType: Prefix
       #   backend:
       #     service:
       #       name: identity-service-clusterip-srv
       #       port:
       #         number: 80
-      # - path: /api/user
+      # - path: /user
       #   pathType: Prefix
       #   backend:
       #     service:

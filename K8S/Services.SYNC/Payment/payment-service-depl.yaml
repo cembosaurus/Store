@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-payment
+      app: payment
       version: v01
   template:
     metadata:
       labels:
-        app: store-payment
+        app: payment
         version: v01
     spec:
       containers:
-        - name: store-payment
+        - name: payment
           image: cembo/store_payment:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-payment
+    app: payment
   ports:
-    - name: store-payment
+    - name: payment
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: payment
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30004

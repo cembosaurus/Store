@@ -6,16 +6,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: store-inventory-amqp-publisher
+      app: inventory-amqp-publisher
       version: v01
   template:
     metadata:
       labels:
-        app: store-inventory-amqp-publisher
+        app: inventory-amqp-publisher
         version: v01
     spec:
       containers:
-        - name: store-inventory-amqp-publisher
+        - name: inventory-amqp-publisher
           image: cembo/store_inventory_amqp_publisher:latest
           ports:
             - containerPort: 80
@@ -29,9 +29,26 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: store-inventory-amqp-publisher
+    app: inventory-amqp-publisher
   ports:
-    - name: store-inventory-amqp-publisher
+    - name: inventory-amqp-publisher
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+
+# development - optional - for direct access
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-amqp-publisher-nodeport-srv
+spec:
+  type: NodePort
+  selector:
+    app: inventory-amqp-publisher
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30091
