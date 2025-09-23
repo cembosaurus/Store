@@ -1,4 +1,4 @@
-In Progrtess.
+In Progress.
 
 To Do: 
 - implement distributed logging (API_Gateway is in progress)
