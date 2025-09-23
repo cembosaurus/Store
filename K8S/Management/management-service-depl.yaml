@@ -25,7 +25,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: management-service-clusterip-srv
+  name: management-clusterip-srv
 spec:
   type: ClusterIP
   selector:

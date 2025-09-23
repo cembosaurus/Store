@@ -25,7 +25,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: static-content-service-clusterip-srv
+  name: static-content-clusterip-srv
 spec:
   type: ClusterIP
   selector:

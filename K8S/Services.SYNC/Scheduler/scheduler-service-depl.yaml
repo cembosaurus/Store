@@ -25,7 +25,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: scheduler-service-clusterip-srv
+  name: scheduler-clusterip-srv
 spec:
   type: ClusterIP
   selector:

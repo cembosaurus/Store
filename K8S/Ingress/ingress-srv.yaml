@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: ingress-srv
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
+  ingressClassName: nginx
   rules:
   - host: store.com
     http:
@@ -14,63 +14,63 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /user
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /item
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /catalogueitem
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /itemprice
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /cart
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /order
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /management
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       - path: /metrics
         pathType: Prefix
         backend:
           service:
-            name: api-gateway-service-clusterip-srv
+            name: api-gateway-clusterip-srv
             port:
               number: 80
       # Seq Logging UI
