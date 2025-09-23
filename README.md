@@ -1,3 +1,33 @@
+Services:
+
+- API Gateway
+- Identity
+- Inventory
+- Inventory (RabbitMQ)
+- Management
+- Metrics
+- Ordering
+- Payment
+- Scheduler
+- Static Content
+
+
+  Kubernetes:
+  
+  - services deployemnts
+  - Ingress
+  - Logging
+  - Secrets
+  - Cluster IP
+  - Node Ports (for dev)
+  - Horiozntal Scaling
+  - Load Balancing
+  - DBs
+  - Volumes
+
+
+*****************************************************************************************************************************************************************
+
 In Progress.
 
 To Do: 
