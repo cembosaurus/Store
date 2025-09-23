@@ -31,6 +31,7 @@ using Business.Scheduler.JWT.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 
 
@@ -80,6 +81,19 @@ builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHa
 builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
 builder.Services.AddTransient<ConsoleWriter>();
+
+
+// ---------------  Configure Serilog ---------------------------------
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", System.AppDomain.CurrentDomain.FriendlyName) // tag service
+    .WriteTo.Console()
+    .WriteTo.Seq("http://seq-logging-clusterip-srv:5341") // central Seq service deployed in K8. Console logg used in dev.
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// --------------------------------------------------------------------
 
 
 // Middleware that authenticate request before hitting controller (endpoint):
@@ -162,6 +176,8 @@ var app = builder.Build();
 app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
+
+app.UseMiddleware<Logging_MW>();
 
 
 if (app.Environment.IsDevelopment())

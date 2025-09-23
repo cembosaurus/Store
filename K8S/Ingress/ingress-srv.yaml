@@ -73,24 +73,19 @@ spec:
             name: api-gateway-service-clusterip-srv
             port:
               number: 80
-      # - path: /identity
+      # Seq Logging UI
+      - path: /logging
+        pathType: Prefix
+        backend:
+          service:
+            name: seq-logging-clusterip-srv
+            port:
+              number: 80
+      # # Seq Ingestion API
+      # - path: /ingest
       #   pathType: Prefix
       #   backend:
       #     service:
-      #       name: identity-service-clusterip-srv
+      #       name: seq-logging-clusterip-srv
       #       port:
-      #         number: 80
-      # - path: /address
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: identity-service-clusterip-srv
-      #       port:
-      #         number: 80
-      # - path: /user
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: identity-service-clusterip-srv
-      #       port:
-      #         number: 80
+      #         number: 5341

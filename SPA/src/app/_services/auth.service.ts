@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  url = environment.gatewayUrl + 'identity/';
+  url = environment.ApiGatewayUrl + 'identity/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   user: User = { id: 0, name: "", password: ""};

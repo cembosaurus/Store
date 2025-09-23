@@ -271,11 +271,13 @@ kubectl create secret generic metrics-mssql --from-literal=SA_PASSWORD="pa55w0rd
 kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
 kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
 kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
+kubectl create secret generic seq-admin-secret --from-literal=SEQ_FIRSTRUN_ADMINPASSWORD='pa55w0rd!'
 kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
 kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
 kubectl apply -f k8s/metrics/metrics-pvc.yaml
 kubectl apply -f k8s/services.sync/ordering/ordering-pvc.yaml
 kubectl apply -f k8s/services.sync/scheduler/scheduler-pvc.yaml
+kubectl apply -f k8s/Logging/seq-logging-pvc.yaml
 kubectl apply -f k8s/services.sync/identity/identity-mssql-depl.yaml
 kubectl apply -f k8s/services.sync/inventory/inventory-mssql-depl.yaml
 kubectl apply -f k8s/metrics/metrics-mssql-depl.yaml
@@ -294,7 +296,9 @@ kubectl apply -f k8s/services.sync/scheduler/scheduler-service-depl.yaml
 kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.yaml
 kubectl apply -f k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
 kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
+kubectl apply -f k8s/Logging/seq-logging-service-depl.yaml
 kubectl get pods
+kubectl get services
 
 ---
 
@@ -344,17 +348,23 @@ kubectl delete pvc inventory-mssql-claim
 kubectl delete pvc metrics-mssql-claim
 kubectl delete pvc ordering-mssql-claim
 kubectl delete pvc scheduler-mssql-claim
+kubectl delete pvc seq-pvc
 kubectl delete secret identity-mssql
 kubectl delete secret inventory-mssql
 kubectl delete secret metrics-mssql
 kubectl delete secret ordering-mssql
 kubectl delete secret scheduler-mssql
+kubectl delete secret seq-admin-secret
 kubectl delete deployment inventory-amqp-mssql-depl
 kubectl delete service inventory-amqp-mssql-clusterip-srv
 kubectl delete service inventory-amqp-mssql-loadbalancer
 kubectl delete pvc inventory-amqp-mssql-claim
 kubectl delete secret inventory-amqp-mssql
+kubectl delete deployment seq-logging-depl
+kubectl delete service seq-logging-clusterip-srv
+kubectl delete service seq-logging-nodeport-srv
 kubectl get pods
+kubectl get services
 
 ---
 

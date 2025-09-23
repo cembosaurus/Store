@@ -18,7 +18,7 @@ import { CartItemUpdateDTO } from 'src/app/_models/CartItemUpdateDTO';
 })
 export class ItemsAlbumComponent implements OnInit {
 
-  _photosURL = environment.gatewayUrl + 'photos/';
+  _photosURL = environment.ApiGatewayUrl + 'photos/';
   _catalogueItems: CatalogueItem[] | undefined;
   _selectedItems: CartItemUpdateDTO[] = new Array<CartItemUpdateDTO>;
 

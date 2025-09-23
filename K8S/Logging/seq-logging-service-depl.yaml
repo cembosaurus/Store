@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seq-logging-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seq-logging
+  template:
+    metadata:
+      labels:
+        app: seq-logging
+    spec:
+      containers:
+      - name: seq-logging
+        image: datalust/seq:latest
+        ports:
+        - containerPort: 80      # UI
+        - containerPort: 5341    # ingestion API
+        env:
+        - name: SEQ_FIRSTRUN_ADMINPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seq-admin-secret
+              key: SEQ_FIRSTRUN_ADMINPASSWORD
+        - name: ACCEPT_EULA
+          value: "Y"
+        volumeMounts:
+        - name: seq-data
+          mountPath: /data
+      volumes:
+      - name: seq-data
+        persistentVolumeClaim:
+          claimName: seq-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: seq-logging-clusterip-srv
+spec:
+  type: ClusterIP   # internal only
+  selector:
+    app: seq-logging
+  ports:
+    - name: ingestion
+      port: 5341        # cluster port
+      targetPort: 5341  # container port
+    - name: ui
+      port: 80          # cluster port for UI
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seq-logging-nodeport-srv
+spec:
+  type: NodePort   # Still available externally via nodeIP:30010 if needed
+  selector:
+    app: seq-logging
+  ports:
+    - name: ui
+      port: 80         # Internal cluster service port for UI
+      targetPort: 80   # Container port
+      nodePort: 30010  # Optional external NodePort for UI
+    - name: ingestion
+      port: 5341       # Internal cluster service port for ingestion
+      targetPort: 5341 # Container port
+      # nodePort omitted → keeps ingestion internal
