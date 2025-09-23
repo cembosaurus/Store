@@ -9,4 +9,4 @@ To Do:
 - implement Payment and Metrics API services
 - upgrade old code in RabbitMQ
 - finish the integration tests
-- pagging
+- paging
