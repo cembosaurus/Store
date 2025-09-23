@@ -13,10 +13,12 @@ namespace API_Gateway.Controllers.Business.Inventory
     {
 
         private readonly IItemService _itemService;
+        private readonly ILogger<ItemController> _logger;
 
-        public ItemController(IItemService itemService)
+        public ItemController(IItemService itemService, ILogger<ItemController> logger)
         {
             _itemService = itemService;
+            _logger = logger;
         }
 
 
@@ -28,7 +30,16 @@ namespace API_Gateway.Controllers.Business.Inventory
         [HttpGet("all")]
         public async Task<object> GetAllItems()
         {
+
+
+            _logger.LogInformation("-----> Start fetching all items from inventory.");
+
+
             var result = await _itemService.GetItems();
+
+
+
+            _logger.LogInformation($"----> ITEMS count: {result.Data.Count()}");
 
             return result;  // ctr res
         }

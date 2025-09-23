@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
 export class ItemsService {
 
   _APIServiceResult: APIServiceResult | undefined;
-  _itemsURL = environment.gatewayUrl + 'CatalogueItem/all/';
+  _itemsURL = environment.ApiGatewayUrl + 'CatalogueItem/all/';
   
 
   constructor(private http: HttpClient, private authService: AuthService) { }
