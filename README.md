@@ -12,7 +12,7 @@ Services:
 - Static Content
 
 
-  Kubernetes:
+Kubernetes:
   
   - services deployemnts
   - Ingress
