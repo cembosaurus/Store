@@ -156,20 +156,20 @@ kubectl delete deployment inventory-amqp-consumer-service-depl
 
 HTTP:
 
-kubectl delete service api-gateway-service-clusterip-srv
-kubectl delete service identity-service-clusterip-srv
-kubectl delete service inventory-service-clusterip-srv
-kubectl delete service management-service-clusterip-srv
-kubectl delete service metrics-service-clusterip-srv
-kubectl delete service ordering-service-clusterip-srv
-kubectl delete service payment-service-clusterip-srv
-kubectl delete service scheduler-service-clusterip-srv
-kubectl delete service static-content-service-clusterip-srv
+kubectl delete service api-gateway-clusterip-srv
+kubectl delete service identity-clusterip-srv
+kubectl delete service inventory-clusterip-srv
+kubectl delete service management-clusterip-srv
+kubectl delete service metrics-clusterip-srv
+kubectl delete service ordering-clusterip-srv
+kubectl delete service payment-clusterip-srv
+kubectl delete service scheduler-clusterip-srv
+kubectl delete service static-content-clusterip-srv
 
 AMQP:
 
-kubectl delete service inventory-amqp-publisher-service-clusterip-srv
-kubectl delete service inventory-amqp-consumer-service-clusterip-srv
+kubectl delete service inventory-amqp-publisher-clusterip-srv
+kubectl delete service inventory-amqp-consumer-clusterip-srv
 
 ----------- DB:
 
@@ -297,6 +297,15 @@ kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.ya
 kubectl apply -f k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
 kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
 kubectl apply -f k8s/Logging/seq-logging-service-depl.yaml
+kubectl apply -f k8s/api_gateway/api-gateway-hpa.yaml
+kubectl apply -f k8s/management/management-hpa.yaml
+kubectl apply -f k8s/metrics/metrics-hpa.yaml
+kubectl apply -f k8s/services.sync/identity/identity-hpa.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-hpa.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-hpa.yaml
+kubectl apply -f k8s/services.sync/payment/payment-hpa.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-hpa.yaml
+kubectl apply -f k8s/services.sync/static-content/static-content-hpa.yaml
 kubectl get pods
 kubectl get services
 
@@ -305,7 +314,14 @@ kubectl get services
 
 DELETE:
 
-
+kubectl delete ingress ingress-srv
+kubectl delete secret identity-mssql
+kubectl delete secret inventory-mssql
+kubectl delete secret metrics-mssql
+kubectl delete secret ordering-mssql
+kubectl delete secret scheduler-mssql
+kubectl delete secret inventory-amqp-mssql
+kubectl delete secret seq-admin-secret
 kubectl delete deployment api-gateway-service-depl
 kubectl delete deployment identity-service-depl
 kubectl delete deployment inventory-service-depl
@@ -317,37 +333,57 @@ kubectl delete deployment scheduler-service-depl
 kubectl delete deployment static-content-service-depl
 kubectl delete deployment inventory-amqp-publisher-service-depl
 kubectl delete deployment inventory-amqp-consumer-service-depl
-kubectl delete service api-gateway-service-clusterip-srv
-kubectl delete service identity-service-clusterip-srv
-kubectl delete service inventory-service-clusterip-srv
-kubectl delete service management-service-clusterip-srv
-kubectl delete service metrics-service-clusterip-srv
-kubectl delete service ordering-service-clusterip-srv
-kubectl delete service payment-service-clusterip-srv
-kubectl delete service scheduler-service-clusterip-srv
-kubectl delete service static-content-service-clusterip-srv
-kubectl delete service inventory-amqp-publisher-service-clusterip-srv
-kubectl delete service inventory-amqp-consumer-service-clusterip-srv
 kubectl delete deployment identity-mssql-depl
 kubectl delete deployment inventory-mssql-depl
 kubectl delete deployment metrics-mssql-depl
 kubectl delete deployment ordering-mssql-depl
 kubectl delete deployment scheduler-mssql-depl
+kubectl delete deployment inventory-amqp-mssql-depl
+kubectl delete deployment seq-logging-depl
+kubectl delete service api-gateway-clusterip-srv
+kubectl delete service identity-clusterip-srv
+kubectl delete service inventory-clusterip-srv
+kubectl delete service management-clusterip-srv
+kubectl delete service metrics-clusterip-srv
+kubectl delete service ordering-clusterip-srv
+kubectl delete service payment-clusterip-srv
+kubectl delete service scheduler-clusterip-srv
+kubectl delete service static-content-clusterip-srv
+kubectl delete service inventory-amqp-publisher-clusterip-srv
+kubectl delete service inventory-amqp-consumer-clusterip-srv
 kubectl delete service identity-mssql-clusterip-srv
 kubectl delete service inventory-mssql-clusterip-srv
 kubectl delete service metrics-mssql-clusterip-srv
 kubectl delete service ordering-mssql-clusterip-srv
 kubectl delete service scheduler-mssql-clusterip-srv
+kubectl delete service inventory-amqp-mssql-clusterip-srv
+kubectl delete service seq-logging-clusterip-srv
 kubectl delete service identity-mssql-loadbalancer 
 kubectl delete service inventory-mssql-loadbalancer
 kubectl delete service metrics-mssql-loadbalancer
 kubectl delete service ordering-mssql-loadbalancer 
 kubectl delete service scheduler-mssql-loadbalancer 
+kubectl delete service inventory-amqp-mssql-loadbalancer
+kubectl delete service inventory-amqp-mssql-loadbalancer
+kubectl delete service api-gateway-nodeport-srv
+kubectl delete service management-nodeport-srv
+kubectl delete service metrics-nodeport-srv
+kubectl delete service identity-nodeport-srv
+kubectl delete service inventory-nodeport-srv
+kubectl delete service inventory-amqp-consumer-nodeport-srv
+kubectl delete service inventory-amqp-publisher-nodeport-srv
+kubectl delete service rabbitmq-nodeport-srv
+kubectl delete service ordering-nodeport-srv
+kubectl delete service payment-nodeport-srv
+kubectl delete service scheduler-nodeport-srv
+kubectl delete service static-content-nodeport-srv
+kubectl delete service seq-logging-nodeport-srv
 kubectl delete pvc identity-mssql-claim
 kubectl delete pvc inventory-mssql-claim
 kubectl delete pvc metrics-mssql-claim
 kubectl delete pvc ordering-mssql-claim
 kubectl delete pvc scheduler-mssql-claim
+kubectl delete pvc inventory-amqp-mssql-claim
 kubectl delete pvc seq-pvc
 kubectl delete secret identity-mssql
 kubectl delete secret inventory-mssql
@@ -355,14 +391,16 @@ kubectl delete secret metrics-mssql
 kubectl delete secret ordering-mssql
 kubectl delete secret scheduler-mssql
 kubectl delete secret seq-admin-secret
-kubectl delete deployment inventory-amqp-mssql-depl
-kubectl delete service inventory-amqp-mssql-clusterip-srv
-kubectl delete service inventory-amqp-mssql-loadbalancer
-kubectl delete pvc inventory-amqp-mssql-claim
 kubectl delete secret inventory-amqp-mssql
-kubectl delete deployment seq-logging-depl
-kubectl delete service seq-logging-clusterip-srv
-kubectl delete service seq-logging-nodeport-srv
+kubectl delete hpa api-gateway-hpa
+kubectl delete hpa management-hpa
+kubectl delete hpa metrics-hpa
+kubectl delete hpa identity-hpa
+kubectl delete hpa inventory-hpa
+kubectl delete hpa ordering-hpa
+kubectl delete hpa payment-hpa
+kubectl delete hpa scheduler-hpa
+kubectl delete hpa static-content-hpa
 kubectl get pods
 kubectl get services
 

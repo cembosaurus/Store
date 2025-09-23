@@ -152,20 +152,20 @@ kubectl delete deployment inventory-amqp-consumer-service-depl
 
 HTTP:
 
-kubectl delete service api-gateway-service-clusterip-srv
-kubectl delete service identity-service-clusterip-srv
-kubectl delete service inventory-service-clusterip-srv
-kubectl delete service management-service-clusterip-srv
-kubectl delete service metrics-service-clusterip-srv
-kubectl delete service ordering-service-clusterip-srv
-kubectl delete service payment-service-clusterip-srv
-kubectl delete service scheduler-service-clusterip-srv
-kubectl delete service static-content-service-clusterip-srv
+kubectl delete service api-gateway-clusterip-srv
+kubectl delete service identity-clusterip-srv
+kubectl delete service inventory-clusterip-srv
+kubectl delete service management-clusterip-srv
+kubectl delete service metrics-clusterip-srv
+kubectl delete service ordering-clusterip-srv
+kubectl delete service payment-clusterip-srv
+kubectl delete service scheduler-clusterip-srv
+kubectl delete service static-content-clusterip-srv
 
 AMQP:
 
-kubectl delete service inventory-amqp-publisher-service-clusterip-srv
-kubectl delete service inventory-amqp-consumer-service-clusterip-srv
+kubectl delete service inventory-amqp-publisher-clusterip-srv
+kubectl delete service inventory-amqp-consumer-clusterip-srv
 
 ----------- DB:
 
@@ -302,17 +302,17 @@ kubectl delete deployment scheduler-service-depl
 kubectl delete deployment static-content-service-depl
 kubectl delete deployment inventory-amqp-publisher-service-depl
 kubectl delete deployment inventory-amqp-consumer-service-depl
-kubectl delete service api-gateway-service-clusterip-srv
-kubectl delete service identity-service-clusterip-srv
-kubectl delete service inventory-service-clusterip-srv
-kubectl delete service management-service-clusterip-srv
-kubectl delete service metrics-service-clusterip-srv
-kubectl delete service ordering-service-clusterip-srv
-kubectl delete service payment-service-clusterip-srv
-kubectl delete service scheduler-service-clusterip-srv
-kubectl delete service static-content-service-clusterip-srv
-kubectl delete service inventory-amqp-publisher-service-clusterip-srv
-kubectl delete service inventory-amqp-consumer-service-clusterip-srv
+kubectl delete service api-gateway-clusterip-srv
+kubectl delete service identity-clusterip-srv
+kubectl delete service inventory-clusterip-srv
+kubectl delete service management-clusterip-srv
+kubectl delete service metrics-clusterip-srv
+kubectl delete service ordering-clusterip-srv
+kubectl delete service payment-clusterip-srv
+kubectl delete service scheduler-clusterip-srv
+kubectl delete service static-content-clusterip-srv
+kubectl delete service inventory-amqp-publisher-clusterip-srv
+kubectl delete service inventory-amqp-consumer-clusterip-srv
 kubectl delete deployment identity-mssql-depl
 kubectl delete deployment inventory-mssql-depl
 kubectl delete deployment metrics-mssql-depl

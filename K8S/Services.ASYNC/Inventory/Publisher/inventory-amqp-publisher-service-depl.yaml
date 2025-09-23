@@ -25,7 +25,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: inventory-amqp-publisher-service-clusterip-srv
+  name: inventory-amqp-publisher-clusterip-srv
 spec:
   type: ClusterIP
   selector:
