@@ -34,6 +34,7 @@ To Do:
 - implement distributed logging (API_Gateway is in progress)
 - finish error handling
 - inspect DI scopes - replace scoped by stateless singletons if possible (to improve performance)
+- replace temporary 'anyone' authorization policy in controllers used for dev by actual ones
 - remove service result return type from methods
 - replace non exception error handling by exceptions in placxes that need to shortcut the http requests
 - improve the design so the HttpBaseService doesn't need to overload constructor to to prevent circulatory DI: HTTPManagementService <--> GlobalConfig_PROVIDER
