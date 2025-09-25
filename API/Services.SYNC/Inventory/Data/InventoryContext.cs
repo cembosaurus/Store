@@ -6,14 +6,8 @@ namespace Services.Inventory.Data
     public class InventoryContext: DbContext
     {
 
-        private readonly IConfiguration _conf;
-        private readonly bool _isProdEnv;
-
-
-        public InventoryContext(DbContextOptions<InventoryContext> opt, IConfiguration conf, IWebHostEnvironment env) : base(opt)
+        public InventoryContext(DbContextOptions<InventoryContext> opt) : base(opt)
         {
-            _conf = conf;
-            _isProdEnv = env.IsProduction();
         }
 
         public DbSet<Item> Items { get; set; }
@@ -22,12 +16,6 @@ namespace Services.Inventory.Data
         public DbSet<AccessoryItem> Accessories { get; set; }
         public DbSet<SimilarProductItem> SimilarProducts { get; set; }
 
-
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_conf.GetSection($"Config.Local:ConnectionStrings:InventoryConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure());
-        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
