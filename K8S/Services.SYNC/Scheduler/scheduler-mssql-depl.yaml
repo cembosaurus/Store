@@ -27,7 +27,7 @@ spec:
           - name: SA_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: scheduler-mssql
+                name: db-secrets
                 key: SA_PASSWORD
           volumeMounts:
           - mountPath: /var/opt/mssql/data

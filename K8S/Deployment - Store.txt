@@ -1,230 +1,9 @@
-
-
------------------------ DOCKER --------------------------------
-
------------ Build and Push:
-
-
-// run from ROOT 'Store' folder:
-
-HTTP:
-
-docker build -t cembo/store_api_gateway -f api/api_gateway/Dockerfile .
-docker push cembo/store_api_gateway
-
-docker build -t cembo/store_identity -f api/Services.SYNC/identity/Dockerfile .
-docker push cembo/store_identity
-
-docker build -t cembo/store_inventory -f api/Services.SYNC/inventory/Dockerfile .
-docker push cembo/store_inventory
-
-docker build -t cembo/store_management -f api/management/Dockerfile .
-docker push cembo/store_management
-
-docker build -t cembo/store_metrics -f api/metrics/Dockerfile .
-docker push cembo/store_metrics
-
-docker build -t cembo/store_ordering -f api/Services.SYNC/ordering/Dockerfile .
-docker push cembo/store_ordering
-
-docker build -t cembo/store_payment -f api/Services.SYNC/payment/Dockerfile .
-docker push cembo/store_payment
-
-docker build -t cembo/store_scheduler -f api/Services.SYNC/scheduler/Dockerfile .
-docker push cembo/store_scheduler
-
-docker build -t cembo/store_static_content -f api/Services.SYNC/staticcontent/Dockerfile .
-docker push cembo/store_static_content
-
-AMQP:
-
-docker build -t cembo/store_inventory_amqp_publisher -f api/Services.ASYNC/Inventory/AMQP/Client/Inventory.Publisher/Dockerfile .
-docker push cembo/store_inventory_amqp_publisher
-
-docker build -t cembo/store_inventory_amqp_consumer -f api/Services.ASYNC/Inventory/AMQP/Server/Inventory.Consumer/Dockerfile .
-docker push cembo/store_inventory_amqp_consumer
-
-
-
-
------------------------ KUBERNETES --------------------------------
-
------------ DB:
-
-
-HTTP:
-
-kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic metrics-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-
-kubectl apply -f identity-pvc.yaml
-kubectl apply -f inventory-pvc.yaml
-kubectl apply -f metrics-pvc.yaml
-kubectl apply -f ordering-pvc.yaml
-kubectl apply -f scheduler-pvc.yaml
-
-kubectl apply -f identity-mssql-depl.yaml
-kubectl apply -f inventory-mssql-depl.yaml
-kubectl apply -f metrics-mssql-depl.yaml
-kubectl apply -f ordering-mssql-depl.yaml
-kubectl apply -f scheduler-mssql-depl.yaml
-
-
-AMQP:
-
-kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-
-kubectl apply -f inventory-amqp-pvc.yaml
-
-kubectl apply -f inventory-amqp-mssql-depl.yaml
-
-
-
-DB USER:
-
-RUN: SQL script 'create-db-user.sql' for all DBs to create 'testUser':
-
-DB LogIns:
-
-HTTP:
-
-- identity-mssql-clusterip-srv, port: 1001
-- inventory-mssql-clusterip-srv, port: 1002
-- ordering-mssql-clusterip-srv, port: 1003
-- scheduler-mssql-clusterip-srv, port: 1004
-- metrics-mssql-clusterip-srv, port: 1005
-
-AMQP:
-
-- inventory-amqp-mssql-clusterip-srv, port: 1012
-
-
-
------------ SERVICES:
-
-HTTP:
-
-kubectl apply -f api-gateway-service-depl.yaml
-kubectl apply -f identity-service-depl.yaml
-kubectl apply -f inventory-service-depl.yaml
-kubectl apply -f management-service-depl.yaml
-kubectl apply -f metrics-service-depl.yaml
-kubectl apply -f ordering-service-depl.yaml
-kubectl apply -f payment-service-depl.yaml
-kubectl apply -f scheduler-service-depl.yaml
-kubectl apply -f static-content-service-depl.yaml
-
-AMQP:
-kubectl apply -f inventory-amqp-publisher-service-depl.yaml
-kubectl apply -f inventory-amqp-consumer-service-depl.yaml
-
-
-
----------------------------------------------------------------
----------------------------------------------------------------
-
-
-
-
-
-
------------------------ DELETE --------------------------------
-
-
------------ SERVICES:
-
-HTTP:
-
-kubectl delete deployment api-gateway-service-depl
-kubectl delete deployment identity-service-depl
-kubectl delete deployment inventory-service-depl
-kubectl delete deployment management-service-depl
-kubectl delete deployment metrics-service-depl
-kubectl delete deployment ordering-service-depl
-kubectl delete deployment payment-service-depl
-kubectl delete deployment scheduler-service-depl
-kubectl delete deployment static-content-service-depl
-
-AMQP:
-
-kubectl delete deployment inventory-amqp-publisher-service-depl
-kubectl delete deployment inventory-amqp-consumer-service-depl
-
-
-HTTP:
-
-kubectl delete service api-gateway-clusterip-srv
-kubectl delete service identity-clusterip-srv
-kubectl delete service inventory-clusterip-srv
-kubectl delete service management-clusterip-srv
-kubectl delete service metrics-clusterip-srv
-kubectl delete service ordering-clusterip-srv
-kubectl delete service payment-clusterip-srv
-kubectl delete service scheduler-clusterip-srv
-kubectl delete service static-content-clusterip-srv
-
-AMQP:
-
-kubectl delete service inventory-amqp-publisher-clusterip-srv
-kubectl delete service inventory-amqp-consumer-clusterip-srv
-
------------ DB:
-
-HTTP:
-
-kubectl delete deployment identity-mssql-depl
-kubectl delete deployment inventory-mssql-depl
-kubectl delete deployment metrics-mssql-depl
-kubectl delete deployment ordering-mssql-depl
-kubectl delete deployment scheduler-mssql-depl
-
-kubectl delete service identity-mssql-clusterip-srv
-kubectl delete service inventory-mssql-clusterip-srv
-kubectl delete service metrics-mssql-clusterip-srv
-kubectl delete service ordering-mssql-clusterip-srv
-kubectl delete service scheduler-mssql-clusterip-srv
-
-kubectl delete service identity-mssql-loadbalancer 
-kubectl delete service inventory-mssql-loadbalancer 
-kubectl delete service metrics-mssql-loadbalancer 
-kubectl delete service ordering-mssql-loadbalancer 
-kubectl delete service scheduler-mssql-loadbalancer 
-
-kubectl delete pvc identity-mssql-claim
-kubectl delete pvc inventory-mssql-claim
-kubectl delete pvc metrics-mssql-claim
-kubectl delete pvc ordering-mssql-claim
-kubectl delete pvc scheduler-mssql-claim
-
-kubectl delete secret identity-mssql
-kubectl delete secret inventory-mssql
-kubectl delete secret metrics-mssql
-kubectl delete secret ordering-mssql
-kubectl delete secret scheduler-mssql
-
-AMQP:
-
-kubectl delete deployment inventory-amqp-mssql-depl
-
-kubectl delete service inventory-amqp-mssql-clusterip-srv
-
-kubectl delete service inventory-amqp-mssql-loadbalancer
-
-kubectl delete pvc inventory-amqp-mssql-claim
-
-kubectl delete secret inventory-amqp-mssql
-
-
-
-
-
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------- BATCH execution: ---------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// run from ROOT 'Store' folder:
+
 
 
 DOCKER:
@@ -259,19 +38,14 @@ docker image ls
 K8:
 
 
-//INGRESS controller:
+//INGRESS controller initial installation before deployment:
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.2/deploy/static/provider/aws/deploy.yaml       // install last version from: https://kubernetes.github.io/ingress-nginx/deploy/#docker-desktop
 OR
 kubectl apply -f k8s/ingress/ingress-controller-depl.v.1.13.2.yaml      // local version
 
 kubectl apply -f k8s/ingress/ingress-srv.yaml
-kubectl create secret generic identity-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic inventory-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic metrics-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic ordering-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic scheduler-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic inventory-amqp-mssql --from-literal=SA_PASSWORD="pa55w0rd!"
-kubectl create secret generic seq-admin-secret --from-literal=SEQ_FIRSTRUN_ADMINPASSWORD='pa55w0rd!'
+kubectl apply -f k8s/db/db-secrets.yaml
+kubectl apply -f k8s/logging/seq-secrets.yaml
 kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
 kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
 kubectl apply -f k8s/metrics/metrics-pvc.yaml
@@ -315,13 +89,8 @@ kubectl get services
 DELETE:
 
 kubectl delete ingress ingress-srv
-kubectl delete secret identity-mssql
-kubectl delete secret inventory-mssql
-kubectl delete secret metrics-mssql
-kubectl delete secret ordering-mssql
-kubectl delete secret scheduler-mssql
-kubectl delete secret inventory-amqp-mssql
-kubectl delete secret seq-admin-secret
+kubectl delete secret db-secrets
+kubectl delete secret seq-secrets
 kubectl delete deployment api-gateway-service-depl
 kubectl delete deployment identity-service-depl
 kubectl delete deployment inventory-service-depl
@@ -406,4 +175,18 @@ kubectl get services
 
 ---
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------- PULL images from HUB: ----------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 
+docker pull cembo/store_api_gateway
+docker pull cembo/store_identity
+docker pull cembo/store_inventory
+docker pull cembo/store_management
+docker pull cembo/store_metrics
+docker pull cembo/store_ordering
+docker pull cembo/store_payment
+docker pull cembo/store_scheduler
+docker pull cembo/store_static_content
+docker pull cembo/store_inventory_amqp_publisher
+docker pull cembo/store_inventory_amqp_consumer

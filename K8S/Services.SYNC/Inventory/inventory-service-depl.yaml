@@ -19,7 +19,18 @@ spec:
           image: cembo/store_inventory:latest
           ports:
             - containerPort: 80
-
+          env:
+            - name: DB_HOST
+              value: "inventory-mssql-clusterip-srv"
+            - name: DB_NAME
+              value: "Store_Inventory"
+            - name: DB_USER
+              value: "StoreUser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: STOREUSER_PASSWORD
 ---
 
 apiVersion: v1
@@ -39,7 +50,6 @@ spec:
 ---
 
 # development - optional - for direct access
-
 apiVersion: v1
 kind: Service
 metadata:

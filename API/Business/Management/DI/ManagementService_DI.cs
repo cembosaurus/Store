@@ -27,6 +27,19 @@ namespace Business.Management.DI
             services.AddScoped<IHttpManagementService, HttpManagementService>();
             builder.Services.AddScoped<Management_HttpClientRequest_INTERCEPTOR>();
 
+            //var config = builder.Configuration;
+            //var prodConnStr = config.GetSection("ConnectionStrings:InventoryConnStr:Prod").Value;
+            //if (!string.IsNullOrEmpty(prodConnStr))
+            //{
+            //    prodConnStr = prodConnStr
+            //        .Replace("${DB_HOST}", Environment.GetEnvironmentVariable("DB_HOST"))
+            //        .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME"))
+            //        .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER"))
+            //        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD"));
+
+            //    builder.Configuration["ConnectionStrings:InventoryConnStr:Prod"] = prodConnStr;
+            //}
+
         }
     }
 }
