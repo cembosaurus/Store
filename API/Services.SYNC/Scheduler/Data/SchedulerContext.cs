@@ -3,28 +3,16 @@ using Scheduler.Models;
 
 namespace Scheduler.Data
 {
-    public class SchedulerDBContext : DbContext
+    public class SchedulerContext : DbContext
     {
 
-        private IConfiguration _conf;
-        private readonly bool _isProdEnv;
-
-
-        public SchedulerDBContext(DbContextOptions<SchedulerDBContext> opt, IConfiguration conf, IWebHostEnvironment env) : base(opt)
+        public SchedulerContext(DbContextOptions<SchedulerContext> opt) : base(opt)
         {
-            _conf = conf;
-            _isProdEnv = env.IsProduction();
+
         }
 
 
         public DbSet<CartItemLock> CartItemLocks { get; set; }
-
-
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_conf.GetSection($"Config.Local:ConnectionStrings:SchedulerConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure());
-        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

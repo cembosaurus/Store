@@ -8,10 +8,10 @@ using Scheduler.Models;
 
 namespace Scheduler.Data.Repositories
 {
-    public class CartItemLockRepository : BaseRepository<SchedulerDBContext>, ICartItemLockRepository
+    public class CartItemLockRepository : BaseRepository<SchedulerContext>, ICartItemLockRepository
     {
 
-        public CartItemLockRepository(SchedulerDBContext context) : base(context)
+        public CartItemLockRepository(SchedulerContext context) : base(context)
         {
         }
 

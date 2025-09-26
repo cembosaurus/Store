@@ -1,4 +1,5 @@
 using Business.Data;
+using Business.Data.DB.DI;
 using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
@@ -30,6 +31,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+DBContext_DI.Register<MetricsContext>(builder);
 ManagementService_DI.Register(builder);
 MetricsService_DI.Register(builder);
 
@@ -43,8 +45,6 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>().AddHttpMessageHandler<Management_HttpClientRequest_INTERCEPTOR>();
 
-
-builder.Services.AddDbContext<MetricsContext>();
 builder.Services.AddScoped<IMetricsDataHandler, MetricsDataHandler>();
 builder.Services.AddScoped<ICollectorService, CollectorService>();
 builder.Services.AddScoped<IMetricsDataTool, MetricsDataTool>();

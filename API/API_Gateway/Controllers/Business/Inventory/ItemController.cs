@@ -31,15 +31,15 @@ namespace API_Gateway.Controllers.Business.Inventory
         public async Task<object> GetAllItems()
         {
 
-
+            // debug:
             _logger.LogInformation("-----> Start fetching all items from inventory.");
 
 
             var result = await _itemService.GetItems();
 
 
-
-            _logger.LogInformation($"----> ITEMS count: {result.Data.Count()}");
+            // debug:
+            _logger.LogInformation($"----> ITEMS count: {result?.Data?.Count()}");
 
             return result;  // ctr res
         }

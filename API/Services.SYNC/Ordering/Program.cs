@@ -1,4 +1,5 @@
 using Business.Data;
+using Business.Data.DB.DI;
 using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
@@ -45,7 +46,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+DBContext_DI.Register<OrderingContext>(builder);
 
 
 
@@ -54,11 +55,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // TEST: ----------------------------------
 builder.Services.AddHttpContextAccessor();
-
-
-
-
-
 
 
 
@@ -88,8 +84,6 @@ builder.Services.AddFluentValidation(conf => {
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });         // Allow optional argument in controller's action
-
-builder.Services.AddDbContext<OrderingContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("Config.Local:ConnectionStrings:OrderingConnStr").Value, opt => opt.EnableRetryOnFailure()));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

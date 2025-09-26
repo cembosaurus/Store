@@ -4,6 +4,8 @@
 
 // run from ROOT 'Store' folder:
 
+/// http://localhost:30010 --> log site
+
 
 
 DOCKER:
@@ -43,45 +45,61 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 OR
 kubectl apply -f k8s/ingress/ingress-controller-depl.v.1.13.2.yaml      // local version
 
+
+
+* * *
+
+kubectl apply -f k8s/management/management-hpa.yaml
+kubectl apply -f k8s/management/management-service-depl.yaml
+kubectl apply -f k8s/api_gateway/api-gateway-hpa.yaml
+kubectl apply -f k8s/api_gateway/api-gateway-service-depl.yaml
+kubectl apply -f k8s/metrics/metrics-mssql-depl.yaml
+kubectl apply -f k8s/metrics/metrics-pvc.yaml
+kubectl apply -f k8s/metrics/metrics-hpa.yaml
+kubectl apply -f k8s/metrics/metrics-service-depl.yaml
+
+kubectl apply -f k8s/logging/seq-secrets.yaml
+kubectl apply -f k8s/Logging/seq-logging-pvc.yaml
+kubectl apply -f k8s/Logging/seq-logging-service-depl.yaml
+
 kubectl apply -f k8s/ingress/ingress-srv.yaml
 kubectl apply -f k8s/db/db-secrets.yaml
-kubectl apply -f k8s/logging/seq-secrets.yaml
-kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
-kubectl apply -f k8s/metrics/metrics-pvc.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-pvc.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-pvc.yaml
-kubectl apply -f k8s/Logging/seq-logging-pvc.yaml
-kubectl apply -f k8s/services.sync/identity/identity-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-mssql-depl.yaml
-kubectl apply -f k8s/metrics/metrics-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-mssql-depl.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-mssql-depl.yaml
+
 kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-pvc.yaml
 kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-mssql-depl.yaml
-kubectl apply -f k8s/api_gateway/api-gateway-service-depl.yaml
-kubectl apply -f k8s/services.sync/identity/identity-service-depl.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-service-depl.yaml
-kubectl apply -f k8s/management/management-service-depl.yaml
-kubectl apply -f k8s/metrics/metrics-service-depl.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-service-depl.yaml
-kubectl apply -f k8s/services.sync/payment/payment-service-depl.yaml
-kubectl apply -f k8s/services.sync/scheduler/scheduler-service-depl.yaml
-kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.yaml
 kubectl apply -f k8s/services.async/inventory/publisher/inventory-amqp-publisher-service-depl.yaml
 kubectl apply -f k8s/services.async/inventory/consumer/inventory-amqp-consumer-service-depl.yaml
-kubectl apply -f k8s/Logging/seq-logging-service-depl.yaml
-kubectl apply -f k8s/api_gateway/api-gateway-hpa.yaml
-kubectl apply -f k8s/management/management-hpa.yaml
-kubectl apply -f k8s/metrics/metrics-hpa.yaml
-kubectl apply -f k8s/services.sync/identity/identity-hpa.yaml
-kubectl apply -f k8s/services.sync/inventory/inventory-hpa.yaml
-kubectl apply -f k8s/services.sync/ordering/ordering-hpa.yaml
+
 kubectl apply -f k8s/services.sync/payment/payment-hpa.yaml
+kubectl apply -f k8s/services.sync/payment/payment-service-depl.yaml
+
+kubectl apply -f k8s/services.sync/static_content/static-content-hpa.yaml
+kubectl apply -f k8s/services.sync/static_content/static-content-service-depl.yaml
+
+kubectl apply -f k8s/services.sync/ordering/ordering-hpa.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-pvc.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/ordering/ordering-service-depl.yaml
+
 kubectl apply -f k8s/services.sync/scheduler/scheduler-hpa.yaml
-kubectl apply -f k8s/services.sync/static-content/static-content-hpa.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-pvc.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/scheduler/scheduler-service-depl.yaml
+
+kubectl apply -f k8s/services.sync/identity/identity-hpa.yaml
+kubectl apply -f k8s/services.sync/identity/identity-pvc.yaml
+kubectl apply -f k8s/services.sync/identity/identity-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/identity/identity-service-depl.yaml
+
+kubectl apply -f k8s/services.sync/inventory/inventory-hpa.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-pvc.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-mssql-depl.yaml
+kubectl apply -f k8s/services.sync/inventory/inventory-service-depl.yaml
+
 kubectl get pods
 kubectl get services
+
+* * * 
 
 ---
 

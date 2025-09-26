@@ -1,4 +1,5 @@
 using Business.Data;
+using Business.Data.DB.DI;
 using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
@@ -43,6 +44,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DBContext_DI.Register<SchedulerContext>(builder);
+
 // Add services to the container.
 
 builder.Services.AddControllers(opt =>
@@ -66,7 +69,6 @@ builder.Services.AddFluentValidation(conf => {
 
 // Scheduler modules (CartItemLocker... etc):
 builder.Services.RegisterSchedulerTasks(builder.Configuration);
-builder.Services.AddDbContext<SchedulerDBContext>();
 builder.Services.AddTransient<IRunAtStartUp, RunAtStartUp>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
