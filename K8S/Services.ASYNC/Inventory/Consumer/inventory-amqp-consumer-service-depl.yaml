@@ -19,6 +19,18 @@ spec:
           image: cembo/store_inventory_amqp_consumer:latest
           ports:
             - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "inventory-amqp-consumer-mssql-clusterip-srv"
+            - name: DB_NAME
+              value: "Store_Inventory_AMQP"
+            - name: DB_USER
+              value: "StoreUser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: STOREUSER_PASSWORD
 
 ---
 
