@@ -19,6 +19,18 @@ spec:
           image: cembo/store_identity:latest
           ports:
             - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "identity-mssql-clusterip-srv"
+            - name: DB_NAME
+              value: "Store_Identity"
+            - name: DB_USER
+              value: "StoreUser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: STOREUSER_PASSWORD
 
 ---
 

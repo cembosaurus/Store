@@ -40,7 +40,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: inventory-amqp-mssql-clusterip-srv
+  name: inventory-amqp-consumer-mssql-clusterip-srv
 spec:
   type: ClusterIP
   selector:
@@ -54,7 +54,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: inventory-amqp-mssql-loadbalancer
+  name: inventory-amqp-consumer-mssql-loadbalancer
 spec:
   type: LoadBalancer
   selector:

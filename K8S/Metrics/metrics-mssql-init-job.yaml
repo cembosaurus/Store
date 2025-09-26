@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: inventory-mssql-init
+  name: metrics-mssql-init
 spec:
   template:
     spec:
@@ -13,16 +13,16 @@ spec:
             - -c
             - |
               sleep 40  # wait for SQL Server startup
-              /opt/mssql-tools/bin/sqlcmd -S inventory-mssql-clusterip-srv -U sa -P "$SA_PASSWORD" -Q "
+              /opt/mssql-tools/bin/sqlcmd -S metrics-mssql-clusterip-srv -U sa -P "$SA_PASSWORD" -Q "
               IF NOT EXISTS (SELECT * FROM sys.sql_logins WHERE name = 'StoreUser')
               BEGIN
                 CREATE LOGIN StoreUser WITH PASSWORD='$(DB_PASSWORD)', CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF;
               END;
-              IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'InventoryDB')
+              IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'Store_Metrics')
               BEGIN
-                CREATE DATABASE InventoryDB;
+                CREATE DATABASE Store_Metrics;
               END;
-              USE InventoryDB;
+              USE Store_Metrics;
               IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'StoreUser')
               BEGIN
                 CREATE USER StoreUser FOR LOGIN StoreUser;

@@ -19,6 +19,18 @@ spec:
           image: cembo/store_scheduler:latest
           ports:
             - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "scheduler-mssql-clusterip-srv"
+            - name: DB_NAME
+              value: "Store_Scheduler"
+            - name: DB_USER
+              value: "StoreUser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: STOREUSER_PASSWORD
 
 ---
 
