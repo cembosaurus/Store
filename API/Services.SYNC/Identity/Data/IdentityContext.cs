@@ -8,25 +8,16 @@ namespace Services.Identity.Data
 {
     public class IdentityContext : IdentityDbContext<AppUser, AppRole, int, IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
-        private IConfiguration _conf;
-        private readonly bool _isProdEnv;
 
-        public IdentityContext(DbContextOptions<IdentityContext> opt, IConfiguration conf, IWebHostEnvironment env) : base(opt)
+        public IdentityContext(DbContextOptions<IdentityContext> opt) : base(opt)
         {
-            _conf = conf;
-            _isProdEnv = env.IsProduction();
+
         }
 
 
         public DbSet<Address> Address { get; set; }
         public DbSet<UserAddress> UserAddress { get; set; }
         public DbSet<CurrentUsersAddress> CurrentUsersAddress { get; set; }
-
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_conf.GetSection($"Config.Local:ConnectionStrings:IdentityConnStr:{(_isProdEnv ? "Prod" : "Dev")}").Value, opt => opt.EnableRetryOnFailure());
-        }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

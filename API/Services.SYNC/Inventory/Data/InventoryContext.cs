@@ -8,6 +8,7 @@ namespace Services.Inventory.Data
 
         public InventoryContext(DbContextOptions<InventoryContext> opt) : base(opt)
         {
+
         }
 
         public DbSet<Item> Items { get; set; }

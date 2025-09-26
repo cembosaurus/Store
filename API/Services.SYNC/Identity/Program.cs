@@ -1,4 +1,5 @@
 using Business.Data;
+using Business.Data.DB.DI;
 using Business.Data.Tools.Interfaces;
 using Business.Exceptions;
 using Business.Exceptions.Interfaces;
@@ -54,6 +55,7 @@ builder.Services.AddFluentValidation(conf => {
     conf.AutomaticValidationEnabled = true;
 });
 
+DBContext_DI.Register<IdentityContext>(builder);
 ManagementService_DI.Register(builder);
 MetricsService_DI.Register(builder);
 
@@ -63,7 +65,6 @@ builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<IdentityContext>();
 builder.Services.AddSingleton<IJWTTokenStore, JWTTokenStore>();
 builder.Services.AddScoped<IIdentityRepository, IdentityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

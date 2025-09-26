@@ -10,7 +10,7 @@ using Scheduler.Data;
 
 namespace Scheduler.Migrations
 {
-    [DbContext(typeof(SchedulerDBContext))]
+    [DbContext(typeof(SchedulerContext))]
     partial class SchedulerContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

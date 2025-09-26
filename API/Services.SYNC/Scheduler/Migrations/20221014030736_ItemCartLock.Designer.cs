@@ -11,7 +11,7 @@ using Scheduler.Data;
 
 namespace Scheduler.Migrations
 {
-    [DbContext(typeof(SchedulerDBContext))]
+    [DbContext(typeof(SchedulerContext))]
     [Migration("20221014030736_ItemCartLock")]
     partial class ItemCartLock
     {

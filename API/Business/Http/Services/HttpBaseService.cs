@@ -11,6 +11,7 @@ using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.Net;
@@ -24,7 +25,6 @@ namespace Business.Http.Services
 {
     public class HttpBaseService : IHttpBaseService
     {
-
         private static IHttpContextAccessor _accessor;
         private readonly IHttpAppClient _httpAppClient;
         private readonly bool _isProdEnv;
@@ -32,6 +32,7 @@ namespace Business.Http.Services
 
         protected readonly IServiceResultFactory _resultFact;
         private readonly ConsoleWriter _cw;
+
         protected IGlobalConfig_PROVIDER _globalConfig_Provider;
         protected readonly IExId _exId;
 
@@ -120,7 +121,6 @@ namespace Business.Http.Services
         // if Management API service is not reached via HTTP request, then there is no logic in trying to update Management API service's URL by response from Management API service:
         protected async virtual Task<HttpResponseMessage> Send()
         {
-
             // FIRST attempt:
 
             try
