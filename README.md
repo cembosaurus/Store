@@ -33,7 +33,7 @@ In Progress.
 To Do: 
 - implement distributed logging (API_Gateway is in progress)
 - implement Terraform for managing K8
-- finish error handling, use global exception filter if needed
+- finish error handling, use global exception filter if needed in addition to exc middleware
 - inspect DI scopes - replace scoped by stateless singletons if possible (to improve performance)
 - replace temporary 'anyone' authorization policy in controllers used for dev by actual ones
 - remove service result return type from methods
