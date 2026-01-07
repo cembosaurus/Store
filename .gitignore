@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 # CUSTOM - cembo/store repo
 K8_all_files
+
+
+# PERSONAL files and data
+*.jpg

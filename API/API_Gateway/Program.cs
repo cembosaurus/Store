@@ -146,23 +146,26 @@ builder.Services.AddAuthorization(opt => {
 
 
 
-//var devCorsPolicy = "devCorsPolicy";
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(devCorsPolicy, builder => {
-//        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-//    });
-//});
+var devCorsPolicy = "DevCors";
+
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        builder =>
-        {
-            builder.WithOrigins("https://localhost:4001", "http://localhost:4000", "http://localhost:4200")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-        });
+    options.AddPolicy(devCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "http://localhost:4200",
+                "http://localhost:4000",
+                "https://localhost:4001"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
+
 
 
 
@@ -186,12 +189,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseCors(devCorsPolicy);
-app.UseCors(opt => { 
-    opt.AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader(); 
-});
+app.UseCors(devCorsPolicy);
 
 app.UseAuthentication();
 

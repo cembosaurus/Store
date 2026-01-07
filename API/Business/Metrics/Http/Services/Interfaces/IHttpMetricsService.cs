@@ -7,6 +7,6 @@ namespace Business.Metrics.Http.Services.Interfaces
 {
     public interface IHttpMetricsService : IHttpBaseService
     {
-        void Update(MetricsCreateDTO metricsData);
+        Task UpdateAsync(MetricsCreateDTO metricsData, CancellationToken ct = default);
     }
 }

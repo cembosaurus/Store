@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: inventory-mssql-init
+  namespace: store
 spec:
   template:
     spec:
@@ -12,23 +13,30 @@ spec:
             - /bin/sh
             - -c
             - |
-              sleep 40  # wait for SQL Server startup
+              sleep 90  # wait for SQL Server startup
               /opt/mssql-tools/bin/sqlcmd -S inventory-mssql-clusterip-srv -U sa -P "$SA_PASSWORD" -Q "
-              IF NOT EXISTS (SELECT * FROM sys.sql_logins WHERE name = 'StoreUser')
+              IF EXISTS (SELECT * FROM sys.sql_logins WHERE name = 'StoreUser')
               BEGIN
-                CREATE LOGIN StoreUser WITH PASSWORD='$(DB_PASSWORD)', CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF;
-              END;
-              IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'InventoryDB')
+                  ALTER LOGIN StoreUser WITH PASSWORD='$(DB_PASSWORD)';
+              END
+              ELSE
               BEGIN
-                CREATE DATABASE InventoryDB;
+                  CREATE LOGIN StoreUser WITH PASSWORD='$(DB_PASSWORD)', CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF;
               END;
-              USE InventoryDB;
+
+              IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'Store_Inventory')
+              BEGIN
+                  CREATE DATABASE Store_Inventory;
+              END;
+
+              USE Store_Inventory;
+
               IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'StoreUser')
               BEGIN
-                CREATE USER StoreUser FOR LOGIN StoreUser;
+                  CREATE USER StoreUser FOR LOGIN StoreUser;
               END;
-              ALTER ROLE db_datareader ADD MEMBER StoreUser;
-              ALTER ROLE db_datawriter ADD MEMBER StoreUser;
+
+              ALTER ROLE db_owner ADD MEMBER StoreUser;
               GRANT EXECUTE TO StoreUser;"
           env:
             - name: SA_PASSWORD

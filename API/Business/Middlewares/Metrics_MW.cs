@@ -1,5 +1,4 @@
 ﻿using Business.Metrics.DTOs;
-using Business.Metrics.Http.Services.Interfaces;
 using Business.Metrics.Services.Interfaces;
 using Business.Tools;
 using Microsoft.AspNetCore.Http;
@@ -13,25 +12,26 @@ namespace Business.Middlewares
 {
     public class Metrics_MW
     {
-        // AppId - identifies instance (one of K8 replicas) of service:
+
+        // Process/pod identity (safe to keep static)
         private static readonly Guid _appId = Guid.NewGuid();
-        private static readonly DateTime _deployed = DateTime.UtcNow;
-        private static readonly AppId_MODEL _appId_Model = new() { AppId = _appId, Deployed = _deployed };
-
+        private static readonly DateTime _deployedUtc = DateTime.UtcNow;
+        private static readonly AppId_MODEL _appId_Model = new(){ AppId = _appId, DeployedUtc = _deployedUtc };
         private readonly RequestDelegate _next;
-        private IMetricsData _metricsData;
-        private ConsoleWriter _cw;
         private readonly string _thisService;
-        private StringValues _requestFrom;
-        private int _index;
-        private IHttpMetricsService _httpMetricsService;
+
+        // per-request state passed between methods
+        private sealed record MetricsState(string RequestFrom);
 
 
 
-        public Metrics_MW(RequestDelegate next, IConfiguration config, IMetricsData metricsData)
+        public Metrics_MW(RequestDelegate next, IConfiguration config)
         {
-            _metricsData = metricsData;
-            _thisService = config.GetSection("Metrics:Name").Value ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "";
+            _thisService =
+                config.GetSection("Metrics:Name").Value
+                ?? Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName)
+                ?? "";
+
             _next = next;
         }
 
@@ -39,142 +39,143 @@ namespace Business.Middlewares
 
 
 
-        public async Task Invoke(HttpContext context, IHttpMetricsService httpMetricsService, ConsoleWriter cw)
+        public async Task Invoke(HttpContext context, IMetricsData metricsData, IMetricsQueue queue, ConsoleWriter cw)
         {
-            _cw = cw;
-            _httpMetricsService = httpMetricsService;
-
             AppId(context);
 
             if (_thisService != "MetricsService")
-                RequestHandler(context);
+                RequestHandler(context, metricsData, queue, cw);
 
             await _next(context);
         }
 
 
 
-
-        private void RequestHandler(HttpContext context)
+        private void RequestHandler(HttpContext context, IMetricsData metricsData, IMetricsQueue queue, ConsoleWriter cw)
         {
-            _metricsData.Initialize();
+            metricsData.Initialize();
 
-            Request_IN(context);
+            var state = Request_IN(context, metricsData);
 
-            context.Response.OnStarting(async () =>
+            // Before response starts: add response headers for service-to-service propagation
+            context.Response.OnStarting(() =>
             {
-                Response_OUT(context);
+                Response_OUT(context, metricsData, state);
+                return Task.CompletedTask;
+            });
 
-                if (_requestFrom == "client")
-                    ReportMetrics(context);
+            // After response completes: enqueue metrics (cheap) for client-originated request
+            context.Response.OnCompleted(() =>
+            {
+                if (state.RequestFrom == "client")
+                    ReportMetrics(context, metricsData, queue, cw);
 
-                return;
+                return Task.CompletedTask;
             });
         }
 
 
 
-
-        private void Request_IN(HttpContext context)
+        private MetricsState Request_IN(HttpContext context, IMetricsData metricsData)
         {
-            // metrics START:
+            var index =
+                context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr)
+                && int.TryParse(indexStrArr.FirstOrDefault(), out int indexInt)
+                    ? indexInt + 1
+                    : 1;
 
-            // index in incoming request header, if null set to 1 else increase it by 1:
-            _index = context.Request.Headers.TryGetValue("Metrics.Index", out StringValues indexStrArr) ? (int.TryParse(indexStrArr[0], out int indexInt) ? ++indexInt : 1) : 1;
-            _requestFrom = context.Request.Headers.TryGetValue("Metrics.RequestFrom", out _requestFrom) ? _requestFrom[0] : "client";
+            var requestFrom =
+                context.Request.Headers.TryGetValue("Metrics.RequestFrom", out var rf)
+                    ? (rf.FirstOrDefault() ?? "client")
+                    : "client";
 
-            // pass index into http client:
-            _metricsData.Index = _index;
+            metricsData.Index = index;
 
-            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.REQ.IN.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{RequestURL(context)}");
+            metricsData.AddHeader(
+                $"Metrics.{_thisService}.{_appId}",
+                $"{index}.REQ.IN.{requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}.{RequestURL(context)}"
+            );
+
+            return new MetricsState(requestFrom);
         }
 
 
 
-
-        private void Response_OUT(HttpContext context)
+        private void Response_OUT(HttpContext context, IMetricsData metricsData, MetricsState state)
         {
-            // metrics END:
+            var index = ++metricsData.Index;
 
-            // increment and read index passed from http client:
-            _index = ++_metricsData.Index;
-
-            // passing this app name and index back into caller app.
-            // client doesn't need it:
-            if (_requestFrom != "client")
-            { 
-                context.Response.Headers.Remove("Metrics.Index");
-                context.Response.Headers.TryAdd("Metrics.Index", _index.ToString());
-
-                context.Response.Headers.Remove("Metrics.ResponseFrom");
-                context.Response.Headers.TryAdd("Metrics.ResponseFrom", _thisService);            
+            // propagate only between services; client doesn't need these headers
+            if (state.RequestFrom != "client")
+            {
+                context.Response.Headers["Metrics.Index"] = index.ToString();
+                context.Response.Headers["Metrics.ResponseFrom"] = _thisService;
             }
 
-            _metricsData.AddHeader($"Metrics.{_thisService}.{_appId}", $"{_index}.RESP.OUT.{_requestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
-                $"{(context.Response.StatusCode == 200 ? "" : ".HTTP:" + context.Response.StatusCode)}");
+            metricsData.AddHeader(
+                $"Metrics.{_thisService}.{_appId}",
+                $"{index}.RESP.OUT.{state.RequestFrom}.{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
+                $"{(context.Response.StatusCode == 200 ? "" : ".HTTP:" + context.Response.StatusCode)}"
+            );
 
-            // append headers from incoming response in http client further down to caller app:
-            foreach (var h in _metricsData.Headers.ToList())
-            { 
-                context.Response.Headers.Append(h.Key, h.Value);
+            // Append Metrics.* headers only for service-to-service calls
+            if (state.RequestFrom != "client")
+            {
+                foreach (var h in metricsData.Headers) // ideally Headers returns a snapshot
+                    context.Response.Headers.Append(h.Key, h.Value);
             }
         }
 
 
 
-
-        // void - fire and foreget (does not wait for response), send metrics repport:
-        private void ReportMetrics(HttpContext context)
+        private void ReportMetrics(HttpContext context, IMetricsData metricsData, IMetricsQueue queue, ConsoleWriter cw)
         {
-            // send data collected from whole chain of HTTP requests to Metrics API serevice:
-        
-            context.Response.Headers.Remove("Metrics.Index");
-        
-            var metricsData = context.Response.Headers
-                .Where(rh => rh.Key.StartsWith("Metrics.") && rh.Value.Any())
-                .Select(s => new KeyValuePair<string, string[]>(s.Key, s.Value!))
+            var payload = metricsData.Headers
+                .Where(h => h.Key.StartsWith("Metrics.") && h.Value.Any())
+                .Select(h => new KeyValuePair<string, string[]>(h.Key, h.Value.ToArray()))
                 .ToList();
-        
-            _cw.Message("HTTP Post (outgoing): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", Enums.TypeOfInfo.INFO, $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}");
-        
-            _httpMetricsService.Update(new MetricsCreateDTO { Data = metricsData });
 
-            //_cw.Message("HTTP Response (incoming): ", _httpMetricsService.GetRemoteServiceName, $"{context.Request.Host}{context.Request.Path}", metricsHttpResult.Status ? Enums.TypeOfInfo.SUCCESS : Enums.TypeOfInfo.FAIL, metricsHttpResult != null ? metricsHttpResult.Message : "Response not received !");
+            var dto = new MetricsCreateDTO { Data = payload };
+
+            if (!queue.TryEnqueue(dto))
+            {
+                cw.Message(
+                    "Metrics dropped (queue full): ",
+                    "MetricsService",
+                    $"{context.Request.Host}{context.Request.Path}",
+                    Enums.TypeOfInfo.INFO,
+                    $"Measured request: '{_thisService}' {context.Request.Host}{context.Request.Path}"
+                );
+            }
         }
-
 
 
 
         private void AppId(HttpContext context)
         {
             if (context.Request.Path == "/appid")
-                context.Response.Headers.Append($"AppId", $"{_thisService}.{_appId}");
+                context.Response.Headers.Append("AppId", $"{_thisService}.{_appId}");
         }
+
 
 
         private static string RequestURL(HttpContext context)
+            => $"{context.Request.Method ?? ""}.{context.Request.Host.Host ?? ""}.{context.Request.Host.Port}.{context.Request.Path.Value ?? ""}";
+
+
+
+        public static AppId_MODEL AppId_Model => _appId_Model;
+
+
+
+        public sealed class AppId_MODEL
         {
-            return $"{context.Request.Method ?? ""}.{context.Request.Host.Host ?? ""}.{context.Request.Host.Port}.{context.Request.Path.Value ?? ""}";
+            public Guid AppId { get; init; }
+            public DateTime DeployedUtc { get; init; }
+
+            // don’t mutate them at runtime:
+            public string AppName { get; init; } = "";
+            public string ServiceName { get; init; } = "";
         }
-
-
-
-        public static AppId_MODEL AppId_Model
-        {
-            get { return _appId_Model; }
-        }
-
-
-
-        public class AppId_MODEL
-        {
-            public Guid AppId = Guid.Empty;
-            public string AppName = "";
-            public string ServiceName = "";
-            public DateTime Deployed;
-
-        }
-
     }
-
 }

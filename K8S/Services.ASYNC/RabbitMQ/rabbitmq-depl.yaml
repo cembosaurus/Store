@@ -2,6 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: rabbitmq-depl
+  namespace: store
 spec:
   replicas: 1
   selector:
@@ -25,6 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-clusterip-srv
+  namespace: store
 spec:
   type: ClusterIP
   selector:
@@ -43,6 +45,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-loadbalancer
+  namespace: store
 spec:
   type: LoadBalancer
   selector:
@@ -65,6 +68,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq-nodeport-srv
+  namespace: store
 spec:
   type: NodePort
   selector:
