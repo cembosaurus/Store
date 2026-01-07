@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Store • Auth</title>
+
+  <!-- If you serve this from API_Gateway (same origin), keep connect-src 'self' -->
+  <!-- If you serve from elsewhere, add your gateway origin to connect-src -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 base-uri 'self';
+                 form-action 'self';
+                 frame-ancestors 'none';
+                 img-src 'self';
+                 style-src 'self';
+                 script-src 'self';
+                 connect-src 'self' https://localhost:2001 http://localhost:2000;">
+  <meta name="referrer" content="no-referrer" />
+
+  <!-- Change if your gateway runs elsewhere -->
+  <meta name="api-base-url" content="https://localhost:2001" />
+
+  <link rel="stylesheet" href="./auth.css" />
+</head>
+
+<body>
+  <main class="card" aria-labelledby="title">
+    <h1 id="title">Store Auth</h1>
+
+    <div class="tabs" role="tablist" aria-label="Authentication">
+      <button id="tab-login" class="tab active" role="tab" aria-selected="true" aria-controls="panel-login">Login</button>
+      <button id="tab-register" class="tab" role="tab" aria-selected="false" aria-controls="panel-register">Register</button>
+    </div>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <!-- LOGIN -->
+    <section id="panel-login" class="panel" role="tabpanel" aria-labelledby="tab-login">
+        <form id="loginForm" novalidate>
+        <label>
+            Name
+            <input name="name" type="text" autocomplete="username" required minlength="2" maxlength="30" />
+        </label>
+
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required minlength="4" maxlength="8" />
+        </label>
+
+        <button id="loginBtn" type="submit">Login</button>
+        </form>
+    </section>
+
+    <!-- REGISTER -->
+    <section id="panel-register" class="panel hidden" role="tabpanel" aria-labelledby="tab-register">
+        <form id="registerForm" novalidate>
+        <label>
+            Name
+            <input name="name" type="text" autocomplete="username" required minlength="2" maxlength="30" />
+        </label>
+
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="new-password" required minlength="4" maxlength="8" />
+        </label>
+
+        <label>
+            Confirm password
+            <input name="confirmPassword" type="password" autocomplete="new-password" required minlength="4" maxlength="8" />
+        </label>
+
+        <button id="registerBtn" type="submit">Create account</button>
+        </form>
+    </section>
+
+    <hr />
+
+    <div class="foot">
+      <button id="whoamiBtn" type="button" class="secondary">Who am I?</button>
+      <pre id="debug" class="debug" aria-label="Response debug output"></pre>
+    </div>
+  </main>
+
+  <script src="./auth.js" defer></script>
+</body>
+</html>
