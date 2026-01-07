@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: identity-mssql-depl
+  namespace: store
   labels:
     app: identity-mssql-depl
 spec:
@@ -41,6 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: identity-mssql-clusterip-srv
+  namespace: store
 spec:
   type: ClusterIP
   selector:
@@ -55,6 +57,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: identity-mssql-loadbalancer
+  namespace: store
 spec:
   type: LoadBalancer
   selector:

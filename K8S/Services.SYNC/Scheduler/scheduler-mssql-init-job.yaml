@@ -1,7 +1,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: inventory-mssql-init
+  name: scheduler-mssql-init
+  namespace: store
 spec:
   template:
     spec:
@@ -12,7 +13,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              sleep 40  # wait for SQL Server startup
+              sleep 90  # wait for SQL Server startup
               /opt/mssql-tools/bin/sqlcmd -S scheduler-mssql-clusterip-srv -U sa -P "$SA_PASSWORD" -Q "
               IF NOT EXISTS (SELECT * FROM sys.sql_logins WHERE name = 'StoreUser')
               BEGIN
@@ -27,8 +28,7 @@ spec:
               BEGIN
                 CREATE USER StoreUser FOR LOGIN StoreUser;
               END;
-              ALTER ROLE db_datareader ADD MEMBER StoreUser;
-              ALTER ROLE db_datawriter ADD MEMBER StoreUser;
+              ALTER ROLE db_owner ADD MEMBER StoreUser;
               GRANT EXECUTE TO StoreUser;"
           env:
             - name: SA_PASSWORD
