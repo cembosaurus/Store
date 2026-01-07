@@ -34,14 +34,19 @@ namespace Business.Metrics.Http.Services
 
 
         // void - fire and foreget (does not wait for response), send metrics repport:
-        public void Update(MetricsCreateDTO metricsData)
+        public Task UpdateAsync(MetricsCreateDTO metricsData, CancellationToken ct = default)
         {
             _method = HttpMethod.Post;
             _requestQuery = $"";
             _content = new StringContent(JsonConvert.SerializeObject(metricsData), _encoding, _mediaType);
 
-            HTTP_Request_Handler<string>();
+            return HTTP_Request_Handler<string>();
         }
+
+
+
+
+
         //public async Task<IServiceResult<string>> Update(IEnumerable<KeyValuePair<string, StringValues>> metricsData)
         //{
         //    _method = HttpMethod.Post;

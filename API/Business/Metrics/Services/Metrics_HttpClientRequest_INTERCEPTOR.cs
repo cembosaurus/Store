@@ -1,142 +1,155 @@
 ﻿using Business.Metrics.Services.Interfaces;
 using Business.Middlewares;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using System.Net;
 
 
-
-public class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
+public sealed class Metrics_HttpClientRequest_INTERCEPTOR : DelegatingHandler
 {
-    private IMetricsData _metricsData;
-    private HttpRequestMessage _requestMessage;
-    private HttpResponseMessage _responseMessage;
-    // read from local appsettings: metrics data - service name
+
+    private readonly IHttpContextAccessor _accessor;
     private readonly string _thisService;
-    // read from response <- appsettings in remote service: metrics data - service name
-    private string _requestTo;
     private readonly Guid _appId;
-    private int _indexOUT;
-    private int _indexIN;
-    private DateTime _timeOUT;
-    private DateTime _timeIN;
+    private sealed record CallState(int IndexOut, DateTime TimeOutUtc, string RequestFrom);
 
 
-    public Metrics_HttpClientRequest_INTERCEPTOR(IMetricsData metricsData, IConfiguration config)
+    public Metrics_HttpClientRequest_INTERCEPTOR(IHttpContextAccessor accessor, IConfiguration config)
     {
-        _metricsData = metricsData;
+        _accessor = accessor;
+
         _appId = Metrics_MW.AppId_Model.AppId;
-        _thisService = config.GetSection("Metrics:Name").Value!;
-        _thisService = !string.IsNullOrWhiteSpace(_thisService) ? _thisService : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName) ?? "undefined";
-        _requestMessage = new HttpRequestMessage();
+
+        var thisApp_Name = config.GetSection("Metrics:Name").Value;
+        _thisService = !string.IsNullOrWhiteSpace(thisApp_Name)
+            ? thisApp_Name
+            : Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName)
+              ?? "undefined";
     }
+
+
+
 
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, CancellationToken cancellationToken)
     {
-        _requestMessage = requestMessage;
+        var context = _accessor.HttpContext;
+        var metricsData = context?.RequestServices.GetService(typeof(IMetricsData)) as IMetricsData;
 
-        Request_OUT();
+        // resend request:
+        if (metricsData is null)
+            return await base.SendAsync(requestMessage, cancellationToken);
 
+        var state = Request_OUT(requestMessage, metricsData);
+
+        HttpResponseMessage? response = null;
+        var createdFallbackResponse = false;
 
         try
         {
-            _responseMessage = await base.SendAsync(requestMessage, cancellationToken);
+            // resend request:
+            response = await base.SendAsync(requestMessage, cancellationToken);
+            return response;
         }
         catch (HttpRequestException httpReqEx)
         {
-            _responseMessage = new HttpResponseMessage(httpReqEx.StatusCode ?? HttpStatusCode.ServiceUnavailable);
-
+            response = new HttpResponseMessage(httpReqEx.StatusCode ?? HttpStatusCode.ServiceUnavailable);
+            createdFallbackResponse = true;
             throw;
         }
         finally
         {
-            Response_IN();
-            AddHeaders();
+            if (response is not null)
+            {
+                Response_IN(requestMessage, response, metricsData);
+
+                AddHeaders(metricsData, requestMessage, response, state);
+
+                if (!createdFallbackResponse)
+                    AddHeadersFromResponse(metricsData, response);
+            }
         }
-
-
-        AddHeadersFromResponse();
-
-        return _responseMessage;
     }
 
 
+    //---------------------------------------------------------------------------------------------------------------------------------------
 
 
-    private void Request_OUT()
+    private CallState Request_OUT(HttpRequestMessage requestMessage, IMetricsData metricsData)
     {
-        // metrics END:
-
-        _timeOUT = DateTime.Now;
+        var timeOutUtc = DateTime.UtcNow;
 
         // increase and read index passed from MW:
-        _indexOUT = ++_metricsData.Index;
+        var indexOut = ++metricsData.Index;
 
-        // send index value to called app ot maintain continual incrementation:
-        _requestMessage.Headers.Remove("Metrics.Index");
-        _requestMessage.Headers.Add("Metrics.Index", _indexOUT.ToString());
+        requestMessage.Headers.Remove("Metrics.Index");
+        requestMessage.Headers.TryAddWithoutValidation("Metrics.Index", indexOut.ToString());
 
-        // send name of this app to called app:
-        _requestMessage.Headers.Remove("Metrics.RequestFrom");
-        _requestMessage.Headers.Add("Metrics.RequestFrom", _thisService);
+        requestMessage.Headers.Remove("Metrics.RequestFrom");
+        requestMessage.Headers.TryAddWithoutValidation("Metrics.RequestFrom", _thisService);
+
+        return new CallState(indexOut, timeOutUtc, _thisService);
     }
 
 
-
-    private void Response_IN()
+    private void Response_IN(HttpRequestMessage requestMessage, HttpResponseMessage responseMessage, IMetricsData metricsData)
     {
-        // metrics START:
+        var timeInUtc = DateTime.UtcNow;
 
-        _timeIN = DateTime.Now;
+        var indexIn =
+            responseMessage.Headers.TryGetValues("Metrics.Index", out var indexStrArr)
+            && int.TryParse(indexStrArr?.FirstOrDefault(), out var idx)
+                ? idx + 1
+                : metricsData.Index + 1;
 
-        // if no index is returned from service response (503 or any 5xx ex) then copy indexOUT into indexIN and increase it by 1 to maintain continuity:
-        _indexIN = _responseMessage.Headers.TryGetValues("Metrics.Index", out IEnumerable<string>? indexStrArr) 
-            ? int.TryParse(indexStrArr?.ElementAt(0), out int indexInt) ? ++indexInt : _indexOUT + 1
-            : _indexOUT + 1;
-        _responseMessage.Headers.Remove("Metrics.Index");
+        responseMessage.Headers.Remove("Metrics.Index");
 
-        _requestTo = _responseMessage.Headers.TryGetValues("Metrics.ResponseFrom", out IEnumerable<string>? responseFrom) ? responseFrom.ElementAt(0) : _requestMessage.RequestUri?.Authority ?? "";
-        _responseMessage.Headers.Remove("Metrics.ResponseFrom");
+        var requestTo =
+            responseMessage.Headers.TryGetValues("Metrics.ResponseFrom", out var responseFrom)
+                ? responseFrom.FirstOrDefault() ?? ""
+                : requestMessage.RequestUri?.Authority ?? "";
+
+        responseMessage.Headers.Remove("Metrics.ResponseFrom");
 
         // passing Index back into MW:
-        _metricsData.Index = _indexIN;
-    }
+        metricsData.Index = indexIn;
 
-
-    private void AddHeaders()
-    {
-        _metricsData.AddHeader(
+        // Store timestamp in metrics headers (kept compatible with your old AddHeaders)
+        metricsData.AddHeader(
             $"Metrics.{_thisService}.{_appId}",
-            $"{_indexOUT}.REQ.OUT.{_requestTo}.{_timeOUT.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
-            );
-
-        // append only 503 Service Unavailable code:
-        _metricsData.AddHeader(
-            $"Metrics.{_thisService}.{_appId}",
-            $"{_indexIN}.RESP.IN.{_requestTo}.{_timeIN.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
-            $"{((int)_responseMessage.StatusCode == 503 ? ".HTTP:" + (int)_responseMessage.StatusCode : "")}"
-            );
+            $"{metricsData.Index}.RESP.IN.{requestTo}.{timeInUtc.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}" +
+            $"{((int)responseMessage.StatusCode == 503 ? ".HTTP:" + (int)responseMessage.StatusCode : "")}"
+        );
     }
 
 
-    private void AddHeadersFromResponse()
+    //---------------------------------------------------------------------------------------------------------------------------------------
+
+
+    private void AddHeaders(IMetricsData metricsData, HttpRequestMessage requestMessage, HttpResponseMessage responseMessage, CallState state)
     {
-        // Appending Metrics headers arrived from responses:
+        var requestTo =
+            responseMessage.Headers.TryGetValues("Metrics.ResponseFrom", out var responseFrom)
+                ? responseFrom.FirstOrDefault() ?? ""
+                : requestMessage.RequestUri?.Authority ?? "";
 
-        var previousServices_MetricsHeaders = _responseMessage.Headers.Where(h => h.Key.StartsWith($"Metrics."));
-
-        if (previousServices_MetricsHeaders != null)
-        {
-            _metricsData.AddHeaders(previousServices_MetricsHeaders);
-        }
-
-        var previousServices_AppIdHeaders = _responseMessage.Headers.Where(h => h.Key.StartsWith($"AppId."));
-
-        if (previousServices_AppIdHeaders != null)
-        {
-            _metricsData.AddHeaders(previousServices_AppIdHeaders);
-        }
+        metricsData.AddHeader(
+            $"Metrics.{_thisService}.{_appId}",
+            $"{state.IndexOut}.REQ.OUT.{requestTo}.{state.TimeOutUtc.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}"
+        );
     }
 
+
+
+    private void AddHeadersFromResponse(IMetricsData metricsData, HttpResponseMessage responseMessage)
+    {
+        var previousServices_MetricsHeaders = responseMessage.Headers.Where(h => h.Key.StartsWith("Metrics."));
+        if (previousServices_MetricsHeaders.Any())
+            metricsData.AddHeaders(previousServices_MetricsHeaders);
+
+        var previousServices_AppIdHeaders = responseMessage.Headers.Where(h => h.Key.StartsWith("AppId."));
+        if (previousServices_AppIdHeaders.Any())
+            metricsData.AddHeaders(previousServices_AppIdHeaders);
+    }
 }
