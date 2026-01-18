@@ -10,6 +10,7 @@ using Business.Exceptions;
 using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
+using Business.Identity.DI;
 using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
@@ -42,8 +43,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-ManagementService_DI.Register(builder);
-MetricsService_DI.Register(builder);
+builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddManagementServiceIntegration(builder.Configuration);
+builder.Services.AddMetricsServiceIntegration();
 
 builder.Services.AddSingleton<IExId, ExId>(); 
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
@@ -111,39 +113,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         ValidateAudience = false    // FE - angular
                     };
                 });
-
-builder.Services.AddAuthorization(opt => {
-    opt.AddPolicy(PolicyType.Administration.ToString(),
-        p => p.RequireRole(
-        RoleType.Admin.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Management.ToString(),
-        p => p.RequireRole(
-        RoleType.Manager.ToString(),
-        RoleType.Accountant.ToString(),
-        RoleType.Seller.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Support.ToString(),
-        p => p.RequireRole(
-        RoleType.ProductExpert.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Shopping.ToString(),
-        p => p.RequireRole(
-        RoleType.Customer.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Everyone.ToString(),
-    p => p.RequireRole(
-        RoleType.Admin.ToString(),
-        RoleType.Manager.ToString(),
-        RoleType.Accountant.ToString(),
-        RoleType.Seller.ToString(),
-        RoleType.ProductExpert.ToString(),
-        RoleType.Customer.ToString(),
-        RoleType.ServiceApp.ToString()
-    ));
-});
-
-
 
 
 var devCorsPolicy = "DevCors";

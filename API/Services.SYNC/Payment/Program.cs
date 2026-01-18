@@ -3,6 +3,7 @@ using Business.Exceptions.Interfaces;
 using Business.Filters.Validation;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
+using Business.Identity.DI;
 using Business.Identity.Enums;
 using Business.Libraries.ServiceResult;
 using Business.Libraries.ServiceResult.Interfaces;
@@ -30,8 +31,9 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-ManagementService_DI.Register(builder);
-MetricsService_DI.Register(builder);
+builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddManagementServiceIntegration(builder.Configuration);
+builder.Services.AddMetricsServiceIntegration();
 
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
@@ -68,36 +70,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     };
                 });
 
-builder.Services.AddAuthorization(opt => {
-    opt.AddPolicy(PolicyType.Administration.ToString(),
-        p => p.RequireRole(
-        RoleType.Admin.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Management.ToString(),
-        p => p.RequireRole(
-        RoleType.Manager.ToString(),
-        RoleType.Accountant.ToString(),
-        RoleType.Seller.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Support.ToString(),
-        p => p.RequireRole(
-        RoleType.ProductExpert.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Shopping.ToString(),
-        p => p.RequireRole(
-        RoleType.Customer.ToString()
-    ));
-    opt.AddPolicy(PolicyType.Everyone.ToString(),
-    p => p.RequireRole(
-        RoleType.Admin.ToString(),
-        RoleType.Manager.ToString(),
-        RoleType.Accountant.ToString(),
-        RoleType.Seller.ToString(),
-        RoleType.ProductExpert.ToString(),
-        RoleType.Customer.ToString(),
-        RoleType.ServiceApp.ToString()
-    ));
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

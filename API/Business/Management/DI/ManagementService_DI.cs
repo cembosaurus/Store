@@ -6,7 +6,7 @@ using Business.Management.Http.Services;
 using Business.Management.Http.Services.Interfaces;
 using Business.Management.Services;
 using Business.Management.Services.Interfaces;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -15,17 +15,20 @@ namespace Business.Management.DI
 {
     public static class ManagementService_DI
     {
-        public static void Register(WebApplicationBuilder builder)
+        public static IServiceCollection AddManagementServiceIntegration(this IServiceCollection services, IConfiguration configuration)
         {
-            var services = builder.Services;
-
             services.AddSingleton<Config_Global_DB>();
             services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
             services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
             services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-            services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+
+            services.Configure<Config_Global_AS_MODEL>(
+                configuration.GetSection("Config.Global"));
+
             services.AddScoped<IHttpManagementService, HttpManagementService>();
-            builder.Services.AddScoped<Management_HttpClientRequest_INTERCEPTOR>();
+            services.AddScoped<Management_HttpClientRequest_INTERCEPTOR>();
+
+            return services;
         }
     }
 }
