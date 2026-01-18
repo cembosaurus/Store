@@ -28,8 +28,8 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IExId, ExId>();
 builder.Services.AddSingleton<IGlobalVariables, GlobalVariables>();
 
-ManagementService_DI.Register(builder);
-MetricsService_DI.Register(builder);
+builder.Services.AddManagementServiceIntegration(builder.Configuration);
+builder.Services.AddMetricsServiceIntegration();
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 

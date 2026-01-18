@@ -32,8 +32,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 DBContext_DI.Register<MetricsContext>(builder);
-ManagementService_DI.Register(builder);
-MetricsService_DI.Register(builder);
+builder.Services.AddManagementServiceIntegration(builder.Configuration);
+builder.Services.AddMetricsServiceIntegration();
 
 builder.Services.AddScoped<IHttpMetricsService, HttpMetricsService>();
 builder.Services.AddSingleton<IExId, ExId>();
