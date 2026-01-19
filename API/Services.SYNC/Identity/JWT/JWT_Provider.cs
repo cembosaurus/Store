@@ -22,7 +22,7 @@ namespace Identity.JWT
 
         public JWT_Provider(IConfiguration config, UserManager<AppUser> userManager, IServiceResultFactory resultFact)
         {
-            var value = config.GetSection("Config.Global:Auth:JWTKey").Value ?? "";
+            var value = config.GetSection("Config:Global:Auth:JWTKey").Value ?? "";
             var secretKey = Encoding.UTF8.GetBytes(value);
             _key = new SymmetricSecurityKey(secretKey);
             _userManager = userManager;

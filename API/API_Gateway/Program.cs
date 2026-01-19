@@ -11,7 +11,6 @@ using Business.Exceptions.Interfaces;
 using Business.Http.Clients;
 using Business.Http.Clients.Interfaces;
 using Business.Identity.DI;
-using Business.Identity.Enums;
 using Business.Identity.Http.Services;
 using Business.Identity.Http.Services.Interfaces;
 using Business.Inventory.Http.Services;
@@ -43,7 +42,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddIdentityServiceIntegration(builder.Configuration);
 builder.Services.AddManagementServiceIntegration(builder.Configuration);
 builder.Services.AddMetricsServiceIntegration();
 
@@ -94,26 +93,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-// --------------------------------------------------------------------
-
-
-// Middleware that authenticate request before hitting controller (endpoint):
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
-                {
-                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
-                    var secretByteArray = Encoding.ASCII.GetBytes(secret);
-
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - API
-                        ValidateAudience = false    // FE - angular
-                    };
-                });
-
 
 var devCorsPolicy = "DevCors";
 
@@ -166,7 +145,8 @@ app.UseAuthorization();
 
 //app.MapGet("/", () => "Zedous !");
 
-GlobalConfig_Seed.Load(app);
+// true/false - load the config from Management service at startup:
+GlobalConfig_Seed.Load(app, true);
 
 
 app.MapControllers();

@@ -38,7 +38,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddIdentityServiceIntegration(builder.Configuration);
 builder.Services.AddMetricsServiceIntegration();
 
 // builder.Services.AddHostedService<Management_Worker>();
@@ -49,14 +49,14 @@ builder.Services.AddHostedService(sp =>
         sp.GetRequiredService<FileSystemWatcher>(),
         sp.GetRequiredService<IServiceScopeFactory>(),
         sp.GetRequiredService<ConsoleWriter>(),
-        false
+        true
     )
 );
 builder.Services.AddSingleton<Config_Global_DB>();
 builder.Services.AddScoped<IConfig_Global_REPO, Config_Global_REPO>();
 builder.Services.AddScoped<IGlobalConfig_PROVIDER, GlobalConfig_PROVIDER>();
 builder.Services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
-builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config.Global"));
+builder.Services.Configure<Config_Global_AS_MODEL>(builder.Configuration.GetSection("Config:Global"));
 
 builder.Services.AddScoped<IHttpAllServices, HttpAllServices>();
 
@@ -75,25 +75,7 @@ builder.Services.AddTransient<IServiceResultFactory, ServiceResultFactory>();
 
 builder.Services.AddHttpClient<IHttpAppClient, HttpAppClient>().AddHttpMessageHandler<Metrics_HttpClientRequest_INTERCEPTOR>();
 
-
 builder.Services.AddTransient<ConsoleWriter>();
-
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
-                {
-                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
-                    var secretByteArray = Encoding.ASCII.GetBytes(secret);
-
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - API
-                        ValidateAudience = false    // FE - angular
-                    };
-                });
-
 
 builder.Services.AddSwaggerGen();
 
