@@ -10,12 +10,21 @@ namespace Business.Management.Data
 {
     public static class GlobalConfig_Seed
     {
-        public static async void Load(IApplicationBuilder app)
+        public static async void Load(IApplicationBuilder app, bool loadOnStartup)
         {
-            // set FALSE do disable HTTP GET to Management service:
-            bool downloadGC = false;
 
-            if (!downloadGC)
+
+
+            // TEST / DEBUG:
+            // Set FALSE do disable HTTP GET to Management service on app startup.
+            // Global config can be received by HTTP POST from Manegement service on its startup or appsettings changes:
+            loadOnStartup = true;
+
+
+
+
+
+            if (!loadOnStartup)
                 return;
 
             using (var scope = app.ApplicationServices.CreateScope())

@@ -34,11 +34,11 @@ namespace Inventory.Consumer.AMQPServices
             _resultFact = resultFact;
             _config = config;
 
-            _requestQueueName = _config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:ItemRequestQueueName").Value;
+            _requestQueueName = _config.GetSection($"Config:Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:ItemRequestQueueName").Value;
             _connFact = new ConnectionFactory()
             {
-                HostName = _config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Host").Value,
-                Port = int.Parse(_config.GetSection($"Config.Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Port").Value)
+                HostName = _config.GetSection($"Config:Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Host").Value,
+                Port = int.Parse(_config.GetSection($"Config:Global:RabbitMQ:Server:{(_isProdEnv ? "Prod" : "Dev")}:Port").Value)
             };
 
             CreateConnection();

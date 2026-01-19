@@ -33,7 +33,7 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddIdentityServiceIntegration(builder.Configuration);
 builder.Services.AddManagementServiceIntegration(builder.Configuration);
 builder.Services.AddMetricsServiceIntegration();
 
@@ -112,6 +112,7 @@ app.MapControllers();
 
 PrepDB.PrepPopulation(app, app.Environment.IsProduction(), app.Configuration);
 
-GlobalConfig_Seed.Load(app);
+// true/false - load the config from Management service at startup:
+GlobalConfig_Seed.Load(app, true);
 
 app.Run();

@@ -34,6 +34,7 @@ public sealed class Metrics_Worker : BackgroundService
 
             try
             {
+                // waiting here until queue (singleton) has new data (metrics report) !!!
                 dto = await _queue.DequeueAsync(stoppingToken);
             }
             catch (OperationCanceledException)

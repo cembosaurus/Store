@@ -60,7 +60,8 @@ app.UseMiddleware<Metrics_MW>();
 
 app.UseMiddleware<ErrorHandler_MW>();
 
-GlobalConfig_Seed.Load(app);
+// true/false - load the config from Management service at startup:
+GlobalConfig_Seed.Load(app, true);
 
 app.MapControllers();
 

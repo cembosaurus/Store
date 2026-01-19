@@ -31,7 +31,7 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddIdentityServiceIntegration(builder.Configuration);
 builder.Services.AddManagementServiceIntegration(builder.Configuration);
 builder.Services.AddMetricsServiceIntegration();
 
@@ -52,23 +52,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IServiceResultFactory, ServiceResultFactory>();
 
 builder.Services.AddTransient<ConsoleWriter>();
-
-
-// Middleware that authenticate request before hitting controller (endpoint):
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
-                {
-                    var secret = builder.Configuration.GetSection("Config.Global:Auth:JWTKey").Value;
-                    var secretByteArray = Encoding.ASCII.GetBytes(secret);
-
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
-                        ValidateIssuer = false,     // BE - API
-                        ValidateAudience = false    // FE - angular
-                    };
-                });
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -101,6 +84,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-GlobalConfig_Seed.Load(app);
+// true/false - load the config from Management service at startup:
+GlobalConfig_Seed.Load(app, true);
 
 app.Run();

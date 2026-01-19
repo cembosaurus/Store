@@ -35,7 +35,7 @@ builder.Services.AddControllers(opt =>
     opt.Filters.Add<ValidationFilter>();
 });
 
-builder.Services.AddIdentityServiceIntegration();
+builder.Services.AddIdentityServiceIntegration(builder.Configuration);
 builder.Services.AddManagementServiceIntegration(builder.Configuration);
 builder.Services.AddMetricsServiceIntegration();
 

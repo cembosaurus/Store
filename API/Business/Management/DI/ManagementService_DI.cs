@@ -23,7 +23,7 @@ namespace Business.Management.DI
             services.AddTransient<IAppsettings_PROVIDER, Appsettings_PROVIDER>();
 
             services.Configure<Config_Global_AS_MODEL>(
-                configuration.GetSection("Config.Global"));
+                configuration.GetSection("Config:Global"));
 
             services.AddScoped<IHttpManagementService, HttpManagementService>();
             services.AddScoped<Management_HttpClientRequest_INTERCEPTOR>();

@@ -27,7 +27,7 @@ namespace Business.Data.DB.DI
             try
             {
                 var envKey = builder.Environment.IsProduction() ? "Prod" : "Dev";
-                var dbConnStr = builder.Configuration[$"Config.Local:ConnectionStrings:{dbContextName}:{envKey}"];
+                var dbConnStr = builder.Configuration[$"Config:Local:ConnectionStrings:{dbContextName}:{envKey}"];
 
                 if (string.IsNullOrEmpty(dbConnStr))
                 {
@@ -83,8 +83,8 @@ namespace Business.Data.DB.DI
                 var overrideSettings = new Dictionary<string, string?>
                 {
                     { dbConnStr_Name, dbConnStr },
-                    { $"Config.Local:ConnectionStrings:{dbContextName}:Prod", string.Empty },
-                    { $"Config.Local:ConnectionStrings:{dbContextName}:Dev", string.Empty }
+                    { $"Config:Local:ConnectionStrings:{dbContextName}:Prod", string.Empty },
+                    { $"Config:Local:ConnectionStrings:{dbContextName}:Dev", string.Empty }
                 };
                 builder.Configuration.AddInMemoryCollection(overrideSettings);
 

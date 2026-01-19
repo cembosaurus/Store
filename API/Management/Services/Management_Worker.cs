@@ -3,6 +3,7 @@ using Business.Http.Services.Interfaces;
 using Business.Management.Appsettings.Interfaces;
 using Business.Management.Services.Interfaces;
 using Business.Tools;
+using System.Threading.Channels;
 
 
 
@@ -17,9 +18,8 @@ namespace Management.Services
         private FileSystemWatcher _watcher;
         private readonly ConsoleWriter _cm;
         private readonly bool _sendGCToServices;
-        private bool _switch; // MS bug - 'FileSystemWatcher.Changed()' is firing event twice for one change! Prevent it by using the switch in 'OnAppsettingsUpdated(...)'.
-                              // Not ideal solution as two independet events could be fired in sequence so second one will be ignored.
-                              // But this event is fired rarely f.e: after Appsettings is updated
+        private readonly Channel<bool> _reloadRequests = Channel.CreateUnbounded<bool>();
+        private CancellationTokenSource? _debounceCts;
 
 
 
@@ -42,6 +42,22 @@ namespace Management.Services
         {
             _cm.Message("App Startup", "Background Worker", "", TypeOfInfo.INFO, "Running...");
 
+            // initial load
+            await ReloadAndDistributeAsync(stoppingToken);
+
+            // subsequent reloads
+            while (await _reloadRequests.Reader.WaitToReadAsync(stoppingToken))
+            {
+                while (_reloadRequests.Reader.TryRead(out _)) { } // coalesce
+
+                await ReloadAndDistributeAsync(stoppingToken);
+            }
+        }
+
+
+
+        private async Task ReloadAndDistributeAsync(CancellationToken ct)
+        {
             if (!GetAppsettingsIntoGlobalConfig())
                 return;
 
@@ -50,20 +66,26 @@ namespace Management.Services
 
 
 
+
         // On Appsettings Update:
-        public async void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
+
+        // MS bug - 'FileSystemWatcher.Changed()' is firing event twice for one change! Prevent it by using Task.Delay() in 'OnAppsettingsUpdated(...)'.
+        // ... to wait until both identical events occur and then treat them as on event
+        public void OnAppsettingsUpdated(object source, FileSystemEventArgs args)
         {
-            if (_switch = !_switch)
-                return;
+            // debounce: collapse bursts of events into one reload
+            _debounceCts?.Cancel();
+            _debounceCts = new CancellationTokenSource();
 
-            _cm.Message("Appsettings WRITE event", "Background Worker", "Appsettings was changed", TypeOfInfo.INFO, $"\n - {args.ChangeType}\n - {args.Name}\n - {args.FullPath}");
-
-            if (!GetAppsettingsIntoGlobalConfig())
-                return;
-
-            await PostGlobalConfigToAPIServices();
-
-            _switch = default;
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(300, _debounceCts.Token);
+                    await _reloadRequests.Writer.WriteAsync(true);
+                }
+                catch (OperationCanceledException) { }
+            });
         }
 
 
