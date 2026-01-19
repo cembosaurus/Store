@@ -7,7 +7,7 @@ namespace API_Gateway.Controllers.Business.StaticContent
 {
     [Route("[controller]")]
     [ApiController]
-    public class PhotosController : ControllerBase
+    public class PhotosController : AppControllerBase
     {
 
         private IGlobalConfig_PROVIDER _globalConfig_Provider;

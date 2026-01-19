@@ -9,7 +9,7 @@ namespace API_Gateway.Controllers.Business.Inventory
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class ItemPriceController : ControllerBase
+    public class ItemPriceController : AppControllerBase
     {
 
         private readonly IItemPriceService _itemPriceService;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using API_Gateway.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using StaticContent.Services.Interfaces;
 
 
@@ -8,7 +9,7 @@ namespace StaticContent.Controllers.Business
 
     [Route("[controller]")]
     [ApiController]
-    public class PhotosController : ControllerBase
+    public class PhotosController : AppControllerBase
     {
 
         private readonly IImageFilesService _imageFilesService;

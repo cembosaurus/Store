@@ -1,4 +1,5 @@
-﻿using Identity.Services.Interfaces;
+﻿using API_Gateway.Controllers;
+using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -8,7 +9,7 @@ namespace Identity.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : AppControllerBase
     {
 
         private readonly IUserService _userService;

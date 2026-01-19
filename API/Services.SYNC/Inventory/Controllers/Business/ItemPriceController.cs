@@ -1,4 +1,5 @@
-﻿using Business.Inventory.DTOs.ItemPrice;
+﻿using API_Gateway.Controllers;
+using Business.Inventory.DTOs.ItemPrice;
 using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Inventory.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class ItemPriceController : ControllerBase
+    public class ItemPriceController : AppControllerBase
     {
 
         private readonly IItemPriceService _itemPriceService;

@@ -5,7 +5,7 @@ namespace API_Gateway.Controllers.Business.Ordering
 {
     [Route("[controller]")]
     [ApiController]
-    public class ArchiveController : ControllerBase
+    public class ArchiveController : AppControllerBase
     {
 
 

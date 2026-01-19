@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using API_Gateway.Controllers;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.CQRS.Commands.Archive;
 using Ordering.CQRS.Queries.Archive;
@@ -11,7 +12,7 @@ namespace Ordering.Controllers.Business
     //[Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class ArchiveController : ControllerBase
+    public class ArchiveController : AppControllerBase
     {
 
         private readonly IMediator _mediator;

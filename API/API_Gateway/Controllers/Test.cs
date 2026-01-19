@@ -8,7 +8,7 @@ namespace API_Gateway.Controllers
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class Test : ControllerBase
+    public class Test : AppControllerBase
     {
         private IServiceResultFactory _resultFact;
 

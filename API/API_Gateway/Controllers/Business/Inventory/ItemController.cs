@@ -9,7 +9,7 @@ namespace API_Gateway.Controllers.Business.Inventory
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class ItemController : ControllerBase
+    public class ItemController : AppControllerBase
     {
 
         private readonly IItemService _itemService;
@@ -28,75 +28,119 @@ namespace API_Gateway.Controllers.Business.Inventory
 
         [Authorize(Policy = "Everyone")]
         [HttpGet("all")]
-        public async Task<object> GetAllItems()
+        public async Task<ActionResult<IEnumerable<ItemReadDTO>>> GetAllItems()
         {
-
             // debug:
             _logger.LogInformation("-----> Start fetching all items from inventory.");
 
-
             var result = await _itemService.GetItems();
 
-
             // debug:
-            _logger.LogInformation($"----> ITEMS count: {result?.Data?.Count()}");
+            _logger.LogInformation("-----> ITEMS count: {Count}", result?.Data?.Count() ?? 0);
 
-            return result;  // ctr res
+            return FromServiceResult(result);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
         [HttpGet]
-        public async Task<object> GetItems(IEnumerable<int> itemIds)
+        public async Task<ActionResult<IEnumerable<ItemReadDTO>>> GetItems([FromQuery] IEnumerable<int> itemIds)
         {
             var result = await _itemService.GetItems(itemIds);
 
-            return result;  // ctr res
+            return FromServiceResult(result);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpGet("{id}")]
-        public async Task<object> GetItemById(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ItemReadDTO>> GetItemById(int id)
         {
             var result = await _itemService.GetItemById(id);
 
-            return result;  // ctr res
+            return FromServiceResult(result);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
         [HttpPost]
-        public async Task<object> AddItem(ItemCreateDTO item)
+        public async Task<ActionResult<ItemReadDTO>> AddItem([FromBody] ItemCreateDTO item)
         {
             var result = await _itemService.AddItem(item);
 
-            return result;  // ctr res
+            // Use FromServiceResult logic but return 201 Created on success
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status502BadGateway, "Downstream service returned null result.");
+            }
+
+            if (!result.Status || result.Data == null)
+            {
+                var message = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Failed to create item."
+                    : result.Message;
+
+                return BadRequest(message);
+            }
+
+            var created = result.Data;
+
+            return CreatedAtAction(nameof(GetItemById), new { id = created.Id }, created);
         }
 
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpPut("{id}")]
-        public async Task<object> UpdateItem(int id, ItemUpdateDTO item)
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateItem(int id, [FromBody] ItemUpdateDTO item)
         {
             var result = await _itemService.UpdateItem(id, item);
 
-            return result;  // ctr res
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status502BadGateway, "Downstream service returned null result.");
+            }
+
+            if (!result.Status)
+            {
+                var message = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Failed to update item."
+                    : result.Message;
+
+                return BadRequest(message);
+            }
+
+
+            return NoContent(); // 204
         }
 
 
 
         [Authorize(Policy = "Everyone")]
-        [HttpDelete("{id}")]
-        public async Task<object> DeleteItem(int id)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteItem(int id)
         {
             var result = await _itemService.DeleteItem(id);
 
-            return result;  // ctr res
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status502BadGateway, "Downstream service returned null result.");
+            }
+
+            if (!result.Status)
+            {
+                var message = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Failed to delete item."
+                    : result.Message;
+
+                return BadRequest(message);
+            }
+
+
+            return NoContent(); // 204
         }
 
 

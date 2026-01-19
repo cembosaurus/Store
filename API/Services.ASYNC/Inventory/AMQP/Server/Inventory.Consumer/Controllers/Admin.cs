@@ -1,4 +1,5 @@
-﻿using Inventory.Consumer.AMQPServices;
+﻿using API_Gateway.Controllers;
+using Inventory.Consumer.AMQPServices;
 using Inventory.Consumer.AMQPServices.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace Inventory.Consumer.Controllers
     [Authorize]
     [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
-    public class Admin : ControllerBase
+    public class Admin : AppControllerBase
     {
         private readonly MessageBusSubscriber _messageBusSubscriber;
 

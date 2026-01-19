@@ -65,7 +65,7 @@ namespace Business.Identity.DI
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(secretByteArray),
                         ValidateIssuer = false,                 // BE - API
-                        ValidateAudience = false,               // FE - angular
+                        ValidateAudience = false,               // FE
                         ClockSkew = TimeSpan.FromSeconds(30)    // A token can still be accepted up to 30 sec. after 'exp' and can be accepted up to 30 sec. before 'nbf'
                     };
                 });

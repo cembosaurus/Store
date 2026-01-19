@@ -1,4 +1,5 @@
-﻿using Business.Filters.Identity;
+﻿using API_Gateway.Controllers;
+using Business.Filters.Identity;
 using Business.Metrics.DTOs;
 using Metrics.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace Metrics.Controllers.Business
 
     [Route("[controller]")]
     [ApiController]
-    public class CollectorController : ControllerBase
+    public class CollectorController : AppControllerBase
     {
         private readonly ICollectorService _collectorService;
 

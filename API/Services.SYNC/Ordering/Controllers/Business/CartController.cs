@@ -1,4 +1,5 @@
-﻿using Business.Filters.Identity;
+﻿using API_Gateway.Controllers;
+using Business.Filters.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace Ordering.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartController : AppControllerBase
     {
 
         private readonly int _principalId;

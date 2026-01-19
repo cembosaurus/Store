@@ -1,4 +1,5 @@
-﻿using Business.Filters.Identity;
+﻿using API_Gateway.Controllers;
+using Business.Filters.Identity;
 using Business.Scheduler.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ namespace Scheduler.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class SchedulerController : ControllerBase
+    public class SchedulerController : AppControllerBase
     {
         private readonly ICartItemsService _cartItemService;
 

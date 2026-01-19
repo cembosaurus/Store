@@ -9,7 +9,7 @@ namespace API_Gateway.Controllers.Business.Inventory
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class CatalogueItemController : ControllerBase
+    public class CatalogueItemController : AppControllerBase
     {
 
         private readonly ICatalogueItemService _catalogueItemService;
