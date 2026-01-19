@@ -1,4 +1,5 @@
-﻿using Business.Filters.Identity;
+﻿using API_Gateway.Controllers;
+using Business.Filters.Identity;
 using Business.Management.Appsettings.Models;
 using Business.Management.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Business.Management.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public partial class GlobalConfigBaseController : ControllerBase
+    public partial class GlobalConfigBaseController : AppControllerBase
     {
         private IGlobalConfig_PROVIDER _globalConfig_Provider;
 

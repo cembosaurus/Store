@@ -13,7 +13,7 @@ namespace API_Gateway.Controllers.Business.Ordering
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrderController : AppControllerBase
     {
 
         private readonly int _principalId;

@@ -1,4 +1,5 @@
-﻿using Business.Inventory.DTOs.Item;
+﻿using API_Gateway.Controllers;
+using Business.Inventory.DTOs.Item;
 using Inventory.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Inventory.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class ItemController : ControllerBase
+    public class ItemController : AppControllerBase
     {
 
         private readonly IItemService _itemService;

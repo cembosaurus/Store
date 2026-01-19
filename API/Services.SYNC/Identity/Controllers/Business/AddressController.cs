@@ -1,4 +1,5 @@
-﻿using Business.Identity.DTOs;
+﻿using API_Gateway.Controllers;
+using Business.Identity.DTOs;
 using Business.Identity.Models;
 using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace Identity.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class AddressController : ControllerBase
+    public class AddressController : AppControllerBase
     {
         private readonly IAddressService _addressService;
 

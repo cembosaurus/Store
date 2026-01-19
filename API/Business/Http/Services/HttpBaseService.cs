@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Business.Exceptions.Interfaces;
+﻿using Business.Exceptions.Interfaces;
 using Business.Http.Clients.Interfaces;
 using Business.Http.Services.Interfaces;
 using Business.Libraries.ServiceResult;
@@ -11,13 +10,10 @@ using Business.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Web.Http;
 
 
 
@@ -96,7 +92,7 @@ namespace Business.Http.Services
 
             // response handling:
 
-            var content = responseMessage.Content.ReadAsStringAsync().Result;
+            var content = await responseMessage.Content.ReadAsStringAsync();
 
             if (!responseMessage.IsSuccessStatusCode || responseMessage.Content.GetType().Name == "EmptyContent")
             {

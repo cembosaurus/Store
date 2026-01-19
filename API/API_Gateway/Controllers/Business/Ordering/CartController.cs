@@ -10,7 +10,7 @@ namespace API_Gateway.Controllers.Business.Ordering
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartController : AppControllerBase
     {
 
         private readonly int _principalId;

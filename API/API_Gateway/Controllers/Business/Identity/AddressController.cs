@@ -8,7 +8,7 @@ namespace API_Gateway.Controllers.Business.Identity
 {
     [Route("[controller]")]
     [ApiController]
-    public class AddressController : ControllerBase
+    public class AddressController : AppControllerBase
     {
 
         private readonly string _url;

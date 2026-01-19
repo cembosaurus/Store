@@ -1,4 +1,5 @@
-﻿using Business.Libraries.ServiceResult.Interfaces;
+﻿using API_Gateway.Controllers;
+using Business.Libraries.ServiceResult.Interfaces;
 using Business.Ordering.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +16,7 @@ namespace Ordering.Controllers.Business
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrderController : AppControllerBase
     {
 
         private readonly int _principalId;

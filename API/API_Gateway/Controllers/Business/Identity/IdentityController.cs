@@ -10,7 +10,7 @@ namespace API_Gateway.Controllers.Business.Identity
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class IdentityController : ControllerBase
+    public class IdentityController : AppControllerBase
     {
 
         private readonly IIdentityService _identityService;

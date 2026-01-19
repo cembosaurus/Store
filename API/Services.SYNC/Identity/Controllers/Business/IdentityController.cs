@@ -1,4 +1,5 @@
-﻿using Business.Identity.DTOs;
+﻿using API_Gateway.Controllers;
+using Business.Identity.DTOs;
 using Identity.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ namespace Identity.Controllers.Business
 
     [Route("[controller]")]
     [ApiController]
-    public class IdentityController : ControllerBase
+    public class IdentityController : AppControllerBase
     {
 
         private readonly IIdentityService _identityService;
