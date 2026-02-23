@@ -27,7 +27,7 @@ namespace Store.Test.Services.Ordering.OrderingBusinessLogic
         private Cart _cart;
         private CartItem _cartItem1, _cartItem2, _cartItem3;
         private Guid _cartId = new Guid();
-        private double _cartTotal;
+        private decimal _cartTotal;
         private int _item1_Id = 1, _item2_Id = 2, _item3_Id = 3;
         private int _item1_CountInStock = 100;
         private ItemPrice _itemPrice1, _itemPrice2, _itemPrice3;

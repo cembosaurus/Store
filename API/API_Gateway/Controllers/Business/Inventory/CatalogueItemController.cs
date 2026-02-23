@@ -24,6 +24,16 @@ namespace API_Gateway.Controllers.Business.Inventory
 
 
 
+
+        // ----------------------------------- FIX controller as in Item,Controller case !!!!!!!!!!!!!!!!!!!!!!!!!! ----------------------------------------------
+
+
+
+
+
+
+
+
         // GET:
         [Authorize(Policy = "Everyone")]
         [HttpGet("all")]

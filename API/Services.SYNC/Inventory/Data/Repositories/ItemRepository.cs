@@ -24,7 +24,7 @@ namespace Services.Inventory.Data
 
 
 
-        public async Task<IEnumerable<Item>> GetItems(IEnumerable<int> itemIds = default)
+        public async Task<IEnumerable<Item>> GetItems(IEnumerable<int>? itemIds = null)
         {
             if (itemIds != null && itemIds.Any())
                 return await _context.Items

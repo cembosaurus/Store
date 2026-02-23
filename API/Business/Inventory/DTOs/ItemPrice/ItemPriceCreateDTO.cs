@@ -4,8 +4,8 @@ namespace Business.Inventory.DTOs.ItemPrice
 {
     public class ItemPriceCreateDTO
     {
-        public double SalePrice { get; set; }
-        public double? RRP { get; set; }
+        public decimal SalePrice { get; set; }
+        public decimal? RRP { get; set; }
         public int? DiscountPercent { get; set; }
     }
 

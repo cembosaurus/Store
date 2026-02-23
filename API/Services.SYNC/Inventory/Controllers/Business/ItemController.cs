@@ -37,7 +37,7 @@ namespace Inventory.Controllers.Business
 
         [Authorize(Policy = "Everyone")]
         [HttpGet]
-        public async Task<object> GetItems(IEnumerable<int> itemIds)
+        public async Task<object> GetItems(IEnumerable<int>? itemIds = null)
         {
             var result = await _itemService.GetItems(itemIds);
 

@@ -33,8 +33,8 @@ namespace Store.Test.Services.Inventory.Services.Tools
                 Instock = 10,
                 ItemPrice = new ItemPrice {
                     ItemId = _itemId,
-                    SalePrice = 12.3,
-                    RRP = 45.6,
+                    SalePrice = 12.3m,
+                    RRP = 45.6m,
                     DiscountPercent = 7
                 },
                 Item = new Item {
