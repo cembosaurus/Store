@@ -27,7 +27,7 @@ namespace Inventory.Services
 
 
 
-        public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int> itemIds = null)
+        public async Task<IServiceResult<IEnumerable<ItemReadDTO>>> GetItems(IEnumerable<int>? itemIds = null)
         {
             var items = await _repo.GetItems(itemIds);
 

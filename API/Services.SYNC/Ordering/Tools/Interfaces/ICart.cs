@@ -10,7 +10,7 @@ namespace Ordering.Tools.Interfaces
     {
         Task<IServiceResult<IEnumerable<CartItem>>> AddItemsToCart(Cart cart, IEnumerable<CartItem> source);
         Task<IServiceResult<IEnumerable<CartItem>>> RemoveItemsFromCart(Cart cart, IEnumerable<CartItem> source);
-        Task<IServiceResult<double>> UpdateCartTotal(Cart cart);
+        Task<IServiceResult<decimal>> UpdateCartTotal(Cart cart);
         Task<IServiceResult<IEnumerable<int>>> CartItemsLock(Guid cartId, IEnumerable<int> itemsIds);
         Task<IServiceResult<IEnumerable<int>>> CartItemsUnLock(Guid cartId, IEnumerable<int> itemsIds);
         Task<IServiceResult<int>> RemoveAmountFromStock(int itemId, int amount);        

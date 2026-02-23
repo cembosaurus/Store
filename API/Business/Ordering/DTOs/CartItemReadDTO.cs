@@ -6,7 +6,7 @@
         public int ItemId { get; set; }
         public string Name { get; set; }
         public int Amount { get; set; }
-        public double SalePrice { get; set; }
+        public decimal SalePrice { get; set; }
         public DateTime Locked { get; set; }
     }
 }

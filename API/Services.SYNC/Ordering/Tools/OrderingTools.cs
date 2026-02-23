@@ -28,10 +28,10 @@ namespace Ordering.Tools
 
 
 
-        public async Task<IServiceResult<double>> UpdateCartTotal(Cart cart)
+        public async Task<IServiceResult<decimal>> UpdateCartTotal(Cart cart)
         {
             if (cart == null)
-                return _resultFact.Result<double>(0, false, $"Cart was NOT provided !");
+                return _resultFact.Result<decimal>(0, false, $"Cart was NOT provided !");
             if (!cart.CartItems.Any())
                 return _resultFact.Result(cart.Total, false, $"NO items found in cart. Total is: '{cart.Total}'");
 

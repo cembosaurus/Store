@@ -39,8 +39,12 @@ namespace Services.Inventory.Data
 
 
 
-            modelBuilder.Entity<ItemPrice>()
-                .HasKey(ip => ip.ItemId);
+            modelBuilder.Entity<ItemPrice>(e =>
+            {
+                e.HasKey(ip => ip.ItemId);
+                e.Property(x => x.SalePrice).HasPrecision(18, 2);
+                e.Property(x => x.RRP).HasPrecision(18, 2);
+            });
 
             modelBuilder.Entity<ItemPrice>()
                 .HasOne(ip => ip.CatalogueItem)

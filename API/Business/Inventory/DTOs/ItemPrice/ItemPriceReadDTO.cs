@@ -3,8 +3,8 @@
     public class ItemPriceReadDTO
     {
         public int ItemId { get; set; }
-        public double SalePrice { get; set; }
-        public double? RRP { get; set; }
+        public decimal SalePrice { get; set; }
+        public decimal? RRP { get; set; }
         public int? DiscountPercent { get; set; }
     }
 }

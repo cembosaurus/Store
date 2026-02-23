@@ -78,8 +78,8 @@ namespace Services.Inventory.Data
                             PhotoURL = Photo("onion.jpg")
                         }, 
                         ItemPrice = new ItemPrice { 
-                            SalePrice = 2.3,
-                            RRP = 3.8,
+                            SalePrice = 2.3m,
+                            RRP = 3.8m,
                             DiscountPercent = 20
                         },
                         Description = "healthy stuff, prevents you from scorbut and other things that make you ill",
@@ -92,7 +92,7 @@ namespace Services.Inventory.Data
                             PhotoURL = Photo("toothbrush.jpg")
                         }, 
                         ItemPrice = new ItemPrice { 
-                            SalePrice = 12.8,
+                            SalePrice = 12.8m,
                             RRP = 15,
                             DiscountPercent = 10
                         },
@@ -179,8 +179,8 @@ namespace Services.Inventory.Data
                             PhotoURL = Photo("tomato.jpg")
                         },
                         ItemPrice = new ItemPrice { 
-                            SalePrice = 1.5,
-                            RRP = 1.7,
+                            SalePrice = 1.5m,
+                            RRP = 1.7m,
                             DiscountPercent = 15
                         },
                         Description = "good for italian kitchen and juices",
